@@ -1,0 +1,27 @@
+{
+  "source": "https://ecode360.com/WA3904",
+  "municipality": "City of Waterville, ME",
+  "code_id": "WA3904",
+  "legislation_through": "08-05-2026",
+  "crawled_at": "2026-09-29T17:51:13Z",
+  "documents": {
+    "code_chapter": 40,
+    "attachment": 39,
+    "new_law": 1
+  },
+  "sections": 856,
+  "chunks": 1150,
+  "chunk_tokens": {
+    "min": 34,
+    "max": 944,
+    "mean": 309,
+    "total": 355452
+  },
+  "tokenizer": "cl100k_base",
+  "verification": {
+    "toc_sections": 856,
+    "parsed_sections": 856,
+    "missing": [],
+    "extra": []
+  }
+}

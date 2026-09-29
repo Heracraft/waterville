@@ -1,0 +1,357 @@
+{
+  "name": "waterville-code",
+  "fields": [
+    {
+      "name": "id",
+      "type": "Edm.String",
+      "key": true,
+      "searchable": false,
+      "filterable": true,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "doc_id",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": true,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "source_type",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": true,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "node_type",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": true,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "title",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": true,
+      "filterable": false,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true,
+      "analyzer": "en.microsoft"
+    },
+    {
+      "name": "citation",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": true,
+      "filterable": true,
+      "facetable": false,
+      "sortable": true,
+      "retrievable": true
+    },
+    {
+      "name": "content",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": true,
+      "filterable": false,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true,
+      "analyzer": "en.microsoft"
+    },
+    {
+      "name": "division",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": true,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "chapter_number",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": true,
+      "sortable": true,
+      "retrievable": true
+    },
+    {
+      "name": "chapter_title",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": true,
+      "filterable": true,
+      "facetable": true,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "part",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": true,
+      "filterable": true,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "article",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": true,
+      "filterable": true,
+      "facetable": true,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "section_number",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": false,
+      "sortable": true,
+      "retrievable": true
+    },
+    {
+      "name": "section_title",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": true,
+      "filterable": false,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "breadcrumb",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": true,
+      "filterable": false,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true,
+      "analyzer": "en.microsoft"
+    },
+    {
+      "name": "url",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": false,
+      "filterable": false,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "ecode_guid",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "history",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": true,
+      "filterable": false,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "ordinances",
+      "type": "Collection(Edm.String)",
+      "key": false,
+      "searchable": true,
+      "filterable": true,
+      "facetable": true,
+      "retrievable": true
+    },
+    {
+      "name": "adopted_date",
+      "type": "Edm.DateTimeOffset",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": false,
+      "sortable": true,
+      "retrievable": true
+    },
+    {
+      "name": "page_start",
+      "type": "Edm.Int32",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "page_end",
+      "type": "Edm.Int32",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "chunk_index",
+      "type": "Edm.Int32",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": false,
+      "sortable": true,
+      "retrievable": true
+    },
+    {
+      "name": "chunk_count",
+      "type": "Edm.Int32",
+      "key": false,
+      "searchable": false,
+      "filterable": false,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "token_count",
+      "type": "Edm.Int32",
+      "key": false,
+      "searchable": false,
+      "filterable": false,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "municipality",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": true,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "legislation_through",
+      "type": "Edm.String",
+      "key": false,
+      "searchable": false,
+      "filterable": false,
+      "facetable": false,
+      "sortable": false,
+      "retrievable": true
+    },
+    {
+      "name": "crawled_at",
+      "type": "Edm.DateTimeOffset",
+      "key": false,
+      "searchable": false,
+      "filterable": true,
+      "facetable": false,
+      "sortable": true,
+      "retrievable": true
+    },
+    {
+      "name": "content_vector",
+      "type": "Collection(Edm.Single)",
+      "searchable": true,
+      "retrievable": false,
+      "stored": false,
+      "dimensions": 3072,
+      "vectorSearchProfile": "vector-profile"
+    }
+  ],
+  "vectorSearch": {
+    "algorithms": [
+      {
+        "name": "hnsw",
+        "kind": "hnsw",
+        "hnswParameters": {
+          "metric": "cosine",
+          "m": 4,
+          "efConstruction": 400,
+          "efSearch": 500
+        }
+      }
+    ],
+    "profiles": [
+      {
+        "name": "vector-profile",
+        "algorithm": "hnsw",
+        "vectorizer": "aoai-vectorizer"
+      }
+    ],
+    "vectorizers": [
+      {
+        "name": "aoai-vectorizer",
+        "kind": "azureOpenAI",
+        "azureOpenAIParameters": {
+          "resourceUri": "https://<your-resource>.openai.azure.com",
+          "deploymentId": "<embedding-deployment>",
+          "modelName": "text-embedding-3-large"
+        }
+      }
+    ]
+  },
+  "semantic": {
+    "defaultConfiguration": "default",
+    "configurations": [
+      {
+        "name": "default",
+        "prioritizedFields": {
+          "titleField": {
+            "fieldName": "title"
+          },
+          "prioritizedContentFields": [
+            {
+              "fieldName": "content"
+            }
+          ],
+          "prioritizedKeywordsFields": [
+            {
+              "fieldName": "citation"
+            },
+            {
+              "fieldName": "chapter_title"
+            },
+            {
+              "fieldName": "breadcrumb"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
