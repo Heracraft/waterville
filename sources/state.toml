@@ -1,0 +1,304 @@
+# Non-eCode sources for the corpus, from the 2026-09-29 project kickoff email
+# ("Today's Kickoff, Resources, & Received Material"). URLs were unwrapped from
+# urldefense and re-pointed where maine.gov moved the file.
+#
+# tier = "ingest"     public-domain state law, rules or guidance; full text goes in the index
+# tier = "reference"  copyrighted model codes; index a short stub that names the code and links to it
+# tier = "skip"       not usable (dead, unauthorized copy, duplicate)
+#
+# The nine ecode360.com links in the email (Chapters 103, 127, 145, 150, 180,
+# 205, 232, 244, 275) are already in the eCode crawl, so they are not listed here.
+
+# ---------------------------------------------------------------- Maine statutes (HTML, one section per page)
+
+[[source]]
+id = "mrs-30a-3001"
+title = "30-A M.R.S. § 3001. Ordinance power"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec3001.html"
+kind = "statute"
+tier = "ingest"
+
+[[source]]
+id = "mrs-30a-4451"
+title = "30-A M.R.S. § 4451. Training and certification for code enforcement officers"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec4451.html"
+kind = "statute"
+tier = "ingest"
+
+[[source]]
+id = "mrs-30a-4452"
+title = "30-A M.R.S. § 4452. Enforcement of land use laws and ordinances"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec4452.html"
+kind = "statute"
+tier = "ingest"
+
+[[source]]
+id = "mrs-38-435"
+title = "38 M.R.S. § 435. Shoreland areas"
+url = "https://legislature.maine.gov/statutes/38/title38sec435.html"
+kind = "statute"
+tier = "ingest"
+
+[[source]]
+id = "mrs-38-436-a"
+title = "38 M.R.S. § 436-A. Definitions"
+url = "https://legislature.maine.gov/statutes/38/title38sec436-A.html"
+kind = "statute"
+tier = "ingest"
+
+[[source]]
+id = "mrs-17-2851"
+title = "17 M.R.S. § 2851. Dangerous buildings"
+url = "https://legislature.maine.gov/statutes/17/title17sec2851.html"
+kind = "statute"
+tier = "ingest"
+
+[[source]]
+id = "mrs-17-2856"
+title = "17 M.R.S. § 2856. Securing dangerous buildings"
+url = "https://legislature.maine.gov/statutes/17/title17sec2856.html"
+kind = "statute"
+tier = "ingest"
+
+# 30-A M.R.S. ch. 183, subch. 1: graveyards, automobile recycling businesses and junkyards
+[[source]]
+id = "mrs-30a-3751"
+title = "30-A M.R.S. §§ 3751-3760. Junkyards and automobile recycling businesses"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec3751.html"
+sections = ["3751", "3752", "3753", "3754", "3754-A", "3755-A", "3756", "3757", "3758-A", "3760"]
+url_pattern = "https://legislature.maine.gov/statutes/30-A/title30-Asec{section}.html"
+kind = "statute"
+tier = "ingest"
+
+# 30-A M.R.S. ch. 187, subch. 4: subdivisions
+[[source]]
+id = "mrs-30a-4401"
+title = "30-A M.R.S. §§ 4401-4408. Subdivisions"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec4401.html"
+sections = ["4401", "4402", "4403", "4404", "4405", "4406", "4407", "4408"]
+url_pattern = "https://legislature.maine.gov/statutes/30-A/title30-Asec{section}.html"
+kind = "statute"
+tier = "ingest"
+
+[[source]]
+id = "mrs-25-ch313"
+title = "25 M.R.S. ch. 313. Fire Prevention and Fire Control (fire safety, building codes)"
+url = "https://legislature.maine.gov/statutes/25/title25ch313.pdf"
+kind = "statute"
+tier = "ingest"
+
+# ---------------------------------------------------------------- Maine rules (CMR)
+
+[[source]]
+id = "cmr-16-642-ch1"
+title = "16-642 CMR ch. 1. Maine Uniform Building and Energy Code: administration"
+url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C001.pdf"
+kind = "rule"
+tier = "ingest"
+
+[[source]]
+id = "cmr-16-642-ch3"
+title = "16-642 CMR ch. 3. MUBEC: adoption of the IBC and IEBC"
+url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C003.pdf"
+kind = "rule"
+tier = "ingest"
+
+[[source]]
+id = "cmr-16-642-ch5"
+title = "16-642 CMR ch. 5. MUBEC: adoption of the IRC"
+url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C005.pdf"
+kind = "rule"
+tier = "ingest"
+
+[[source]]
+id = "cmr-16-642-ch6"
+title = "16-642 CMR ch. 6. MUBEC: adoption of the IECC"
+url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C006_0.pdf"
+kind = "rule"
+tier = "ingest"
+
+[[source]]
+id = "cmr-16-642-ch7"
+title = "16-642 CMR ch. 7. MUBEC: adoption of the IMC"
+url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C007.pdf"
+kind = "rule"
+tier = "ingest"
+
+[[source]]
+id = "cmr-10-144-ch241"
+title = "10-144 CMR ch. 241. Subsurface Wastewater Disposal Rules (2023)"
+url = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+kind = "rule"
+tier = "ingest"
+
+[[source]]
+id = "cmr-06-096-ch1000"
+title = "06-096 CMR ch. 1000. Guidelines for Municipal Shoreland Zoning Ordinances"
+url = "https://www.maine.gov/sos/sites/maine.gov.sos/files/content/assets/096c1000.docx"
+kind = "rule"
+tier = "ingest"
+
+# ---------------------------------------------------------------- State guidance and CEO training manuals
+# The CEO training program moved from DECD to the Maine Office of Community
+# Affairs (MOCA); every decd/ link in the email now 404s. New homes are from
+# https://www.maine.gov/moca/programs/code-enforcement/resources/publications-manuals
+
+[[source]]
+id = "state-building-codes-page"
+title = "Building and Energy Codes (Maine Department of Energy Resources)"
+url = "https://www.maine.gov/energy/initiatives/energy-efficiency/building-codes"
+kind = "guidance"
+tier = "ingest"
+
+[[source]]
+id = "moca-80k-manual-2017"
+title = "Court Rule 80K Manual (2017)"
+url = "https://www.maine.gov/moca/sites/maine.gov.moca/files/80k-manual-2017.pdf"
+was = "https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/80K%20Manual%202017.pdf"
+kind = "guidance"
+tier = "ingest"
+
+[[source]]
+id = "moca-land-use-manual-2010"
+title = "Zoning and Land Use Regulations Manual (2010)"
+url = "https://www.maine.gov/moca/sites/maine.gov.moca/files/landusemanualdec2010_0.pdf"
+was = "https://www11.maine.gov/decd/sites/maine.gov.decd/files/inline-files/landusemanual2010.pdf"
+kind = "guidance"
+tier = "ingest"
+
+[[source]]
+id = "moca-legal-issues-manual-2017"
+title = "Legal Issues and Enforcement Techniques Manual (2017)"
+url = "https://www.maine.gov/moca/sites/maine.gov.moca/files/legal-issues-manual-2017.pdf"
+was = "https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/Legal%20Issues%20Manual%202017.pdf"
+kind = "guidance"
+tier = "ingest"
+
+[[source]]
+id = "moca-subsurface-guidance-2011"
+title = "Subsurface Wastewater Guidance Manual (2011)"
+url = "https://www.maine.gov/moca/sites/maine.gov.moca/files/subsurface-guidance-manual-2011-final.pdf"
+was = "https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/guidance-manual-2011-final_0.doc"
+kind = "guidance"
+tier = "ingest"
+
+[[source]]
+id = "moca-shoreland-zoning-manual-2008"
+title = "Shoreland Zoning Manual (2008)"
+url = "https://www.maine.gov/moca/sites/maine.gov.moca/files/2008shoreland_zoning_manual_0.pdf"
+was = "https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/2008shoreland_zoning_manual_0.pdf"
+kind = "guidance"
+tier = "ingest"
+
+# Not republished by MOCA; Wayback Machine copies of the old DECD files.
+[[source]]
+id = "decd-building-standards-manual-2007"
+title = "Building Standards Manual (2007)"
+url = "https://web.archive.org/web/20260521164752/https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/2007buildingstandardsmanual.pdf"
+kind = "guidance"
+tier = "ingest"
+note = "archived copy; superseded in part by MUBEC"
+
+[[source]]
+id = "decd-ceo-info-guide-2009"
+title = "Municipal Code Enforcement Officer Training and Certification Information Guide (2009)"
+url = "https://web.archive.org/web/20260521165657/https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/CEOInfoGuide2009%20%281%29.pdf"
+kind = "guidance"
+tier = "ingest"
+note = "archived copy"
+
+[[source]]
+id = "decd-ceo-classifications"
+title = "Code Enforcement Officer certification classifications"
+url = "https://web.archive.org/web/20260521164407/https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/classifications.pdf"
+kind = "guidance"
+tier = "ingest"
+note = "archived copy"
+
+[[source]]
+id = "decd-energy-manual"
+title = "Building Standards: Energy Conservation manual (2000)"
+url = "https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/energy_man.pdf"
+kind = "guidance"
+tier = "skip"
+note = "404 on maine.gov, not on MOCA's page, no Wayback snapshot; superseded by IECC 2021. Ask the city for a copy if wanted."
+
+# ---------------------------------------------------------------- Copyrighted model codes and standards
+# Maine adopts these through MUBEC (16-642 CMR, above), but the text belongs
+# to ICC, IAPMO, ASHRAE and ASTM. Their sites offer read-only viewers and
+# forbid copying, so the index gets a stub per code: what it covers, which
+# MUBEC chapter adopts it, and the link. Full text needs a license (ask the
+# city whether it has ICC Digital Codes Premium).
+
+[[source]]
+id = "icc-irc-2021"
+title = "2021 International Residential Code (IRC)"
+url = "https://codes.iccsafe.org/content/IRC2021V3.0"
+kind = "model_code"
+tier = "reference"
+
+[[source]]
+id = "icc-ibc-2021"
+title = "2021 International Building Code (IBC)"
+url = "https://codes.iccsafe.org/content/IBC2021V2.0"
+kind = "model_code"
+tier = "reference"
+
+[[source]]
+id = "icc-iebc-2021"
+title = "2021 International Existing Building Code (IEBC)"
+url = "https://codes.iccsafe.org/content/IEBC2021V2.0"
+kind = "model_code"
+tier = "reference"
+
+[[source]]
+id = "icc-iecc-2021"
+title = "2021 International Energy Conservation Code (IECC)"
+url = "https://codes.iccsafe.org/content/IECC2021V3.0"
+kind = "model_code"
+tier = "reference"
+
+[[source]]
+id = "icc-imc-2021"
+title = "2021 International Mechanical Code (IMC)"
+url = "https://codes.iccsafe.org/content/IMC2021V4.0"
+kind = "model_code"
+tier = "reference"
+
+[[source]]
+id = "iapmo-upc-2021"
+title = "2021 Uniform Plumbing Code (UPC)"
+url = "https://epubs.iapmo.org/2021/UPC/"
+kind = "model_code"
+tier = "reference"
+
+[[source]]
+id = "ashrae-62-1-2019"
+title = "ANSI/ASHRAE Standard 62.1-2019. Ventilation for Acceptable Indoor Air Quality"
+url = "https://ashrae.iwrapper.com/ASHRAE_PREVIEW_ONLY_STANDARDS/STD_62.1_2019"
+was = "https://fire-gas.com/storage/2024/06/ASHRAE-62.1-2019.pdf"
+kind = "model_code"
+tier = "reference"
+note = "the emailed fire-gas.com PDF is an unauthorized repost (now 404); pointed at ASHRAE's own viewer instead"
+
+[[source]]
+id = "ashrae-62-2-2019"
+title = "ANSI/ASHRAE Standard 62.2-2019. Ventilation and Indoor Air Quality in Residential Buildings"
+url = "https://ashrae.iwrapper.com/ASHRAE_PREVIEW_ONLY_STANDARDS/STD_62.2_2019"
+kind = "model_code"
+tier = "reference"
+
+[[source]]
+id = "ashrae-90-1-2019"
+title = "ANSI/ASHRAE/IES Standard 90.1-2019. Energy Standard for Buildings Except Low-Rise Residential"
+url = "https://ashrae.iwrapper.com/ASHRAE_PREVIEW_ONLY_STANDARDS/STD_90.1_2019"
+kind = "model_code"
+tier = "reference"
+
+[[source]]
+id = "astm-e1465-08"
+title = "ASTM E1465-08. Radon Control Options for New Low-Rise Residential Buildings"
+url = "https://maineindoorair.org/wp-content/uploads/2023/02/ASTM-E1465-08-Reprint.pdf"
+kind = "model_code"
+tier = "reference"
+note = "reprint hosted by a third party; treat as reference only"
