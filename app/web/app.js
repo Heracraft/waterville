@@ -8,6 +8,8 @@ const intro = document.getElementById("intro");
 const history = []; // {role, content}
 
 const msgData = new WeakMap(); // bot message element -> {sources, answer}
+const clearBtn = document.getElementById("clear-chat");
+let inflight = null; // AbortController for the answer being streamed
 
 const chipHref = (s) => safeUrl(s.open_url) || safeUrl(s.url);
 
@@ -253,7 +255,6 @@ function addMessage(role, html) {
   li.className = `msg ${role}`;
   li.innerHTML = html;
   thread.appendChild(li);
-  li.scrollIntoView({ block: "end", behavior: "smooth" });
   return li;
 }
 
@@ -267,19 +268,25 @@ function showAnswer(bot) {
 
 async function ask(question) {
   intro.hidden = true;
+  clearBtn.hidden = false;
   send.disabled = true;
   addMessage("user", escapeHtml(question));
   history.push({ role: "user", content: question });
-  const bot = addMessage("bot", '<p class="typing">Searching the code</p>');
+  const bot = addMessage(
+    "bot",
+    '<div class="loading" role="status"><span class="loading-label">Searching the City Code and state law</span><span class="loading-bar" aria-hidden="true"></span></div>',
+  );
   const data = { sources: [], answer: "" };
   msgData.set(bot, data);
   let failed = null;
+  const ctrl = (inflight = new AbortController());
 
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ messages: history.slice(-6) }),
+      signal: ctrl.signal,
     });
     if (!res.ok) {
       let detail = "Something went wrong. Please try again.";
@@ -301,7 +308,11 @@ async function ask(question) {
         buf = buf.slice(idx + 2);
         const ev = (raw.match(/^event: (.*)$/m) || [])[1];
         const payload = JSON.parse((raw.match(/^data: (.*)$/m) || [, "null"])[1]);
-        if (ev === "sources") data.sources = payload;
+        if (ev === "sources") {
+          data.sources = payload;
+          const label = !data.answer && bot.querySelector(".loading-label");
+          if (label && payload.length) label.textContent = `Reading ${payload.length} matching section${payload.length === 1 ? "" : "s"}`;
+        }
         else if (ev === "delta") {
           data.answer += payload.text;
           showAnswer(bot);
@@ -311,6 +322,9 @@ async function ask(question) {
   } catch (e) {
     failed = e.message;
   }
+  // Cleared while streaming: the thread and history are already reset.
+  if (ctrl.signal.aborted) return;
+  inflight = null;
 
   const { sources, answer } = data;
   if (failed && !answer) {
@@ -347,6 +361,22 @@ input.addEventListener("input", () => {
   input.style.height = "auto";
   input.style.height = input.scrollHeight + "px";
 });
+
+function clearChat() {
+  inflight?.abort();
+  inflight = null;
+  closePanel();
+  thread.replaceChildren();
+  history.length = 0;
+  intro.hidden = false;
+  clearBtn.hidden = true;
+  send.disabled = false;
+  input.value = "";
+  input.style.height = "";
+  window.scrollTo({ top: 0 });
+  input.focus();
+}
+clearBtn.addEventListener("click", clearChat);
 
 for (const b of document.querySelectorAll(".examples button")) {
   b.addEventListener("click", () => ask(b.textContent));

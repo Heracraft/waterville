@@ -16,7 +16,12 @@
 
   // Only scrolls the user causes change the follow state, not our own.
   const markInput = () => (userInputAt = performance.now());
-  for (const ev of ["wheel", "touchmove", "pointerdown"]) window.addEventListener(ev, markInput, { passive: true });
+  for (const ev of ["wheel", "touchmove"]) window.addEventListener(ev, markInput, { passive: true });
+  // A click on Ask or an example is not a scroll. Count only the scrollbar
+  // and source links, which can scroll their chip into view.
+  window.addEventListener("pointerdown", (e) => {
+    if (e.clientX >= document.documentElement.clientWidth || e.target.closest?.(".cite, .sources a")) markInput();
+  }, { passive: true });
   window.addEventListener("keydown", (e) => {
     if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key) && e.target === document.body) markInput();
     // Opening a source from the keyboard can scroll its chip into view.
