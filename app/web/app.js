@@ -18,7 +18,7 @@ function render(md, sources) {
     escapeHtml(t)
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>")
-      .replace(/\[(\d{1,2})\]/g, (m, n) => {
+      .replace(/\[(\d{1,2})(?:[.,:;\s][^\]\n]{0,40})?\]/g, (m, n) => {
         const s = byN.get(Number(n));
         if (!s) return m;
         const label = escapeHtml(s.citation || s.title || "");
@@ -52,7 +52,7 @@ function render(md, sources) {
 
 function renderSources(el, sources, answer) {
   if (!sources.length) return;
-  const cited = new Set([...answer.matchAll(/\[(\d{1,2})\]/g)].map((m) => Number(m[1])));
+  const cited = new Set([...answer.matchAll(/\[(\d{1,2})(?:[.,:;\s][^\]\n]{0,40})?\]/g)].map((m) => Number(m[1])));
   // Show what the answer cites; if it cites nothing, the top few results.
   const shown = cited.size ? sources.filter((s) => cited.has(s.n)) : sources.slice(0, 3);
   const items = shown
