@@ -34,6 +34,8 @@ import requests
 SEARCH_API = "2024-07-01"
 AOAI_API = "2024-10-21"
 VECTOR_FIELD = "content_vector"
+# Id prefixes written by ecode.export; stale cleanup never deletes anything else.
+OWNED_PREFIXES = ("code-", "attachment-", "newlaw-")
 
 
 def _f(name, type_="Edm.String", *, key=False, search=False, filt=False, facet=False, sort=False, analyzer=None):
@@ -339,8 +341,14 @@ def main(argv=None) -> None:
         print(f"uploaded {min(i + args.batch, len(chunks))}/{len(chunks)}", file=sys.stderr)
 
     # Remove documents for sections that no longer exist (repealed or renumbered).
+    # Only ids this pipeline creates are touched, so other sources in the same
+    # index survive a refresh.
     current = {c["id"] for c in chunks}
-    stale = [k for k in _all_keys(endpoint, name, search_auth) if k not in current]
+    stale = [
+        k
+        for k in _all_keys(endpoint, name, search_auth)
+        if k not in current and k.startswith(OWNED_PREFIXES)
+    ]
     for i in range(0, len(stale), 1000):
         batch = [{"@search.action": "delete", "id": k} for k in stale[i : i + 1000]]
         _retry(lambda: requests.post(docs_url, headers=search_auth.headers(), json={"value": batch}, timeout=300), "delete")

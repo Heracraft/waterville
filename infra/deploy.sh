@@ -13,6 +13,8 @@
 #   CHAT_CAPACITY      thousands of tokens/minute for the chat model (default 50)
 #   EMBEDDING_CAPACITY thousands of tokens/minute for embeddings (default 150)
 #   MIN_REPLICAS       0 scales to zero when idle (default), 1 avoids cold starts
+#   SEARCH_LOCATION    region for AI Search when the main region has no capacity
+#                      (default: the existing service's region, else the group's)
 #   REFRESH=1          run the refresh job even if this is not the first deploy
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -36,7 +38,9 @@ az login --service-principal -u "$AZURE_CLIENT_ID" -p "$AZURE_CLIENT_SECRET" --t
 az account set --subscription "$AZURE_SUBSCRIPTION_ID"
 
 LOCATION=$(az group show -n "$RG" --query location -o tsv) || die "resource group $RG not found or not accessible"
-log "Resource group $RG in $LOCATION"
+EXISTING_SEARCH=$(az resource list -g "$RG" --resource-type Microsoft.Search/searchServices --query "[0].location" -o tsv)
+SEARCH_LOCATION=${SEARCH_LOCATION:-${EXISTING_SEARCH:-$LOCATION}}
+log "Resource group $RG in $LOCATION (AI Search in $SEARCH_LOCATION)"
 
 for ns in Microsoft.Search Microsoft.CognitiveServices Microsoft.App Microsoft.ContainerRegistry \
           Microsoft.OperationalInsights Microsoft.ManagedIdentity; do
@@ -96,7 +100,7 @@ PARAMS=(
   chatCapacity="$CHAT_CAPACITY" chatReasoningEffort="$REASONING"
   embeddingModel="$EMBEDDING_MODEL" embeddingModelVersion="$EMBEDDING_VERSION"
   embeddingSku="$EMBEDDING_SKU" embeddingCapacity="$EMBEDDING_CAPACITY"
-  minReplicas="$MIN_REPLICAS"
+  minReplicas="$MIN_REPLICAS" searchLocation="$SEARCH_LOCATION"
 )
 
 # ------------------------------------------------------------------ infra pass 1

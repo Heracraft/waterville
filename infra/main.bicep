@@ -6,6 +6,9 @@ targetScope = 'resourceGroup'
 @description('Azure region. Must have quota for both models.')
 param location string = resourceGroup().location
 
+@description('Region for AI Search. Defaults to location; set another when that region lacks Search capacity.')
+param searchLocation string = location
+
 @description('Short prefix for resource names.')
 param prefix string = 'waterville'
 
@@ -49,7 +52,7 @@ var tags = { app: 'waterville-code-assistant' }
 
 // Built-in role definition IDs.
 var roles = {
-  acrPull: '7f951dff-4ed5-480f-9a1d-8d5adb59d62e'
+  acrPull: '7f951dda-4ed3-4680-a7ca-43fe172d538d'
   searchIndexDataReader: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
   searchIndexDataContributor: '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
   searchServiceContributor: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
@@ -96,7 +99,7 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
 
 resource search 'Microsoft.Search/searchServices@2023-11-01' = {
   name: '${prefix}-search-${suffix}'
-  location: location
+  location: searchLocation
   tags: tags
   sku: { name: 'basic' }
   identity: { type: 'SystemAssigned' }
