@@ -318,7 +318,7 @@ resource refreshJob 'Microsoft.App/jobs@2024-03-01' = if (deployApps) {
     configuration: {
       triggerType: 'Schedule'
       scheduleTriggerConfig: { cronExpression: refreshCron, parallelism: 1, replicaCompletionCount: 1 }
-      replicaTimeout: 3600
+      replicaTimeout: 7200
       replicaRetryLimit: 1
       registries: [ { server: acr.properties.loginServer, identity: jobIdentity.id } ]
     }

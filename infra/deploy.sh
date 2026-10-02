@@ -135,7 +135,7 @@ if [ "$FIRST_DEPLOY" = 1 ] || [ "${REFRESH:-0}" = 1 ]; then
     log "Waiting 2 minutes for new role assignments to propagate"
     sleep 120
   fi
-  log "Running the refresh job to crawl eCode360 and load the index (about 10 minutes)"
+  log "Running the refresh job to crawl eCode360 and load the index (20 to 40 minutes)"
   EXEC=$(az containerapp job start -g "$RG" -n "$JOB" --query name -o tsv)
   while :; do
     STATUS=$(az containerapp job execution show -g "$RG" -n "$JOB" --job-execution-name "$EXEC" \
