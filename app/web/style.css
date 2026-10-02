@@ -269,8 +269,8 @@ form#ask { margin-left: 52px; }
 }
 
 /* ---- source panel ---- */
-/* From the citation-panel branch, restyled to the template: the panel header
-   uses the teal title block, the passage reads in the serif, square edges. */
+/* From the citation-panel branch, restyled to the template: one light sheet
+   with a rust top rule like the answer boxes, the passage in the serif. */
 
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .cite.is-active { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -283,26 +283,26 @@ form#ask { margin-left: 52px; }
 .panel[hidden], .panel-backdrop[hidden] { display: none; }
 .panel-head {
   display: flex; align-items: flex-start; gap: 12px; padding: 18px 18px 16px 24px;
-  background: var(--hero-bg); color: var(--hero-text); border-bottom: 1px solid var(--rule);
+  background: var(--surface); color: var(--text);
+  border-top: 3px solid var(--accent); border-bottom: 1px solid var(--rule);
 }
 .panel-id { flex: 1; min-width: 0; }
 .panel-head h2 {
-  margin: 0; font: 300 1.45rem/1.25 var(--serif); color: var(--hero-text); overflow-wrap: anywhere;
+  margin: 0; font: 300 1.45rem/1.25 var(--serif); color: var(--text); overflow-wrap: anywhere;
 }
 .panel-head h2:focus { outline: none; }
-.panel-head h2:focus-visible { outline: 2px solid var(--blush); outline-offset: 4px; }
-.panel-n { display: block; margin-bottom: 4px; color: var(--blush); font: 600 0.8rem var(--sans); letter-spacing: 0.01em; }
+.panel-head h2:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.panel-n { display: block; margin-bottom: 4px; color: var(--accent); font: 600 0.8rem var(--sans); letter-spacing: 0.01em; }
 .panel-close {
   flex: none; display: grid; place-items: center; width: 36px; height: 36px; margin: -2px -2px 0 0;
-  border: 1px solid var(--hero-rule); background: transparent; color: var(--hero-text); cursor: pointer;
+  border: 1px solid var(--rule); background: transparent; color: var(--text); cursor: pointer;
 }
-.panel-close:hover { border-color: var(--blush); color: var(--blush); }
-.panel-close:focus-visible { outline-color: var(--blush); }
+.panel-close:hover { border-color: var(--accent); color: var(--accent); }
 .panel-meta {
   margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
-  font-size: 0.82rem; color: rgb(225 220 216 / 0.8);
+  font-size: 0.82rem; color: var(--muted);
 }
-.panel-meta .tag { border: 1px solid var(--blush); color: var(--blush); padding: 0 8px; font-weight: 600; }
+.panel-meta .tag { border: 1px solid var(--accent); color: var(--accent); padding: 0 8px; font-weight: 600; }
 .panel-meta .crumb { flex-basis: 100%; overflow-wrap: anywhere; }
 .panel-scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 20px 24px 28px; }
 .panel-claim { padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); font: 400 0.95rem/1.5 var(--serif); }
