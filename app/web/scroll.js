@@ -29,7 +29,8 @@
     for (const r of records) {
       for (const n of r.addedNodes) if (n.classList?.contains("user")) follow = true;
     }
-    if (!follow || queued) return;
+    // The source panel locks the page behind it on narrow screens.
+    if (!follow || queued || document.body.classList.contains("panel-open")) return;
     queued = true;
     requestAnimationFrame(() => {
       queued = false;
