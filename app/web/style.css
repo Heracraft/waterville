@@ -28,8 +28,9 @@
   --sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color-scheme: light;
 }
+/* Dark theme: follows the system unless the header toggle sets data-theme on <html>. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #011a24;
     --surface: #06394c;
     --surface-hover: #0a4a62;
@@ -46,6 +47,22 @@
     color-scheme: dark;
   }
 }
+:root[data-theme="dark"] {
+    --bg: #011a24;
+    --surface: #06394c;
+    --surface-hover: #0a4a62;
+    --text: #f1eeeb;
+    --muted: #b9c8cd;
+    --border: rgb(225 220 216 / 0.28);
+    --rule: rgb(225 220 216 / 0.6);
+    --accent: #e8805f;
+    --accent-text: var(--ink);
+    --accent-soft: rgb(230 197 184 / 0.2);
+    --error: #f19999;
+    --hero-bg: var(--ink);
+    --hero-rule: rgb(225 220 216 / 0.4);
+    color-scheme: dark;
+}
 * { box-sizing: border-box; }
 body {
   margin: 0;
@@ -57,15 +74,28 @@ body {
 }
 a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .wrap { width: 100%; max-width: 760px; margin: 0 auto; padding-inline: 24px; }
+@media (min-width: 1100px) { .wrap { max-width: 1240px; padding-inline: 48px; } }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 /* Header: a teal title block with a small meta line, like the template's title slide. */
 header.site { background: var(--hero-bg); color: var(--hero-text); border-bottom: 1px solid var(--rule); }
 header.site .wrap { padding-block: 20px 40px; }
-header.site .wrap::before {
-  content: "City of Waterville, Maine"; display: block; padding-bottom: 14px; margin-bottom: 44px;
-  border-bottom: 1px solid var(--hero-rule); font-size: 0.85rem; letter-spacing: 0.01em;
+.meta {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-bottom: 12px; margin-bottom: 44px; border-bottom: 1px solid var(--hero-rule);
+  font-size: 0.85rem; letter-spacing: 0.01em;
 }
+.theme-toggle {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  border: 1px solid var(--hero-rule); border-radius: 0; background: transparent; color: var(--hero-text);
+  font: 500 0.8rem var(--sans); padding: 6px 12px; transition: background-color 0.15s, border-color 0.15s;
+}
+.theme-toggle:hover { border-color: var(--blush); background: rgb(225 220 216 / 0.08); }
+.theme-toggle:focus-visible { outline: 2px solid var(--blush); outline-offset: 2px; }
+.theme-toggle svg { width: 15px; height: 15px; }
+.theme-toggle .moon, :root[data-theme-now="dark"] .theme-toggle .sun { display: none; }
+:root[data-theme-now="dark"] .theme-toggle .moon { display: inline; }
+
 header.site h1 {
   margin: 0 0 14px; font: 300 clamp(2.3rem, 6vw, 3.4rem)/1.08 var(--serif);
   letter-spacing: -0.01em; color: var(--hero-text);
@@ -167,9 +197,26 @@ form#ask:focus-within { border-color: var(--accent); }
 
 .disclaimer { color: var(--muted); font-size: 0.82rem; margin: 22px 0 0; }
 
+/* Wide screens: answers get a reading column with their sources beside it. */
+@media (min-width: 1100px) {
+  header.site h1 { font-size: 4rem; }
+  .examples { grid-template-columns: repeat(4, 1fr); }
+  .examples button { min-height: 150px; }
+  .msg.user { font-size: 2rem; }
+  .msg.bot {
+    display: grid; grid-template-columns: minmax(0, 1fr) 340px; column-gap: 40px;
+    font-size: 1.125rem; padding: 28px 32px 30px;
+  }
+  .msg.bot > :not(.sources) { grid-column: 1; max-width: 46em; }
+  .msg.bot > .sources {
+    grid-column: 2; grid-row: 1 / span 40; align-self: stretch;
+    margin: -28px -32px -30px 0; padding: 22px 28px 16px; border-top: 0; border-left: 1px solid var(--rule);
+  }
+}
+
 @media (max-width: 640px) {
   .wrap { padding-inline: 16px; }
-  header.site .wrap::before { margin-bottom: 32px; }
+  .meta { margin-bottom: 32px; }
   .examples { grid-template-columns: 1fr; }
   .examples button { padding: 14px 16px 16px; }
   .msg.user { padding-left: 40px; }
