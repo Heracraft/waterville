@@ -3,7 +3,7 @@
 # urldefense and re-pointed where maine.gov moved the file.
 #
 # tier = "ingest"     public-domain state law, rules or guidance; full text goes in the index
-# tier = "reference"  copyrighted model codes; index a short stub that names the code and links to it
+# tier = "reference"  copyrighted model codes; index the `summary` below as a stub that links to the code
 # tier = "skip"       not usable (dead, unauthorized copy, duplicate)
 #
 # The nine ecode360.com links in the email (Chapters 103, 127, 145, 150, 180,
@@ -82,44 +82,68 @@ tier = "ingest"
 
 [[source]]
 id = "mrs-25-ch313"
-title = "25 M.R.S. ch. 313. Fire Prevention and Fire Control (fire safety, building codes)"
+title = "25 M.R.S. ch. 313. Municipal Inspection of Buildings"
 url = "https://legislature.maine.gov/statutes/25/title25ch313.pdf"
 kind = "statute"
 tier = "ingest"
 
 # ---------------------------------------------------------------- Maine rules (CMR)
+# 16-642 CMR chs. 1-7 make up the Maine Uniform Building and Energy Code
+# (MUBEC). The email linked chs. 1, 3, 5, 6 and 7 (and ch. 3 a second time
+# where it meant the IEBC); chs. 2 and 4 are added so the set is complete.
 
 [[source]]
 id = "cmr-16-642-ch1"
-title = "16-642 CMR ch. 1. Maine Uniform Building and Energy Code: administration"
+title = "16-642 CMR ch. 1. MUBEC: Administrative procedures"
+citation = "16-642 CMR ch. 1"
 url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C001.pdf"
 kind = "rule"
 tier = "ingest"
 
 [[source]]
+id = "cmr-16-642-ch2"
+title = "16-642 CMR ch. 2. MUBEC: Third-party inspectors"
+citation = "16-642 CMR ch. 2"
+url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C002.pdf"
+kind = "rule"
+tier = "ingest"
+
+[[source]]
 id = "cmr-16-642-ch3"
-title = "16-642 CMR ch. 3. MUBEC: adoption of the IBC and IEBC"
+title = "16-642 CMR ch. 3. MUBEC: Commercial Building Code (2021 IBC with Maine amendments)"
+citation = "16-642 CMR ch. 3"
 url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C003.pdf"
 kind = "rule"
 tier = "ingest"
 
 [[source]]
+id = "cmr-16-642-ch4"
+title = "16-642 CMR ch. 4. MUBEC: Existing Building Code (2021 IEBC with Maine amendments)"
+citation = "16-642 CMR ch. 4"
+url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C004.pdf"
+kind = "rule"
+tier = "ingest"
+
+[[source]]
 id = "cmr-16-642-ch5"
-title = "16-642 CMR ch. 5. MUBEC: adoption of the IRC"
+title = "16-642 CMR ch. 5. MUBEC: Residential Building Code for one- and two-family dwellings (2021 IRC with Maine amendments)"
+citation = "16-642 CMR ch. 5"
 url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C005.pdf"
 kind = "rule"
 tier = "ingest"
 
 [[source]]
 id = "cmr-16-642-ch6"
-title = "16-642 CMR ch. 6. MUBEC: adoption of the IECC"
+title = "16-642 CMR ch. 6. MUBEC: Energy Code (2021 IECC with Maine amendments)"
+citation = "16-642 CMR ch. 6"
 url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C006_0.pdf"
 kind = "rule"
 tier = "ingest"
 
 [[source]]
 id = "cmr-16-642-ch7"
-title = "16-642 CMR ch. 7. MUBEC: adoption of the IMC"
+title = "16-642 CMR ch. 7. MUBEC: Mechanical Code (2021 IMC, ASHRAE 62.1, 62.2 and 90.1, ASTM E1465)"
+citation = "16-642 CMR ch. 7"
 url = "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C007.pdf"
 kind = "rule"
 tier = "ingest"
@@ -190,9 +214,12 @@ was = "https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/2008sh
 kind = "guidance"
 tier = "ingest"
 
-# Not republished by MOCA; Wayback Machine copies of the old DECD files.
+# Not republished by MOCA. These are Wayback Machine copies of the old DECD
+# files, stored in ecode/archived/ because the Wayback Machine rate-limits
+# (HTTP 429) and the files will not change. `url` is what the assistant cites.
 [[source]]
 id = "decd-building-standards-manual-2007"
+file = "archived/decd-building-standards-manual-2007.pdf"
 title = "Building Standards Manual (2007)"
 url = "https://web.archive.org/web/20260521164752/https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/2007buildingstandardsmanual.pdf"
 kind = "guidance"
@@ -201,6 +228,7 @@ note = "archived copy; superseded in part by MUBEC"
 
 [[source]]
 id = "decd-ceo-info-guide-2009"
+file = "archived/decd-ceo-info-guide-2009.pdf"
 title = "Municipal Code Enforcement Officer Training and Certification Information Guide (2009)"
 url = "https://web.archive.org/web/20260521165657/https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/CEOInfoGuide2009%20%281%29.pdf"
 kind = "guidance"
@@ -208,12 +236,13 @@ tier = "ingest"
 note = "archived copy"
 
 [[source]]
-id = "decd-ceo-classifications"
-title = "Code Enforcement Officer certification classifications"
+id = "decd-use-and-occupancy-classifications"
+file = "archived/decd-use-and-occupancy-classifications.md"
+title = "Use and Occupancy Classifications (IBC occupancy groups summary)"
 url = "https://web.archive.org/web/20260521164407/https://www.maine.gov/decd/sites/maine.gov.decd/files/inline-files/classifications.pdf"
 kind = "guidance"
 tier = "ingest"
-note = "archived copy"
+note = "archived copy; the PDF is a 3-page scan with no text layer, so the stored file is a transcription"
 
 [[source]]
 id = "decd-energy-manual"
@@ -236,6 +265,7 @@ title = "2021 International Residential Code (IRC)"
 url = "https://codes.iccsafe.org/content/IRC2021V3.0"
 kind = "model_code"
 tier = "reference"
+summary = """The 2021 International Residential Code (IRC), published by the International Code Council, governs construction of detached one- and two-family dwellings and townhouses. Maine adopts it as part of the Maine Uniform Building and Energy Code (MUBEC), with Maine amendments in 16-642 CMR ch. 5. Those amendments require a radon control system built to ASTM E1465-08 in new one- and two-family dwellings and townhouses, and replace references to the International Plumbing Code with the State of Maine Plumbing Code."""
 
 [[source]]
 id = "icc-ibc-2021"
@@ -243,6 +273,7 @@ title = "2021 International Building Code (IBC)"
 url = "https://codes.iccsafe.org/content/IBC2021V2.0"
 kind = "model_code"
 tier = "reference"
+summary = """The 2021 International Building Code (IBC), published by the International Code Council, governs construction of buildings other than one- and two-family dwellings and townhouses (commercial, multifamily and institutional buildings). Maine adopts it as the Commercial Building Code of Maine, part of the Maine Uniform Building and Energy Code (MUBEC), with Maine amendments in 16-642 CMR ch. 3."""
 
 [[source]]
 id = "icc-iebc-2021"
@@ -250,6 +281,7 @@ title = "2021 International Existing Building Code (IEBC)"
 url = "https://codes.iccsafe.org/content/IEBC2021V2.0"
 kind = "model_code"
 tier = "reference"
+summary = """The 2021 International Existing Building Code (IEBC), published by the International Code Council, governs repair, alteration, change of occupancy, addition to and relocation of existing buildings. Maine adopts it as part of the Maine Uniform Building and Energy Code (MUBEC), with Maine amendments in 16-642 CMR ch. 4."""
 
 [[source]]
 id = "icc-iecc-2021"
@@ -257,6 +289,7 @@ title = "2021 International Energy Conservation Code (IECC)"
 url = "https://codes.iccsafe.org/content/IECC2021V3.0"
 kind = "model_code"
 tier = "reference"
+summary = """The 2021 International Energy Conservation Code (IECC), published by the International Code Council, sets minimum energy efficiency requirements for residential and commercial buildings: insulation, windows, air leakage, mechanical systems and lighting. Maine adopts it as the Energy Code component of the Maine Uniform Building and Energy Code (MUBEC), with Maine amendments in 16-642 CMR ch. 6. The Maine Department of Energy Resources also publishes a 2021 Stretch Code that goes beyond the IECC."""
 
 [[source]]
 id = "icc-imc-2021"
@@ -264,6 +297,7 @@ title = "2021 International Mechanical Code (IMC)"
 url = "https://codes.iccsafe.org/content/IMC2021V4.0"
 kind = "model_code"
 tier = "reference"
+summary = """The 2021 International Mechanical Code (IMC), published by the International Code Council, governs heating, ventilation, air conditioning and exhaust systems. Maine adopts it as the Mechanical Code component of the Maine Uniform Building and Energy Code (MUBEC), with Maine amendments in 16-642 CMR ch. 7. Those amendments defer to the Maine Fuel Board Rules and the Maine State Plumbing Code where they apply."""
 
 [[source]]
 id = "iapmo-upc-2021"
@@ -271,6 +305,7 @@ title = "2021 Uniform Plumbing Code (UPC)"
 url = "https://epubs.iapmo.org/2021/UPC/"
 kind = "model_code"
 tier = "reference"
+summary = """The 2021 Uniform Plumbing Code (UPC), published by the International Association of Plumbing and Mechanical Officials (IAPMO), is a model plumbing code. Maine's building code (MUBEC, 16-642 CMR chs. 5 and 7) does not use the International Plumbing Code; it defers plumbing to the Maine State Plumbing Code adopted under Title 32 by the state's plumbing board."""
 
 [[source]]
 id = "ashrae-62-1-2019"
@@ -279,6 +314,7 @@ url = "https://ashrae.iwrapper.com/ASHRAE_PREVIEW_ONLY_STANDARDS/STD_62.1_2019"
 was = "https://fire-gas.com/storage/2024/06/ASHRAE-62.1-2019.pdf"
 kind = "model_code"
 tier = "reference"
+summary = """ANSI/ASHRAE Standard 62.1-2019 sets minimum ventilation rates and indoor air quality requirements for buildings other than low-rise residential. Maine incorporates it by reference in the Maine Uniform Building and Energy Code (MUBEC) mechanical code, 16-642 CMR ch. 7, and the commercial building code amendments in ch. 3 refer to it."""
 note = "the emailed fire-gas.com PDF is an unauthorized repost (now 404); pointed at ASHRAE's own viewer instead"
 
 [[source]]
@@ -287,6 +323,7 @@ title = "ANSI/ASHRAE Standard 62.2-2019. Ventilation and Indoor Air Quality in R
 url = "https://ashrae.iwrapper.com/ASHRAE_PREVIEW_ONLY_STANDARDS/STD_62.2_2019"
 kind = "model_code"
 tier = "reference"
+summary = """ANSI/ASHRAE Standard 62.2-2019 sets ventilation and indoor air quality requirements for residential buildings. Maine incorporates it by reference in the Maine Uniform Building and Energy Code (MUBEC) mechanical code, 16-642 CMR ch. 7."""
 
 [[source]]
 id = "ashrae-90-1-2019"
@@ -294,6 +331,7 @@ title = "ANSI/ASHRAE/IES Standard 90.1-2019. Energy Standard for Buildings Excep
 url = "https://ashrae.iwrapper.com/ASHRAE_PREVIEW_ONLY_STANDARDS/STD_90.1_2019"
 kind = "model_code"
 tier = "reference"
+summary = """ANSI/ASHRAE/IES Standard 90.1-2019 sets minimum energy efficiency requirements for buildings other than low-rise residential. Maine incorporates it by reference in the Maine Uniform Building and Energy Code (MUBEC) mechanical code, 16-642 CMR ch. 7."""
 
 [[source]]
 id = "astm-e1465-08"
@@ -301,4 +339,5 @@ title = "ASTM E1465-08. Radon Control Options for New Low-Rise Residential Build
 url = "https://maineindoorair.org/wp-content/uploads/2023/02/ASTM-E1465-08-Reprint.pdf"
 kind = "model_code"
 tier = "reference"
+summary = """ASTM E1465-08 is the standard practice for radon control options in the design and construction of new low-rise residential buildings. Maine's residential building code amendments (16-642 CMR ch. 5, Section R301.2.5) require a radon control system built to ASTM E1465-08 in new one- and two-family dwellings and townhouses, and the mechanical code amendments (ch. 7) incorporate it by reference in place of IMC Section 512."""
 note = "reprint hosted by a third party; treat as reference only"

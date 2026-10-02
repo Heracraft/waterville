@@ -14,6 +14,12 @@ The `output/` folder holds the finished export. You only need to re-run the scra
 
 The site's Law Ledger for this code is empty, and Waterville has no Public Documents section, so neither produces files.
 
+### Maine state sources
+
+The scraper also ingests the state law, rules and guidance listed in `ecode/state_sources.toml`, which came from the project kickoff materials. It covers 26 statute sections from Titles 17, 25, 30-A and 38 (as HTML from legislature.maine.gov), the seven chapters of the Maine Uniform Building and Energy Code (16-642 CMR), the subsurface wastewater rule (10-144 CMR ch. 241), the shoreland zoning guidelines (06-096 CMR ch. 1000), and nine code enforcement officer manuals. Copyrighted model codes (ICC, UPC, ASHRAE, ASTM) get a one-chunk stub that says which state rule adopts them and links to the publisher's free viewer. The stub does not include the code's text.
+
+To add a source, add a `[[source]]` entry with `kind` (`statute`, `rule`, `guidance` or `model_code`) and `tier` (`ingest`, `reference` or `skip`). Files the state no longer hosts live in `ecode/archived/` and are referenced with `file`. State chunks use ids starting with `ext-`, write to `output/markdown/state/` and `output/pdf/state/`, and are fetched again on every run. Pass `--no-state` to skip them.
+
 ## Output files
 
 - `output/chunks.jsonl`: the retrieval units, one JSON object per line. Each object already matches the Azure AI Search index schema in `azure/index.json` (minus the vector, which the push script adds). This is the file to index.
@@ -35,7 +41,7 @@ Chapter 275. Zoning > Article III. Definitions > § 275-3.2. Additional definiti
 
 That header goes into the embedding, so a chunk holding one definition still matches queries about zoning. It also lets the LLM cite the section without looking up metadata.
 
-Useful metadata fields for filters, facets and citations: `citation` (such as `§ 275-3.2` or `Charter Art. IV, § 9`), `chapter_number`, `chapter_title`, `article`, `section_number`, `url` (deep link to the section on eCode360), `ordinances` (ordinance numbers from the section history), `source_type` (`code`, `attachment`, `new_law`), `page_start`/`page_end` for PDFs, and `legislation_through`.
+Useful metadata fields for filters, facets and citations: `citation` (such as `§ 275-3.2` or `Charter Art. IV, § 9`), `chapter_number`, `chapter_title`, `article`, `section_number`, `url` (deep link to the section on eCode360), `ordinances` (ordinance numbers from the section history), `source_type` (`code`, `attachment`, `new_law`, `state_statute`, `state_rule`, `state_guidance`, `model_code_ref`), `page_start`/`page_end` for PDFs, and `legislation_through`.
 
 ## Loading into Azure AI Search
 

@@ -35,7 +35,7 @@ class SourceDoc:
     """One ingestible document: a code chapter, a PDF attachment or a new law."""
 
     doc_id: str
-    source_type: str  # code_chapter | attachment | new_law
+    source_type: str  # code_chapter | attachment | new_law | state_* | model_code_ref (see state.py)
     title: str
     url: str
     markdown_path: str
@@ -397,10 +397,7 @@ class Exporter:
         manifest = {
             "source": f"{BASE}/{self.cust}",
             **self._base_meta(),
-            "documents": {
-                t: sum(1 for d in self.docs if d.source_type == t)
-                for t in ("code_chapter", "attachment", "new_law")
-            },
+            "documents": {t: sum(1 for d in self.docs if d.source_type == t) for t in dict.fromkeys(d.source_type for d in self.docs)},
             "sections": sum(1 for _, n in self.chapters for x in iter_nodes(n) if x.kind == "section"),
             "chunks": len(chunks),
             "chunk_tokens": {

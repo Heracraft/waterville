@@ -10,6 +10,7 @@ from pathlib import Path
 
 from .export import Exporter
 from .fetch import Fetcher
+from .state import StateExporter
 
 
 def main(argv=None) -> None:
@@ -20,6 +21,7 @@ def main(argv=None) -> None:
     ap.add_argument("--refresh", action="store_true", help="ignore the cache and re-download everything")
     ap.add_argument("--delay", type=float, default=1.5, help="seconds between requests")
     ap.add_argument("--no-verify", action="store_true", help="skip the TOC cross-check (saves ~200 requests)")
+    ap.add_argument("--no-state", action="store_true", help="skip the Maine state sources in state_sources.toml")
     ap.add_argument("-v", "--verbose", action="store_true")
     args = ap.parse_args(argv)
     logging.basicConfig(
@@ -37,6 +39,8 @@ def main(argv=None) -> None:
     ex.export_code()
     ex.export_attachments()
     ex.export_new_laws()
+    if not args.no_state:
+        ex.docs += StateExporter(ex).export()
     manifest = ex.write_outputs(report)
     print(json.dumps(manifest, indent=2))
     v = manifest["verification"]
