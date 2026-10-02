@@ -63,6 +63,68 @@ Option 2 skips the script. Upload `output/chunks.jsonl` to a blob container and 
 
 `azure/index.json` is the index definition with placeholder vectorizer settings; regenerate it with `uv run python -m ecode.azure schema --out azure/index.json`.
 
+## Deploying the public assistant to Azure
+
+`infra/` deploys a public question-answering site on top of the index. Everything runs in one resource group:
+
+- **Azure AI Search** (Basic, semantic ranker on the standard plan) holds the index.
+- **Azure OpenAI** runs two deployments: `embedding` (text-embedding-3-large) and `chat`. Key auth is disabled on the account.
+- **Container Apps** runs `waterville-app`, the FastAPI chat API that also serves the web UI from `app/web/`. It scales from 0 to 2 replicas.
+- **A Container Apps job** (`waterville-refresh`) re-crawls eCode360 every Monday at 07:00 UTC, checks completeness and updates the index. It also deletes sections that disappeared from the code. If the crawl comes back incomplete, the job fails before touching the index.
+- **Azure Container Registry** (Basic) stores the image, and **Log Analytics** stores the logs.
+
+The app and the job each get their own user-assigned managed identity. The app can only read the index and call the chat model. The job can write the index and call the embedding model. The search service calls Azure OpenAI with its own identity to vectorize queries, so no keys exist anywhere.
+
+### One-time setup (your laptop, Azure CLI signed in)
+
+```bash
+SUB=$(az account show --query id -o tsv)
+az group create -n rg-waterville-rag -l eastus2
+az ad sp create-for-rbac --name sp-waterville-rag --role Contributor \
+  --scopes /subscriptions/$SUB/resourceGroups/rg-waterville-rag
+az role assignment create --assignee <appId> --role "Role Based Access Control Administrator" \
+  --scope /subscriptions/$SUB/resourceGroups/rg-waterville-rag
+for ns in Microsoft.Search Microsoft.CognitiveServices Microsoft.App Microsoft.ContainerRegistry \
+          Microsoft.OperationalInsights Microsoft.ManagedIdentity; do az provider register --namespace $ns; done
+```
+
+Check Azure OpenAI quota for the region in the Foundry portal (ai.azure.com, Quotas).
+
+### Deploy
+
+```bash
+export AZURE_CLIENT_ID=... AZURE_CLIENT_SECRET=... AZURE_TENANT_ID=... AZURE_SUBSCRIPTION_ID=...
+infra/deploy.sh
+```
+
+The script needs `az`, `docker` and `jq`. It:
+1. picks a chat model with free quota in the region (gpt-5-mini, then gpt-4.1-mini, then gpt-4o-mini; override with `CHAT_MODEL`)
+2. deploys the infrastructure, builds the image and pushes it to the registry
+3. deploys the app and job
+4. on the first deploy, runs the refresh job to load the index (about 10 minutes)
+5. asks the live site a test question
+
+Re-running it updates everything in place. `REFRESH=1 infra/deploy.sh` forces a re-crawl. To refresh the index without redeploying, run `az containerapp job start -g rg-waterville-rag -n waterville-refresh`.
+
+### Abuse and cost controls
+
+The site has no login, so the API limits itself:
+- 6 questions per minute and 60 per day per IP address
+- 3,000 questions per day in total
+- questions capped at 1,000 characters
+
+Change these with the `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY`, `GLOBAL_LIMIT_PER_DAY` and `MAX_QUESTION_CHARS` environment variables on the container app. The chat deployment's capacity (`CHAT_CAPACITY`, default 50K tokens per minute) sets a hard ceiling on spend, because Azure rejects requests above it. Azure OpenAI's default content filter stays on.
+
+Expected fixed cost is about $85 to $100 a month, mostly AI Search Basic. Model usage comes on top and depends on traffic.
+
+### Running the app locally
+
+```bash
+export AZURE_SEARCH_ENDPOINT=... AZURE_OPENAI_ENDPOINT=... AZURE_OPENAI_CHAT_DEPLOYMENT=chat
+# Uses your az login (DefaultAzureCredential); or set AZURE_SEARCH_API_KEY / AZURE_OPENAI_API_KEY
+uv run uvicorn app.main:app --reload
+```
+
 ## Re-running the scraper
 
 ```bash
@@ -81,6 +143,9 @@ The run also checks completeness. It walks the site's own navigation (chapter pa
 - `ecode/pdf.py`: PDF to Markdown via `pymupdf4llm`, with running headers and footers removed.
 - `ecode/chunk.py`: token-aware chunk packing.
 - `ecode/export.py`: the pipeline and the writers for all output files.
-- `ecode/azure.py`: Azure AI Search index schema, validation and push.
+- `ecode/azure.py`: Azure AI Search index schema, validation and push (API keys or Entra ID).
+- `app/main.py`: the public chat API (hybrid search, semantic ranker, streamed answers with citations, rate limits).
+- `app/web/`: the web UI, plain HTML, CSS and JS.
+- `infra/main.bicep`, `infra/deploy.sh`, `infra/refresh.sh`, `Dockerfile`: the Azure deployment.
 
 Other eCode360 codes should work with `--customer <ID>`, though only WA3904 has been tested. The index name, "Waterville" in the defaults and the chunk header text come from the site, so change `AZURE_SEARCH_INDEX` for another code.

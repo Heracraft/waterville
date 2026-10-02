@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask the Waterville City Code</title>
+<meta name="description" content="Search and ask questions about the Code of the City of Waterville, Maine.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f4e79'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' fill='white' text-anchor='middle'%3E%C2%A7%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <h1>Ask the Waterville City Code</h1>
+    <p class="lede">Questions about ordinances, permits, zoning and fees in Waterville, Maine. Answers cite the sections they come from.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="intro" aria-label="Example questions">
+    <p class="hint">Try one of these:</p>
+    <div class="examples">
+      <button type="button">How tall can a fence be in a residential zone?</button>
+      <button type="button">What does a short-term rental license cost?</button>
+      <button type="button">Can I keep chickens in my backyard?</button>
+      <button type="button">Are consumer fireworks allowed in Waterville?</button>
+    </div>
+  </section>
+
+  <ol id="thread" aria-live="polite"></ol>
+
+  <form id="ask" autocomplete="off">
+    <label for="q" class="sr-only">Your question</label>
+    <textarea id="q" rows="1" maxlength="1000" placeholder="Ask about the City Code..." required></textarea>
+    <button type="submit" id="send">Ask</button>
+  </form>
+
+  <p class="disclaimer">
+    This assistant gives general information from the
+    <a href="https://ecode360.com/WA3904" target="_blank" rel="noopener">official City Code on eCode360</a>
+    and can make mistakes. It is not legal advice. Check the linked sections, and for questions about a specific property or permit contact the City Clerk at 207-680-4200.
+  </p>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

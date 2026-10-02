@@ -4,10 +4,10 @@ Uses the REST APIs directly (no Azure SDK) so the only dependency is requests.
 
 Environment:
   AZURE_SEARCH_ENDPOINT            https://<service>.search.windows.net
-  AZURE_SEARCH_API_KEY             admin key
+  AZURE_SEARCH_API_KEY             admin key (omit to use Entra ID / managed identity)
   AZURE_SEARCH_INDEX               index name (default: waterville-code)
   AZURE_OPENAI_ENDPOINT            https://<resource>.openai.azure.com
-  AZURE_OPENAI_API_KEY             key for the Azure OpenAI resource
+  AZURE_OPENAI_API_KEY             key for the Azure OpenAI resource (omit to use Entra ID)
   AZURE_OPENAI_EMBEDDING_DEPLOYMENT  deployment name of the embedding model
   AZURE_OPENAI_EMBEDDING_MODEL     text-embedding-3-large (default) | text-embedding-3-small | text-embedding-ada-002
   EMBEDDING_DIMENSIONS             vector size (default 3072 for 3-large, 1536 otherwise)
@@ -56,7 +56,7 @@ def _f(name, type_="Edm.String", *, key=False, search=False, filt=False, facet=F
 
 def index_definition(name: str, dims: int, model: str, aoai_endpoint: str | None, deployment: str | None) -> dict:
     fields = [
-        _f("id", key=True, filt=True),
+        _f("id", key=True, filt=True, sort=True),
         _f("doc_id", filt=True, facet=True),
         _f("source_type", filt=True, facet=True),
         _f("node_type", filt=True, facet=True),
@@ -181,6 +181,35 @@ def validate(chunks: list[dict], index: dict) -> list[str]:
 # ------------------------------------------------------------------ push
 
 
+class Auth:
+    """Headers for an Azure data-plane call: API key if set, else an Entra ID token.
+
+    Token auth uses DefaultAzureCredential, which picks up a managed identity
+    in Azure and the service principal env vars (AZURE_CLIENT_ID etc.) elsewhere.
+    """
+
+    def __init__(self, key_env: str, scope: str):
+        self.key = os.environ.get(key_env)
+        self.scope = scope
+        self.cred = None
+        if not self.key:
+            from azure.identity import DefaultAzureCredential
+
+            self.cred = DefaultAzureCredential()
+
+    def headers(self) -> dict:
+        h = {"Content-Type": "application/json"}
+        if self.key:
+            h["api-key"] = self.key
+        else:
+            h["Authorization"] = "Bearer " + self.cred.get_token(self.scope).token
+        return h
+
+
+SEARCH_SCOPE = "https://search.azure.com/.default"
+AOAI_SCOPE = "https://cognitiveservices.azure.com/.default"
+
+
 def _retry(fn, what: str):
     for attempt in range(8):
         r = fn()
@@ -196,9 +225,9 @@ def _retry(fn, what: str):
 
 
 class Embedder:
-    def __init__(self, endpoint: str, api_key: str, deployment: str, model: str, dims: int, cache: Path):
+    def __init__(self, endpoint: str, auth: Auth, deployment: str, model: str, dims: int, cache: Path):
         self.url = f"{endpoint.rstrip('/')}/openai/deployments/{deployment}/embeddings?api-version={AOAI_API}"
-        self.headers = {"api-key": api_key, "Content-Type": "application/json"}
+        self.auth = auth
         self.model = model
         self.dims = dims
         self.cache_path = cache
@@ -219,7 +248,7 @@ class Embedder:
                 body = {"input": part}
                 if self.model != "text-embedding-ada-002":
                     body["dimensions"] = self.dims
-                r = _retry(lambda: requests.post(self.url, headers=self.headers, json=body, timeout=120), "embed")
+                r = _retry(lambda: requests.post(self.url, headers=self.auth.headers(), json=body, timeout=120), "embed")
                 for t, item in zip(part, sorted(r.json()["data"], key=lambda d: d["index"])):
                     h = self._hash(t)
                     self.cache[h] = item["embedding"]
@@ -273,22 +302,24 @@ def main(argv=None) -> None:
         return
 
     endpoint = _env("AZURE_SEARCH_ENDPOINT").rstrip("/")
-    sheaders = {"api-key": _env("AZURE_SEARCH_API_KEY"), "Content-Type": "application/json"}
-    aoai_key = _env("AZURE_OPENAI_API_KEY")
-    # Query-time vectorizer needs a credential too; fill it in on the live index only.
-    index["vectorSearch"]["vectorizers"][0]["azureOpenAIParameters"]["apiKey"] = aoai_key
+    search_auth = Auth("AZURE_SEARCH_API_KEY", SEARCH_SCOPE)
+    aoai_auth = Auth("AZURE_OPENAI_API_KEY", AOAI_SCOPE)
+    if aoai_auth.key:
+        # The query-time vectorizer needs a credential; with no key the search
+        # service calls Azure OpenAI with its own managed identity instead.
+        index["vectorSearch"]["vectorizers"][0]["azureOpenAIParameters"]["apiKey"] = aoai_auth.key
 
     idx_url = f"{endpoint}/indexes/{name}?api-version={SEARCH_API}"
     if args.recreate:
-        r = requests.delete(idx_url, headers=sheaders, timeout=60)
+        r = requests.delete(idx_url, headers=search_auth.headers(), timeout=60)
         if r.status_code not in (204, 404):
             sys.exit(f"delete index failed: {r.status_code} {r.text}")
-    _retry(lambda: requests.put(idx_url, headers=sheaders, json=index, timeout=60), "create index")
+    _retry(lambda: requests.put(idx_url, headers=search_auth.headers(), json=index, timeout=60), "create index")
     print(f"index '{name}' ready", file=sys.stderr)
 
     embedder = Embedder(
         _env("AZURE_OPENAI_ENDPOINT"),
-        aoai_key,
+        aoai_auth,
         _env("AZURE_OPENAI_EMBEDDING_DEPLOYMENT"),
         model,
         dims,
@@ -301,11 +332,31 @@ def main(argv=None) -> None:
         batch = []
         for c, v in zip(chunks[i : i + args.batch], vectors[i : i + args.batch]):
             batch.append({"@search.action": "mergeOrUpload", **c, VECTOR_FIELD: v})
-        r = _retry(lambda: requests.post(docs_url, headers=sheaders, json={"value": batch}, timeout=300), "upload")
+        r = _retry(lambda: requests.post(docs_url, headers=search_auth.headers(), json={"value": batch}, timeout=300), "upload")
         failed = [x for x in r.json()["value"] if not x["status"]]
         if failed:
             sys.exit(f"upload failures: {failed[:5]}")
         print(f"uploaded {min(i + args.batch, len(chunks))}/{len(chunks)}", file=sys.stderr)
+
+    # Remove documents for sections that no longer exist (repealed or renumbered).
+    current = {c["id"] for c in chunks}
+    stale = [k for k in _all_keys(endpoint, name, search_auth) if k not in current]
+    for i in range(0, len(stale), 1000):
+        batch = [{"@search.action": "delete", "id": k} for k in stale[i : i + 1000]]
+        _retry(lambda: requests.post(docs_url, headers=search_auth.headers(), json={"value": batch}, timeout=300), "delete")
+    print(f"removed {len(stale)} stale documents", file=sys.stderr)
+
+
+def _all_keys(endpoint: str, name: str, auth: Auth) -> list[str]:
+    url = f"{endpoint}/indexes/{name}/docs/search?api-version={SEARCH_API}"
+    keys: list[str] = []
+    while True:
+        body = {"search": "*", "select": "id", "top": 1000, "skip": len(keys), "orderby": "id"}
+        r = _retry(lambda: requests.post(url, headers=auth.headers(), json=body, timeout=120), "list keys")
+        page = [d["id"] for d in r.json()["value"]]
+        keys += page
+        if len(page) < 1000:
+            return keys
 
 
 if __name__ == "__main__":
