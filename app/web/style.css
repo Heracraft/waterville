@@ -18,6 +18,7 @@
   --accent: var(--rust);
   --accent-text: #ffffff;
   --accent-soft: var(--blush);
+  --mark: var(--blush);
   --user: transparent;
   --error: #9b1c1c;
   --hero-bg: var(--ink);
@@ -41,6 +42,7 @@
     --accent: #e8805f;
     --accent-text: var(--ink);
     --accent-soft: rgb(230 197 184 / 0.2);
+    --mark: rgb(230 197 184 / 0.22);
     --error: #f19999;
     --hero-bg: var(--ink);
     --hero-rule: rgb(225 220 216 / 0.4);
@@ -58,6 +60,7 @@
     --accent: #e8805f;
     --accent-text: var(--ink);
     --accent-soft: rgb(230 197 184 / 0.2);
+    --mark: rgb(230 197 184 / 0.22);
     --error: #f19999;
     --hero-bg: var(--ink);
     --hero-rule: rgb(225 220 216 / 0.4);
@@ -211,6 +214,16 @@ form#ask:focus-within { border-color: var(--accent); }
   .msg.bot > .sources {
     grid-column: 2; grid-row: 1 / span 40; align-self: stretch;
     margin: -28px -32px -30px 0; padding: 22px 28px 16px; border-top: 0; border-left: 1px solid var(--rule);
+  }
+}
+
+/* The source panel docks 440px on the right; keep sources below the answer
+   unless the rest of the window still fits the two-column layout. */
+@media (min-width: 1100px) and (max-width: 1539px) {
+  body.panel-open .msg.bot { display: block; padding: 22px 26px 24px; }
+  body.panel-open .msg.bot > :not(.sources) { max-width: none; }
+  body.panel-open .msg.bot > .sources {
+    margin: 22px -26px -24px; padding: 14px 26px 6px; border-left: 0; border-top: 1px solid var(--rule);
   }
 }
 
