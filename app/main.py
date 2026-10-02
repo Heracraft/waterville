@@ -13,6 +13,7 @@ use keys instead, e.g. for local development.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -35,7 +36,6 @@ AOAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT", "").rstrip("/")
 CHAT_DEPLOYMENT = os.environ.get("AZURE_OPENAI_CHAT_DEPLOYMENT", "chat")
 REASONING_EFFORT = os.environ.get("CHAT_REASONING_EFFORT")  # set only for reasoning models
 MAX_ANSWER_TOKENS = int(os.environ.get("MAX_ANSWER_TOKENS", "1500"))
-TOP_K = int(os.environ.get("TOP_K", "8"))
 
 MAX_QUESTION_CHARS = int(os.environ.get("MAX_QUESTION_CHARS", "1000"))
 PER_IP_PER_MINUTE = int(os.environ.get("RATE_LIMIT_PER_MINUTE", "6"))
@@ -141,14 +141,23 @@ def client_ip(request: Request) -> str:
 # ---------------------------------------------------------------- retrieval
 
 
-async def search(query: str) -> list[dict]:
+# City sources and state sources are searched separately and merged, so the
+# much larger state manuals can't crowd the city's own code out of the results.
+LOCAL_TYPES = "code,attachment,new_law"
+LOCAL_K = int(os.environ.get("LOCAL_K", "5"))
+STATE_K = int(os.environ.get("STATE_K", "4"))
+MIN_RERANKER_SCORE = float(os.environ.get("MIN_RERANKER_SCORE", "1.0"))  # semantic ranker scale is 0-4
+
+
+async def _search(query: str, filter_: str, top: int) -> list[dict]:
     body = {
         "search": query,
+        "filter": filter_,
         "queryType": "semantic",
         "semanticConfiguration": "default",
         "semanticErrorHandling": "partial",
         "vectorQueries": [{"kind": "text", "text": query, "fields": "content_vector", "k": 50}],
-        "top": TOP_K,
+        "top": top,
         "select": "id,title,citation,breadcrumb,url,source_type,content,page_start,page_end",
     }
     url = f"{SEARCH_ENDPOINT}/indexes/{SEARCH_INDEX}/docs/search?api-version={SEARCH_API}"
@@ -157,6 +166,21 @@ async def search(query: str) -> list[dict]:
         log.error("search failed %s %s", r.status_code, r.text[:500])
         raise HTTPException(502, "Search is unavailable right now.")
     return r.json()["value"]
+
+
+def _rank(d: dict) -> float:
+    return d.get("@search.rerankerScore") or 0.0
+
+
+async def search(query: str) -> list[dict]:
+    local, state = await asyncio.gather(
+        _search(query, f"search.in(source_type, '{LOCAL_TYPES}')", LOCAL_K),
+        _search(query, f"not search.in(source_type, '{LOCAL_TYPES}')", STATE_K),
+    )
+    docs = sorted(local + state, key=_rank, reverse=True)
+    # Drop weak matches, but always keep a few so the model can say what it found.
+    strong = [d for d in docs if _rank(d) >= MIN_RERANKER_SCORE]
+    return strong if len(strong) >= 3 else docs[:3]
 
 
 def retrieval_query(messages: list[dict]) -> str:
