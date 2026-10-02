@@ -34,8 +34,9 @@ import requests
 SEARCH_API = "2024-07-01"
 AOAI_API = "2024-10-21"
 VECTOR_FIELD = "content_vector"
-# Id prefixes written by ecode.export; stale cleanup never deletes anything else.
-OWNED_PREFIXES = ("code-", "attachment-", "newlaw-")
+# Id prefixes written by the `python -m ecode` pipeline (ecode.export plus the
+# state-law step); stale cleanup never deletes anything else.
+OWNED_PREFIXES = ("code-", "attachment-", "newlaw-", "ext-")
 
 
 def _f(name, type_="Edm.String", *, key=False, search=False, filt=False, facet=False, sort=False, analyzer=None):
