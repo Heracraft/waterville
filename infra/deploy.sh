@@ -63,7 +63,12 @@ pick_model() {
     [ -n "$ver" ] || continue
     local free
     free=$(jq -r --arg k "OpenAI.$sku.$name" '
-      [ .[] | select(.name.value == $k) | (.limit - .currentValue) ] | first // 0' <<<"$USAGE")
+      [ .[] | select(.name.value == $k) | (.limit - .currentValue) ] | first // "unknown"' <<<"$USAGE")
+    if [ "$free" = unknown ]; then
+      # Usage is readable only with subscription-level access; let the deployment enforce quota.
+      printf '  %s %s: quota not readable, trying it\n' "$name" "$sku" >&2
+      echo "$ver $sku"; return
+    fi
     if [ "${free%.*}" -ge "$cap" ]; then echo "$ver $sku"; return; fi
     printf '  %s %s: only %s quota free, need %s\n' "$name" "$sku" "$free" "$cap" >&2
   done
