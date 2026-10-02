@@ -1,51 +1,90 @@
 # Waterville, ME Code for Azure RAG
 
-This repo scrapes the City of Waterville, ME municipal code from eCode360 (https://ecode360.com/WA3904) and turns it into files you can load straight into Azure AI Search for retrieval-augmented generation.
+Live site: https://waterville-app.greensky-a20028bf.eastus2.azurecontainerapps.io
 
-The `output/` folder holds the finished export. You only need to re-run the scraper when the city adopts new legislation.
+This repository has three parts:
 
-## What gets collected
+1. A scraper. It gets the municipal code of the City of Waterville, ME from eCode360 (https://ecode360.com/WA3904). It also gets the related Maine state law, rules and guidance.
+2. An export. The scraper writes files that you can load into Azure AI Search for retrieval-augmented generation (RAG).
+3. A public question-and-answer site. It uses the search index to answer questions about the code.
 
-| Source | Where it comes from | Output |
+The `output/` folder contains the completed export. Run the scraper again only when the city adopts new legislation.
+
+## Collected sources
+
+| Source | Location on eCode360 | Output |
 | --- | --- | --- |
-| The Charter, 38 code chapters and the Disposition List | `/print/WA3904?guid=<chapter>&children=true`, which returns a chapter's full text | `output/markdown/code/*.md` |
-| 39 PDF attachments (fee schedules, committee charges, personnel policies, the sex offender address exclusion list, subdivision appendix, and more) | `/attachment/...pdf` links inside chapters | `output/pdf/attachments/`, `output/markdown/attachments/*.md` |
-| New Laws (adopted but not yet codified) | `/WA3904/laws` | `output/pdf/new-laws/`, `output/markdown/new-laws/*.md` |
+| The Charter, 38 code chapters and the Disposition List | `/print/WA3904?guid=<chapter>&children=true`. This page gives the full text of a chapter. | `output/markdown/code/*.md` |
+| 39 PDF attachments. Examples: fee schedules, committee charges, personnel policies, the sex offender address exclusion list, the subdivision appendix. | `/attachment/...pdf` links in the chapters | `output/pdf/attachments/`, `output/markdown/attachments/*.md` |
+| New Laws (adopted, but not yet in the code) | `/WA3904/laws` | `output/pdf/new-laws/`, `output/markdown/new-laws/*.md` |
 
-The site's Law Ledger for this code is empty, and Waterville has no Public Documents section, so neither produces files.
+The Law Ledger for this code is empty. Waterville has no Public Documents section. Thus these two parts of the site give no files.
 
 ### Maine state sources
 
-The scraper also ingests the state law, rules and guidance listed in `ecode/state_sources.toml`, which came from the project kickoff materials. It covers 26 statute sections from Titles 17, 25, 30-A and 38 (as HTML from legislature.maine.gov), the seven chapters of the Maine Uniform Building and Energy Code (16-642 CMR), the subsurface wastewater rule (10-144 CMR ch. 241), the shoreland zoning guidelines (06-096 CMR ch. 1000), and nine code enforcement officer manuals. Copyrighted model codes (ICC, UPC, ASHRAE, ASTM) get a one-chunk stub that says which state rule adopts them and links to the publisher's free viewer. The stub does not include the code's text.
+The file `ecode/state_sources.toml` lists the state sources. The list comes from the project kickoff materials. It contains:
 
-To add a source, add a `[[source]]` entry with `kind` (`statute`, `rule`, `guidance` or `model_code`) and `tier` (`ingest`, `reference` or `skip`). Files the state no longer hosts live in `ecode/archived/` and are referenced with `file`. State chunks use ids starting with `ext-`, write to `output/markdown/state/` and `output/pdf/state/`, and are fetched again on every run. Pass `--no-state` to skip them.
+- 26 statute sections from Titles 17, 25, 30-A and 38, as HTML from legislature.maine.gov
+- the seven chapters of the Maine Uniform Building and Energy Code (16-642 CMR)
+- the subsurface wastewater rule (10-144 CMR ch. 241)
+- the shoreland zoning guidelines (06-096 CMR ch. 1000)
+- nine manuals for code enforcement officers
+
+Some model codes have a copyright (ICC, UPC, ASHRAE, ASTM). For each of these codes, the scraper writes one short stub chunk. The stub tells which state rule adopts the code. It also gives a link to the free viewer of the publisher. The stub does not contain the text of the code.
+
+To add a source:
+
+1. Add a `[[source]]` entry to `ecode/state_sources.toml`.
+2. Set `kind` to `statute`, `rule`, `guidance` or `model_code`.
+3. Set `tier` to `ingest`, `reference` or `skip`.
+4. If the state no longer hosts the file, put the file in `ecode/archived/`. Then refer to it with `file`.
+
+State chunks have IDs that start with `ext-`. The scraper writes them to `output/markdown/state/` and `output/pdf/state/`. The scraper gets the state sources again on each run. To skip them, use `--no-state`.
 
 ## Output files
 
-- `output/chunks.jsonl`: the retrieval units, one JSON object per line. Each object already matches the Azure AI Search index schema in `azure/index.json` (minus the vector, which the push script adds). This is the file to index.
-- `output/markdown/**.md`: one Markdown file per source document with YAML front matter. Use these if you prefer Azure's blob indexer or the portal's "Import and vectorize data" wizard, or to read the code as plain text.
-- `output/pdf/**`: original PDFs, kept so you can reprocess them with Azure AI Document Intelligence if you want its layout model instead of the text extraction done here.
-- `output/documents.jsonl`: one line per source document with its metadata and chunk count.
-- `output/manifest.json`: crawl date, "legislation through" date, counts, token stats and the completeness check result.
+- `output/chunks.jsonl`: the retrieval units, one JSON object per line. Each object agrees with the Azure AI Search index schema in `azure/index.json`. Only the vector is missing; the push script adds it. Index this file.
+- `output/markdown/**.md`: one Markdown file for each source document, with YAML front matter. Use these files with the Azure blob indexer or the "Import and vectorize data" wizard in the portal. You can also read the code as plain text in these files.
+- `output/pdf/**`: the original PDFs. You can process them again with Azure AI Document Intelligence if you prefer its layout model.
+- `output/documents.jsonl`: one line for each source document, with its metadata and its number of chunks.
+- `output/manifest.json`: the crawl date, the "legislation through" date, counts, token statistics and the result of the completeness check.
 
-### How chunks are built
+### Chunk structure
 
-A code section is the natural retrieval unit, so each section becomes one chunk. Sections longer than 800 tokens (cl100k, the tokenizer of the `text-embedding-3` models) are split at subsection boundaries. When a split lands inside a list, the previous short item repeats at the top of the next chunk so a lead-in sentence travels with its items. Long tables split by rows and repeat the header row in each piece. PDFs are chunked page by page and every chunk records `page_start` and `page_end`.
+Each code section becomes one chunk. The rules for long content are:
 
-Every chunk's `content` starts with a two-line context header, for example:
+- If a section has more than 800 tokens, the scraper divides it at subsection boundaries. (The token count uses cl100k, the tokenizer of the `text-embedding-3` models.)
+- If a division occurs in a list, the next chunk starts with the previous short item. Thus the lead-in sentence stays with its items.
+- Long tables are divided by rows. Each part repeats the header row.
+- PDFs are divided by page. Each chunk records `page_start` and `page_end`.
+
+The `content` of each chunk starts with a header of two lines. Example:
 
 ```
 City of Waterville, ME Code
 Chapter 275. Zoning > Article III. Definitions > § 275-3.2. Additional definitions. (part 4 of 15)
 ```
 
-That header goes into the embedding, so a chunk holding one definition still matches queries about zoning. It also lets the LLM cite the section without looking up metadata.
+The embedding includes this header. Thus a chunk with only one definition still matches queries about zoning. The LLM can also cite the section without the metadata.
 
-Useful metadata fields for filters, facets and citations: `citation` (such as `§ 275-3.2` or `Charter Art. IV, § 9`), `chapter_number`, `chapter_title`, `article`, `section_number`, `url` (deep link to the section on eCode360), `ordinances` (ordinance numbers from the section history), `source_type` (`code`, `attachment`, `new_law`, `state_statute`, `state_rule`, `state_guidance`, `model_code_ref`), `page_start`/`page_end` for PDFs, and `legislation_through`.
+Use these metadata fields for filters, facets and citations:
 
-## Loading into Azure AI Search
+- `citation`, for example `§ 275-3.2` or `Charter Art. IV, § 9`
+- `chapter_number`, `chapter_title`, `article`, `section_number`
+- `url`: a direct link to the section on eCode360
+- `ordinances`: the ordinance numbers from the section history
+- `source_type`: `code`, `attachment`, `new_law`, `state_statute`, `state_rule`, `state_guidance` or `model_code_ref`
+- `page_start` and `page_end` for PDFs
+- `legislation_through`
 
-Option 1 pushes documents with vectors you generate through Azure OpenAI. You need an Azure AI Search service (Basic tier or higher for semantic ranker) and an Azure OpenAI embedding deployment.
+## Load the export into Azure AI Search
+
+### Option 1: Use the push script
+
+The push script makes the vectors with Azure OpenAI and uploads the documents. You must have:
+
+- an Azure AI Search service. Use the Basic tier or higher for the semantic ranker.
+- an Azure OpenAI embedding deployment.
 
 ```bash
 export AZURE_SEARCH_ENDPOINT=https://<service>.search.windows.net
@@ -55,33 +94,68 @@ export AZURE_OPENAI_ENDPOINT=https://<resource>.openai.azure.com
 export AZURE_OPENAI_API_KEY=<key>
 export AZURE_OPENAI_EMBEDDING_DEPLOYMENT=<deployment name>
 export AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-large   # or text-embedding-3-small
-# export EMBEDDING_DIMENSIONS=1536                            # optional, shrinks 3-large vectors
+# export EMBEDDING_DIMENSIONS=1536                            # optional, makes 3-large vectors smaller
 
-uv run python -m ecode.azure validate   # checks every document against the schema, no network
+uv run python -m ecode.azure validate   # checks each document against the schema, no network
 uv run python -m ecode.azure push       # creates the index, embeds, uploads
 ```
 
-`push` creates the index with hybrid search in mind: BM25 on `content`, `title` and `breadcrumb` (English Microsoft analyzer), an HNSW cosine vector field, a semantic ranker configuration, and an Azure OpenAI vectorizer so queries can be vectorized server side. Embeddings are cached in `output/embeddings-cache-*.jsonl`, so a re-run after a code update only pays for changed chunks. Pass `--recreate` to drop and rebuild the index, which you need after changing the embedding model or dimensions.
+`push` makes an index for hybrid search. The index has:
 
-For the best answers, query with hybrid search plus the semantic ranker (`queryType=semantic`, `semanticConfiguration=default`, a text query and a `vectorQueries` entry of kind `text` against `content_vector`). Azure AI Foundry "On your data" and Azure OpenAI "Add your data" can point at the same index; map `content` as the content field, `title` as title, `url` as URL and `content_vector` as the vector field.
+- BM25 on `content`, `title` and `breadcrumb`, with the English Microsoft analyzer
+- an HNSW vector field with cosine distance
+- a semantic ranker configuration
+- an Azure OpenAI vectorizer. The search service uses it to make query vectors.
 
-Option 2 skips the script. Upload `output/chunks.jsonl` to a blob container and create an indexer with `"parsingMode": "jsonLines"` targeting the same index definition, plus a skillset with the `AzureOpenAIEmbedding` skill writing to `content_vector`. Or upload `output/markdown/` and run the portal's "Import and vectorize data" wizard, which chunks for you but drops the per-section metadata.
+The script keeps the embeddings in `output/embeddings-cache-*.jsonl`. After a code update, the script embeds only the changed chunks. If you change the embedding model or the dimensions, you must delete and make the index again. To do this, use `--recreate`.
 
-`azure/index.json` is the index definition with placeholder vectorizer settings; regenerate it with `uv run python -m ecode.azure schema --out azure/index.json`.
+For the best answers, use hybrid search with the semantic ranker:
 
-## Deploying the public assistant to Azure
+- `queryType=semantic`
+- `semanticConfiguration=default`
+- a text query
+- a `vectorQueries` entry of kind `text` against `content_vector`
 
-`infra/` deploys a public question-answering site on top of the index. Everything runs in one resource group:
+You can also connect Azure AI Foundry "On your data" or Azure OpenAI "Add your data" to the same index. Set these field mappings:
 
-- **Azure AI Search** (Basic, semantic ranker on the standard plan) holds the index.
-- **Azure OpenAI** runs two deployments: `embedding` (text-embedding-3-large) and `chat`. Key auth is disabled on the account.
-- **Container Apps** runs `waterville-app`, the FastAPI chat API that also serves the web UI from `app/web/`. It scales from 0 to 2 replicas.
-- **A Container Apps job** (`waterville-refresh`) re-crawls eCode360 every Monday at 07:00 UTC, checks completeness and updates the index. It also deletes sections that disappeared from the code. If the crawl comes back incomplete, the job fails before touching the index.
-- **Azure Container Registry** (Basic) stores the image, and **Log Analytics** stores the logs.
+| Setting | Field |
+| --- | --- |
+| Content | `content` |
+| Title | `title` |
+| URL | `url` |
+| Vector | `content_vector` |
 
-The app and the job each get their own user-assigned managed identity. The app can only read the index and call the chat model. The job can write the index and call the embedding model. The search service calls Azure OpenAI with its own identity to vectorize queries, so no keys exist anywhere.
+### Option 2: Use an indexer
 
-### One-time setup (your laptop, Azure CLI signed in)
+This option does not use the script. Do one of these procedures:
+
+- Upload `output/chunks.jsonl` to a blob container. Make an indexer with `"parsingMode": "jsonLines"` and the same index definition. Add a skillset with the `AzureOpenAIEmbedding` skill. Set the skill to write to `content_vector`.
+- Upload `output/markdown/`. Run the "Import and vectorize data" wizard in the portal. The wizard makes its own chunks, but it does not keep the metadata of each section.
+
+`azure/index.json` is the index definition. Its vectorizer settings are placeholders. To make it again, run `uv run python -m ecode.azure schema --out azure/index.json`.
+
+## Deploy the public site to Azure
+
+The `infra/` folder deploys a public question-and-answer site that uses the index. All resources are in one resource group:
+
+- **Azure AI Search** (Basic, semantic ranker on the standard plan) contains the index.
+- **Azure OpenAI** has two deployments: `embedding` (text-embedding-3-large) and `chat`. Key authentication is off for the account.
+- **Container Apps** runs `waterville-app`. This is the FastAPI chat API. It also serves the web UI from `app/web/`. It scales from 0 to 2 replicas.
+- **A Container Apps job** (`waterville-refresh`) runs each Monday at 07:00 UTC. The job crawls eCode360 again, does the completeness check and updates the index. It also deletes sections that the code no longer contains. If the crawl is not complete, the job stops before it changes the index.
+- **Azure Container Registry** (Basic) keeps the image. **Log Analytics** keeps the logs.
+
+The app and the job each have a user-assigned managed identity:
+
+| Identity | Index access | Model access |
+| --- | --- | --- |
+| App | Read | Chat model |
+| Job | Write | Embedding model |
+
+The search service uses its own identity to call Azure OpenAI for query vectors. Thus the deployment uses no keys.
+
+### One-time setup
+
+Do these steps on your computer, with the Azure CLI signed in.
 
 ```bash
 SUB=$(az account show --query id -o tsv)
@@ -94,7 +168,7 @@ for ns in Microsoft.Search Microsoft.CognitiveServices Microsoft.App Microsoft.C
           Microsoft.OperationalInsights Microsoft.ManagedIdentity; do az provider register --namespace $ns; done
 ```
 
-Check Azure OpenAI quota for the region in the Foundry portal (ai.azure.com, Quotas).
+Make sure that the region has Azure OpenAI quota. To see the quota, go to the Foundry portal (ai.azure.com) and open Quotas.
 
 ### Deploy
 
@@ -103,27 +177,38 @@ export AZURE_CLIENT_ID=... AZURE_CLIENT_SECRET=... AZURE_TENANT_ID=... AZURE_SUB
 infra/deploy.sh
 ```
 
-The script needs `az`, `docker` and `jq`. It:
-1. picks a chat model with free quota in the region (gpt-5-mini, then gpt-4.1-mini, then gpt-4o-mini; override with `CHAT_MODEL`)
-2. deploys the infrastructure, builds the image and pushes it to the registry
-3. deploys the app and job
-4. on the first deploy, runs the refresh job to load the index (about 10 minutes)
-5. asks the live site a test question
+The script must have `az`, `docker` and `jq`. The script does these steps:
 
-Re-running it updates everything in place. `REFRESH=1 infra/deploy.sh` forces a re-crawl. To refresh the index without redeploying, run `az containerapp job start -g rg-waterville-rag -n waterville-refresh`.
+1. It finds a chat model with free quota in the region. It tries gpt-5-mini, then gpt-4.1-mini, then gpt-4o-mini. To select a different model, set `CHAT_MODEL`.
+2. It deploys the infrastructure.
+3. It builds the image and pushes it to the registry.
+4. It deploys the app and the job.
+5. On the first deploy, it starts the refresh job to load the index. This takes approximately 10 minutes.
+6. It sends a test question to the live site.
+
+You can run the script again. It updates all resources in place.
+
+- To crawl again during the deploy, run `REFRESH=1 infra/deploy.sh`.
+- To update the index without a deploy, run `az containerapp job start -g rg-waterville-rag -n waterville-refresh`.
 
 ### Abuse and cost controls
 
-The site has no login, so the API limits itself:
-- 6 questions per minute and 60 per day per IP address
-- 3,000 questions per day in total
-- questions capped at 1,000 characters
+The site has no login. Thus the API applies these limits:
 
-Change these with the `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY`, `GLOBAL_LIMIT_PER_DAY` and `MAX_QUESTION_CHARS` environment variables on the container app. The chat deployment's capacity (`CHAT_CAPACITY`, default 50K tokens per minute) sets a hard ceiling on spend, because Azure rejects requests above it. Azure OpenAI's default content filter stays on.
+| Limit | Default | Environment variable |
+| --- | --- | --- |
+| Questions per minute, for each IP address | 6 | `RATE_LIMIT_PER_MINUTE` |
+| Questions per day, for each IP address | 60 | `RATE_LIMIT_PER_DAY` |
+| Questions per day, total | 3,000 | `GLOBAL_LIMIT_PER_DAY` |
+| Characters per question | 1,000 | `MAX_QUESTION_CHARS` |
 
-Expected fixed cost is about $85 to $100 a month, mostly AI Search Basic. Model usage comes on top and depends on traffic.
+To change a limit, set its environment variable on the container app.
 
-### Running the app locally
+The capacity of the chat deployment (`CHAT_CAPACITY`, default 50K tokens per minute) sets a maximum on cost. Azure refuses requests above this capacity. The default content filter of Azure OpenAI stays on.
+
+The fixed cost is approximately $85 to $100 each month. Most of this cost is AI Search Basic. The cost of model usage is in addition to this amount. It changes with traffic.
+
+### Run the app on your computer
 
 ```bash
 export AZURE_SEARCH_ENDPOINT=... AZURE_OPENAI_ENDPOINT=... AZURE_OPENAI_CHAT_DEPLOYMENT=chat
@@ -131,27 +216,33 @@ export AZURE_SEARCH_ENDPOINT=... AZURE_OPENAI_ENDPOINT=... AZURE_OPENAI_CHAT_DEP
 uv run uvicorn app.main:app --reload
 ```
 
-## Re-running the scraper
+## Run the scraper again
 
 ```bash
 uv sync
-uv run python -m ecode --refresh      # re-download everything and rebuild output/
+uv run python -m ecode --refresh      # downloads all pages again and makes output/ again
 ```
 
-Without `--refresh` the scraper reuses the HTTP cache in `data/raw/` (not committed). It waits 1.5 seconds between requests and backs off on HTTP 429.
+If you do not use `--refresh`, the scraper uses the HTTP cache in `data/raw/`. Git does not track this folder. The scraper waits 1.5 seconds between requests. If it gets HTTP 429, it waits longer before the next request.
 
-The run also checks completeness. It walks the site's own navigation (chapter pages, then article and part pages) to collect every section ID eCode360 lists, and compares that set with the sections parsed from the print pages. `manifest.json` records both counts, and the command exits non-zero if any section is missing or unexpected. Pass `--no-verify` to skip this and save about 200 requests.
+Each run also does a completeness check:
+
+1. The scraper follows the navigation of the site: first the chapter pages, then the article and part pages.
+2. It collects each section ID that eCode360 lists.
+3. It compares these IDs with the sections that it got from the print pages.
+
+`manifest.json` records the two counts. If a section is missing or unexpected, the command exits with a non-zero code. To skip the check, use `--no-verify`. This saves approximately 200 requests.
 
 ## Code layout
 
-- `ecode/fetch.py`: HTTP with a disk cache, rate limit and retries.
-- `ecode/parse.py`: table of contents parsing and the HTML to Markdown converter for chapter print pages (nested subsections, definitions, tables with row and column spans, footnotes, history notes, attachments).
-- `ecode/pdf.py`: PDF to Markdown via `pymupdf4llm`, with running headers and footers removed.
-- `ecode/chunk.py`: token-aware chunk packing.
-- `ecode/export.py`: the pipeline and the writers for all output files.
-- `ecode/azure.py`: Azure AI Search index schema, validation and push (API keys or Entra ID).
-- `app/main.py`: the public chat API (hybrid search, semantic ranker, streamed answers with citations, rate limits).
-- `app/web/`: the web UI, plain HTML, CSS and JS.
+- `ecode/fetch.py`: HTTP with a disk cache, a rate limit and retries.
+- `ecode/parse.py`: parses the table of contents. Converts the HTML of the chapter print pages to Markdown. Supports nested subsections, definitions, tables with row and column spans, footnotes, history notes and attachments.
+- `ecode/pdf.py`: converts PDF to Markdown with `pymupdf4llm`. Removes the headers and footers that repeat on each page.
+- `ecode/chunk.py`: puts text into chunks by token count.
+- `ecode/export.py`: the pipeline, and the writers for all output files.
+- `ecode/azure.py`: the Azure AI Search index schema, validation and push. Supports API keys or Entra ID.
+- `app/main.py`: the public chat API. It does hybrid search with the semantic ranker, streams answers with citations and applies rate limits.
+- `app/web/`: the web UI, in plain HTML, CSS and JS.
 - `infra/main.bicep`, `infra/deploy.sh`, `infra/refresh.sh`, `Dockerfile`: the Azure deployment.
 
-Other eCode360 codes should work with `--customer <ID>`, though only WA3904 has been tested. The index name, "Waterville" in the defaults and the chunk header text come from the site, so change `AZURE_SEARCH_INDEX` for another code.
+Other eCode360 codes possibly work with `--customer <ID>`. We tested only WA3904. The index name, the name "Waterville" in the defaults and the text of the chunk header come from the site. For a different code, change `AZURE_SEARCH_INDEX`.

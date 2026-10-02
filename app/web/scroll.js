@@ -19,6 +19,8 @@
   for (const ev of ["wheel", "touchmove", "pointerdown"]) window.addEventListener(ev, markInput, { passive: true });
   window.addEventListener("keydown", (e) => {
     if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key) && e.target === document.body) markInput();
+    // Opening a source from the keyboard can scroll its chip into view.
+    if ((e.key === "Enter" || e.key === " ") && e.target.closest?.(".cite, .sources a")) markInput();
   });
   window.addEventListener("scroll", () => {
     if (performance.now() - userInputAt < 400) follow = atBottom();

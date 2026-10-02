@@ -49,13 +49,27 @@
     <textarea id="q" rows="1" maxlength="1000" placeholder="Ask about the City Code..." required></textarea>
     <button type="submit" id="send">Ask</button>
   </form>
-
-  <p class="disclaimer">
-    This assistant gives general information from the
-    <a href="https://ecode360.com/WA3904" target="_blank" rel="noopener">official City Code on eCode360</a>
-    and can make mistakes. It is not legal advice. Check the linked sections, and for questions about a specific property or permit contact the City Clerk at 207-680-4200.
-  </p>
 </main>
+
+<div id="panel-backdrop" class="panel-backdrop" hidden></div>
+<aside id="panel" class="panel" role="complementary" aria-label="Source text" hidden>
+  <div class="panel-head">
+    <div class="panel-id">
+      <h2 id="panel-title" tabindex="-1">Source</h2>
+      <div id="panel-meta" class="panel-meta"></div>
+    </div>
+    <button type="button" class="panel-close" aria-label="Close source">
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.5 3.5l9 9m0-9l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+    </button>
+  </div>
+  <div id="panel-scroll" class="panel-scroll">
+    <div id="panel-claim" class="panel-claim" hidden></div>
+    <p id="panel-note" class="panel-note" hidden></p>
+    <div id="panel-body" class="panel-body"></div>
+  </div>
+  <div class="panel-foot"><a id="panel-open" target="_blank" rel="noopener">Open original</a></div>
+</aside>
+<script src="/source.js"></script>
 <script src="/app.js"></script>
 <script src="/scroll.js"></script>
 <script src="/theme.js"></script>
