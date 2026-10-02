@@ -204,6 +204,15 @@ form#ask {
 #send:hover { filter: brightness(1.08); }
 #send:disabled { opacity: 0.45; cursor: default; filter: none; }
 form#ask:focus-within { border-color: var(--accent); }
+/* The ask bar lines up with the answer boxes instead of spanning the full width. */
+form#ask { margin-left: 52px; }
+#intro:not([hidden]) ~ form#ask { margin-left: 0; }
+@media (min-width: 1100px) {
+  /* Same width as the answer's text column: stop at the rule before the sources column. */
+  form#ask { max-width: calc(100% - 52px - 373px); }
+  /* Before the first question, end on the border after the third example tile. */
+  #intro:not([hidden]) ~ form#ask { max-width: 75%; }
+}
 
 /* Wide screens: answers get a reading column with their sources beside it. */
 @media (min-width: 1100px) {
@@ -243,6 +252,7 @@ form#ask:focus-within { border-color: var(--accent); }
   .sources { margin-inline: -16px; padding-inline: 16px; }
   #q { padding: 12px 14px; }
   #send { padding: 0 18px; }
+  form#ask { margin-left: 0; }
 }
 
 /* ---- source panel ---- */

@@ -12,7 +12,7 @@
 #   CHAT_MODEL_VERSION default: newest GA version in the region
 #   CHAT_CAPACITY      thousands of tokens/minute for the chat model (default 50)
 #   EMBEDDING_CAPACITY thousands of tokens/minute for embeddings (default 150)
-#   MIN_REPLICAS       0 scales to zero when idle (default), 1 avoids cold starts
+#   MIN_REPLICAS       1 keeps one replica warm (default), 0 scales to zero when idle (~20 s cold start)
 #   SEARCH_LOCATION    region for AI Search when the main region has no capacity
 #                      (default: the existing service's region, else the group's)
 #   REFRESH=1          run the refresh job even if this is not the first deploy
@@ -22,7 +22,7 @@ cd "$(dirname "$0")/.."
 RG=${RESOURCE_GROUP:-rg-waterville-rag}
 CHAT_CAPACITY=${CHAT_CAPACITY:-50}
 EMBEDDING_CAPACITY=${EMBEDDING_CAPACITY:-150}
-MIN_REPLICAS=${MIN_REPLICAS:-0}
+MIN_REPLICAS=${MIN_REPLICAS:-1}
 EMBEDDING_MODEL=text-embedding-3-large
 
 log() { printf '\n==> %s\n' "$*" >&2; }

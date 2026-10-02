@@ -39,8 +39,8 @@ param deployApps bool = false
 @description('Full image reference, e.g. myacr.azurecr.io/waterville:abc123.')
 param image string = ''
 
-@description('Minimum app replicas. 0 scales to zero when idle (a few seconds of cold start).')
-param minReplicas int = 0
+@description('Minimum app replicas. 1 keeps the app warm; 0 scales to zero when idle (about 20 seconds of cold start).')
+param minReplicas int = 1
 
 @description('Cron schedule (UTC) for the refresh job. Default: Mondays 07:00.')
 param refreshCron string = '0 7 * * 1'

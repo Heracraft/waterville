@@ -140,7 +140,7 @@ The `infra/` folder deploys a public question-and-answer site that uses the inde
 
 - **Azure AI Search** (Basic, semantic ranker on the standard plan) contains the index.
 - **Azure OpenAI** has two deployments: `embedding` (text-embedding-3-large) and `chat`. Key authentication is off for the account.
-- **Container Apps** runs `waterville-app`. This is the FastAPI chat API. It also serves the web UI from `app/web/`. It scales from 0 to 2 replicas.
+- **Container Apps** runs `waterville-app`. This is the FastAPI chat API. It also serves the web UI from `app/web/`. It runs 1 to 2 replicas. One replica stays warm, so there is no cold start. Set `MIN_REPLICAS=0` to scale to zero when idle (the first request then waits about 20 seconds).
 - **A Container Apps job** (`waterville-refresh`) runs each Monday at 07:00 UTC. The job crawls eCode360 again, does the completeness check and updates the index. It also deletes sections that the code no longer contains. If the crawl is not complete, the job stops before it changes the index.
 - **Azure Container Registry** (Basic) keeps the image. **Log Analytics** keeps the logs.
 
