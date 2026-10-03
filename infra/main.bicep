@@ -47,6 +47,12 @@ param refreshCron string = '0 7 * * 1'
 
 param searchIndex string = 'waterville-code'
 
+@description('Custom hostname bound to the app (empty for none). Keeps the binding on redeploys.')
+param customDomain string = 'waterville.nehemia.dev'
+
+@description('Name of the Azure-managed certificate for customDomain in the environment.')
+param customDomainCertificate string = 'mc-waterville-env-waterville-nehem-9228'
+
 var suffix = uniqueString(resourceGroup().id)
 var tags = { app: 'waterville-code-assistant' }
 
@@ -252,6 +258,11 @@ resource env 'Microsoft.App/managedEnvironments@2024-03-01' = {
   }
 }
 
+resource domainCert 'Microsoft.App/managedEnvironments/managedCertificates@2024-03-01' existing = if (!empty(customDomain)) {
+  parent: env
+  name: customDomainCertificate
+}
+
 var commonEnv = [
   { name: 'AZURE_SEARCH_ENDPOINT', value: 'https://${search.name}.search.windows.net' }
   { name: 'AZURE_SEARCH_INDEX', value: searchIndex }
@@ -274,6 +285,9 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
         targetPort: 8000
         transport: 'auto'
         allowInsecure: false
+        customDomains: empty(customDomain) ? [] : [
+          { name: customDomain, certificateId: domainCert.id, bindingType: 'SniEnabled' }
+        ]
       }
       registries: [ { server: acr.properties.loginServer, identity: appIdentity.id } ]
     }

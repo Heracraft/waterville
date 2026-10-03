@@ -106,10 +106,21 @@ var roles = {
   storageTableDataContributor: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
 }
 
+@description('Custom hostname bound to the preview app (empty for none). Keeps the binding on redeploys.')
+param customDomain string = 'waterville-preview.nehemia.dev'
+
+@description('Name of the Azure-managed certificate for customDomain in the environment.')
+param customDomainCertificate string = 'mc-waterville-env-waterville-previ-1801'
+
 // ------------------------------------------------------------------ existing (read only)
 
 resource env 'Microsoft.App/managedEnvironments@2024-03-01' existing = {
   name: envName
+}
+
+resource domainCert 'Microsoft.App/managedEnvironments/managedCertificates@2024-03-01' existing = if (!empty(customDomain)) {
+  parent: env
+  name: customDomainCertificate
 }
 
 resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
@@ -315,6 +326,9 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
         targetPort: 8000
         transport: 'auto'
         allowInsecure: false
+        customDomains: empty(customDomain) ? [] : [
+          { name: customDomain, certificateId: domainCert.id, bindingType: 'SniEnabled' }
+        ]
       }
       registries: [ { server: acr.properties.loginServer, identity: appIdentity.id } ]
       secrets: [
