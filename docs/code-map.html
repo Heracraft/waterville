@@ -16,6 +16,8 @@
     --stone: #e1dcd8;
     --band: #032c3c;
     --band-text: #e1dcd8;
+    --band-link: #e6c5b8;
+    --adv-ink: #ba351a;
     --hi: #f3e2db;
     --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
     --sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -23,34 +25,38 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --paper: #011a24;
-      --surface: #032c3c;
-      --text: #e6e2de;
-      --muted: #9fb3bb;
-      --rule: #6f8c97;
-      --hair: #20475a;
-      --rust: #e2674a;
+      --paper: #102f3c;
+      --surface: #1c4556;
+      --text: #f1f2f1;
+      --muted: #bfd0d6;
+      --rule: #7f9ea9;
+      --hair: #3a6678;
+      --rust: #f59c80;
       --blush: #5a2f26;
-      --stone: #0b3647;
-      --band: #00121a;
-      --band-text: #e1dcd8;
-      --hi: #3d231d;
+      --stone: #29586b;
+      --band: #00090d;
+      --band-text: #e8e4e0;
+      --band-link: #f1cdbf;
+      --adv-ink: #ffd2c4;
+      --hi: #4a2c24;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --paper: #011a24;
-    --surface: #032c3c;
-    --text: #e6e2de;
-    --muted: #9fb3bb;
-    --rule: #6f8c97;
-    --hair: #20475a;
-    --rust: #e2674a;
+    --paper: #102f3c;
+    --surface: #1c4556;
+    --text: #f1f2f1;
+    --muted: #bfd0d6;
+    --rule: #7f9ea9;
+    --hair: #3a6678;
+    --rust: #f59c80;
     --blush: #5a2f26;
-    --stone: #0b3647;
-    --band: #00121a;
-    --band-text: #e1dcd8;
-    --hi: #3d231d;
+    --stone: #29586b;
+    --band: #00090d;
+    --band-text: #e8e4e0;
+    --band-link: #f1cdbf;
+    --adv-ink: #ffd2c4;
+    --hi: #4a2c24;
   }
 
   * { box-sizing: border-box; }
@@ -77,7 +83,7 @@
   }
   .lede { max-width: 62ch; margin: 0; font: 300 1.15rem/1.55 var(--serif); color: #cfd6d9; }
   .toc { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 22px; font-size: 0.85rem; }
-  .toc a { color: var(--blush); }
+  .toc a { color: var(--band-link); }
 
   main .wrap { padding-block: 8px 56px; }
   section { padding-top: 48px; }
@@ -102,7 +108,7 @@
   .rung .what strong { font-weight: 600; }
   .rung .eg { font-size: 0.85rem; color: var(--muted); }
   .rung.adv { background: var(--stone); }
-  .rung.adv .tier { color: var(--rust); }
+  .rung.adv .tier { color: var(--adv-ink); }
   .ladder-note { margin: 10px 0 0; font-size: 0.85rem; color: var(--muted); max-width: 75ch; }
   @media (max-width: 760px) {
     .rung { grid-template-columns: 1fr; gap: 4px; }
@@ -149,6 +155,7 @@
   .pill.law { color: var(--text); }
   .pill.proc { color: var(--muted); }
   .pill.adv { color: var(--rust); }
+  .rung.adv .eg { color: var(--text); }
   .pill.full { color: var(--text); background: var(--stone); border-color: var(--stone); }
   .pill.ref { color: var(--rust); }
   .pill.none { color: var(--muted); }
