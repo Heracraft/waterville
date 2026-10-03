@@ -359,4 +359,10 @@ async def index():
     return FileResponse(WEB_DIR / "index.html")
 
 
+# Unlisted explainer page, shared by link only (built by docs/build_map.py).
+@app.get("/map")
+async def code_map():
+    return FileResponse(WEB_DIR / "map.html", headers={"X-Robots-Tag": "noindex"})
+
+
 app.mount("/", StaticFiles(directory=WEB_DIR), name="web")
