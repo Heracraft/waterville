@@ -37,9 +37,10 @@ def _system(captured) -> str:
 
 def test_staff_prompt_rules():
     p = prompts.STAFF_SYSTEM_PROMPT
-    # Section numbers first, verbatim blockquotes with citations.
-    assert "First line: the controlling citations in bold" in p
-    assert 'blockquotes' in p and '"> "' in p
+    # Prose with sections named and cited inline; no pasted source blocks.
+    assert "Name each section in the sentence that relies on it" in p
+    assert "Do not paste blocks of source text" in p
+    assert '"> "' not in p
     # The enforcement chain with the § 4452(3) tier as the sources state it.
     assert "Enforcement chain" in p and "30-A M.R.S. § 4452(3)" in p and "Rule 80K" in p
     assert "Never carry a figure from one paragraph to another" in p
@@ -80,8 +81,17 @@ def test_public_chat_never_gets_staff_prompt(staff_client, capture):
     # Signed-in staff asking without mode=staff get the public prompt.
     staff_client.post("/api/chat", json=Q)
     assert capture["kind"] == "public"
-    assert _system(capture).startswith(prompts.PUBLIC_SYSTEM_PROMPT + "\n\nSources:\n\n[1] ")
+    assert _system(capture).startswith(prompts.PUBLIC_SYSTEM_PROMPT + prompts.CHECKLIST_NOTE + "\n\nSources:\n\n[1] ")
     assert "STAFF" not in _system(capture) and "Enforcement chain" not in _system(capture)
+
+
+def test_checklist_note_only_with_a_checklist_card(client, capture):
+    # A matched checklist card tells the model not to repeat it.
+    client.post("/api/chat", json={"messages": [{"role": "user", "content": "How tall can my fence be?"}]})
+    assert prompts.CHECKLIST_NOTE in _system(capture)
+    # No card, no note.
+    client.post("/api/chat", json={"messages": [{"role": "user", "content": "When does the city council meet?"}]})
+    assert prompts.CHECKLIST_NOTE not in _system(capture)
 
 
 def test_staff_filters_reach_prompt(staff_client, capture):

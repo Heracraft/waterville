@@ -322,10 +322,18 @@ if (opts.publicOnly) {
 		{ needs: signedIn }
 	);
 
+	async function openDeskPanel(name) {
+		const toggle = page.locator('.desk-bar').getByRole('button', { name });
+		if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+		await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+	}
+
 	await step(
 		'desk lookup',
 		async () => {
 			await page.goto(caseId ? `/staff?case=${encodeURIComponent(caseId)}` : '/staff');
+			// Lookup, filters and case are closed until opened.
+			await openDeskPanel('Citation lookup');
 			await page.getByLabel('Look up a citation').fill('205-7');
 			await page.getByRole('button', { name: 'Open', exact: true }).click();
 			const result = page.locator('.desk-result');
@@ -359,6 +367,7 @@ if (opts.publicOnly) {
 		'desk filters',
 		async () => {
 			if (!new URL(page.url()).pathname.startsWith('/staff')) await page.goto(`/staff?case=${encodeURIComponent(caseId)}`);
+			await openDeskPanel(/^Filters/);
 			const chip = page.getByRole('button', { name: 'City Code', exact: true });
 			await expect(chip).toBeVisible({ timeout: 20_000 });
 			await chip.click();

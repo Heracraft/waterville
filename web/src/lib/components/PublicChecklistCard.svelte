@@ -8,7 +8,8 @@
 		open = false,
 		external = false,
 		showGuide = true,
-		headingLevel = 3
+		headingLevel = 3,
+		compact = false
 	}: {
 		checklist: Checklist;
 		/** Open the "What to bring" list. */
@@ -18,6 +19,9 @@
 		/** Link to /permits for this project. */
 		showGuide?: boolean;
 		headingLevel?: 2 | 3;
+		/** Under a chat answer: the answer already covers the sections, so show
+		 *  only the confirm line and a closed "before you apply" list. */
+		compact?: boolean;
 	} = $props();
 
 	const c = $derived(checklist);
@@ -26,6 +30,33 @@
 	const fireClass = $derived(c.fire_review.status === 'yes' ? 'is-yes' : c.fire_review.status === 'no' ? 'is-no' : 'is-maybe');
 </script>
 
+{#if compact}
+<section class="pc pc-compact" aria-label="Permit checklist: {c.title}">
+	<p class="pc-line">{c.confirm_line}</p>
+	<details class="pc-bring" {open}>
+		<summary>Before you apply: what to bring{c.forms.length ? ' and which form' : ''} ({c.bring.length})</summary>
+		<ul>
+			{#each c.bring as item, i (i)}<li>{item}</li>{/each}
+		</ul>
+		{#if c.forms.length}
+			<p class="pc-muted">
+				Form{c.forms.length > 1 ? 's' : ''}:
+				{#each c.forms as f, i (f.id)}{#if i}, {/if}<a href={f.url} target="_blank" rel="noopener">{f.title}</a>{/each}
+			</p>
+		{:else}
+			<p class="pc-muted">No form for this is posted online. Ask the office which application to file.</p>
+		{/if}
+		{#if c.fire_review.status === 'yes'}
+			<p class="pc-muted"><strong>Fire Department review.</strong> {c.fire_review.label}</p>
+		{/if}
+		{#if c.survey_note}<p class="pc-muted">{c.survey_note}</p>{/if}
+		<p class="pc-links">
+			{#if showGuide}<a href={c.permit_guide} {target} {rel}>Permit guide</a>{/if}
+			<a href="/fees" {target} {rel}>Estimate fees</a>
+		</p>
+	</details>
+</section>
+{:else}
 <section class="pc" aria-label="Permit checklist: {c.title}">
 	<div class="pc-head">
 		<span class="pc-kicker">Permit checklist</span>
@@ -85,6 +116,7 @@
 		<a href="/fees" {target} {rel}>Estimate fees</a>
 	</p>
 </section>
+{/if}
 
 <style>
 	.pc {
@@ -97,6 +129,22 @@
 		:global(.msg.bot > .sources) ~ .pc {
 			margin-top: 40px;
 		}
+	}
+	.pc-compact {
+		margin-top: 18px;
+		padding-top: 12px;
+	}
+	.pc-line {
+		margin: 0 0 8px;
+		font-weight: 600;
+		color: var(--text);
+	}
+	.pc-compact .pc-bring {
+		border-top: 0;
+		padding-top: 0;
+	}
+	.pc-compact .pc-links {
+		margin-bottom: 4px;
 	}
 	.pc-head {
 		margin-bottom: 12px;

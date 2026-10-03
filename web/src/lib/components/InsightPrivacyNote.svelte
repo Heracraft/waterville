@@ -9,8 +9,7 @@
 <footer class="privacy-note" inert={chrome.modal}>
 	<div class="wrap">
 		<p>
-			Questions are logged without personal details to improve the service. Names, street addresses, map and lot
-			numbers, phone numbers and email addresses are removed before a question is saved.
+			Questions are saved without names, addresses or phone numbers to improve the service.
 			{#if offlineLink}<a href="/offline">Sections saved on this device</a>{/if}
 		</p>
 	</div>

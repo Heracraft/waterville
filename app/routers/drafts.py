@@ -83,7 +83,7 @@ PK = "draft"
 ID_RE = r"^[A-Za-z0-9_\-]{1,64}$"
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "data" / "templates"
 
-BANNER = "Draft for review. The Code Enforcement Officer reviews and signs. Check every citation against the primary source."
+BANNER = "The Code Enforcement Officer reviews and signs. Check every citation against the primary source."
 FOOTER = "DRAFT FOR REVIEW. The Code Enforcement Officer reviews and signs. Check every citation against the primary source."
 LETTERHEAD = ("City of Waterville", "Code Enforcement Office", "7 College Avenue, Waterville, Maine 04901")
 

@@ -113,7 +113,9 @@ def test_staff_mode_uses_staff_prompt_and_depth(staff_client, monkeypatch):
     assert captured["max_tokens"] == config.STAFF_MAX_ANSWER_TOKENS
     assert captured["kind"] == "staff"
     staff_client.post("/api/chat", json=Q)
-    assert captured["messages"][0]["content"].startswith(prompts.PUBLIC_SYSTEM_PROMPT + "\n\nSources:\n\n[1] ")
+    assert captured["messages"][0]["content"].startswith(prompts.PUBLIC_SYSTEM_PROMPT)
+    assert "\n\nSources:\n\n[1] " in captured["messages"][0]["content"]
+    assert prompts.STAFF_SYSTEM_PROMPT not in captured["messages"][0]["content"]
     assert captured["max_tokens"] == config.MAX_ANSWER_TOKENS
 
 

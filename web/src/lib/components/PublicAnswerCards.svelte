@@ -12,5 +12,5 @@
 {#if cards.triage}
 	<PublicTriageCard triage={cards.triage} {external} />
 {:else if cards.checklist}
-	<PublicChecklistCard checklist={cards.checklist} {external} />
+	<PublicChecklistCard checklist={cards.checklist} {external} compact />
 {/if}

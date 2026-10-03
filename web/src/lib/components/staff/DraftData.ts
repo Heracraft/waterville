@@ -100,7 +100,7 @@ export type PenaltyResult = {
 
 /** The banner every draft carries. The server sends the same text with each draft. */
 export const BANNER =
-	'Draft for review. The Code Enforcement Officer reviews and signs. Check every citation against the primary source.';
+	'The Code Enforcement Officer reviews and signs. Check every citation against the primary source.';
 
 const base = '/api/staff/drafts';
 const enc = encodeURIComponent;

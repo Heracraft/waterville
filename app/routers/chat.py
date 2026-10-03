@@ -126,6 +126,12 @@ async def chat(req: ChatRequest, request: Request):
     context, sources = search.format_sources(docs, mode)
     # Staff: tell the model which filters narrowed the search, so a gap reads as out of scope.
     scope = prompts.staff_scope(search.validate_filters(filters, mode)) if mode == "staff" else ""
+    # Public: a permit checklist (A1) or a triage card (A2) matched by keyword,
+    # sent just before `done`. Clients that do not know the event ignore it.
+    # The model is told about a checklist so the answer does not repeat it.
+    cards = checklists.chat_cards(question) if mode == "public" else []
+    if any(name == "checklist" for name, _ in cards):
+        scope += prompts.CHECKLIST_NOTE
     # Earlier assistant turns are trimmed so old answers don't crowd out sources.
     history = [{"role": m["role"], "content": m["content"][:2000]} for m in messages[:-1]]
     chat_messages = (
@@ -136,9 +142,6 @@ async def chat(req: ChatRequest, request: Request):
     max_tokens = config.STAFF_MAX_ANSWER_TOKENS if mode == "staff" else config.MAX_ANSWER_TOKENS
     events = await llm.open_stream(chat_messages, max_tokens, kind=mode)
     answer_id = uuid.uuid4().hex
-    # Public: a permit checklist (A1) or a triage card (A2) matched by keyword,
-    # sent just before `done`. Clients that do not know the event ignore it.
-    cards = checklists.chat_cards(question) if mode == "public" else []
 
     async def stream():
         yield sse("meta", {"mode": mode, "answer_id": answer_id})
