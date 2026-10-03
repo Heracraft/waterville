@@ -63,96 +63,21 @@
   function el(tag, cls, html) { var n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
-  // ---------------------------------------------------------------- map
-  var colEnt = document.getElementById('col-ent'), colDoc = document.getElementById('col-doc');
-  var detail = document.getElementById('detail'), svg = document.getElementById('wires'), grid = document.getElementById('mapgrid');
-  var btns = {};
-  var groups = {};
-  ENTS.forEach(function (e) {
-    if (!groups[e.g]) { groups[e.g] = el('div', 'grp'); groups[e.g].appendChild(el('div', 'label', esc(e.g))); colEnt.appendChild(groups[e.g]); }
-    var b = el('button', 'pick', '<span class="nm' + (e.key ? ' key' : '') + '">' + esc(e.name) + '</span>');
-    b.type = 'button'; b.dataset.id = e.id; groups[e.g].appendChild(b); btns[e.id] = b;
-  });
-  var dg = el('div', 'grp'); dg.appendChild(el('div', 'label', 'Types of documents')); colDoc.appendChild(dg);
-  DOCS.forEach(function (d) {
-    var b = el('button', 'pick', '<i class="sw ' + d.force + '" title="' + FORCE[d.force] + '"></i><span class="nm">' + esc(d.name) + '</span><i class="cov ' + d.cov + '" title="' + COV[d.cov] + '"></i>');
-    b.type = 'button'; b.dataset.id = d.id; dg.appendChild(b); btns[d.id] = b;
-  });
-
-  var EDGES = [];
-  ENTS.forEach(function (e) {
-    (e.makes || []).forEach(function (d) { EDGES.push({ a: e.id, b: d, dash: false }); });
-    (e.hosts || []).forEach(function (d) { EDGES.push({ a: e.id, b: d, dash: true }); });
-  });
-
-  function draw() {
-    var box = grid.getBoundingClientRect();
-    svg.setAttribute('viewBox', '0 0 ' + box.width + ' ' + box.height);
-    svg.innerHTML = '';
-    if (getComputedStyle(svg).display === 'none') return;
-    EDGES.forEach(function (ed) {
-      var A = btns[ed.a].getBoundingClientRect(), B = btns[ed.b].getBoundingClientRect();
-      var x1 = A.right - box.left, y1 = A.top + A.height / 2 - box.top;
-      var x2 = B.left - box.left, y2 = B.top + B.height / 2 - box.top;
-      var mx = (x1 + x2) / 2;
-      var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      p.setAttribute('d', 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2);
-      p.dataset.a = ed.a; p.dataset.b = ed.b;
-      if (ed.dash) p.classList.add('dash');
-      svg.appendChild(p);
-    });
-    mark();
+  // ---------------------------------------------------------------- entity filter
+  var chips = document.querySelectorAll('.chip[data-level]');
+  var cards = document.querySelectorAll('.ent');
+  var groupsEl = document.querySelectorAll('.groups > div');
+  function applyLevel(level) {
+    chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.level === level)); });
+    cards.forEach(function (e) { e.hidden = level !== 'all' && e.dataset.level !== level; });
+    groupsEl.forEach(function (g) { g.hidden = !g.querySelector('.ent:not([hidden])'); });
+    try { localStorage.setItem('codemap-level', level); } catch (e) {}
   }
-
-  var current = 'icc';
-  function related(id) {
-    var r = {};
-    EDGES.forEach(function (ed) { if (ed.a === id) r[ed.b] = 1; if (ed.b === id) r[ed.a] = 1; });
-    return r;
-  }
-  function mark() {
-    var r = related(current);
-    Object.keys(btns).forEach(function (k) {
-      var b = btns[k];
-      b.classList.toggle('on', k === current);
-      b.classList.toggle('rel', !!r[k]);
-      b.classList.toggle('dim', k !== current && !r[k]);
-      b.setAttribute('aria-pressed', String(k === current));
-    });
-    svg.querySelectorAll('path').forEach(function (p) {
-      var hi = p.dataset.a === current || p.dataset.b === current;
-      p.classList.toggle('hi', hi);
-      if (hi) svg.appendChild(p);
-    });
-  }
-  function usedIn(docId) { return STEPS.filter(function (s) { return s.src.some(function (x) { return x[0] === docId; }); }); }
-  function stepsFor(entId) { return STEPS.filter(function (s) { return s.who.indexOf(entId) >= 0; }); }
-  function stepTags(list) { return list.length ? '<span class="tags">' + list.map(function (s) { return '<span class="tag">' + esc(s.name) + '</span>'; }).join('') + '</span>' : 'Not a direct part of the workflow'; }
-
-  function show(id) {
-    current = id;
-    var d = docById[id], e = entById[id], h = '';
-    if (d) {
-      var makers = EDGES.filter(function (x) { return x.b === id && !x.dash; }).map(function (x) { return entById[x.a].name; });
-      var hosts = EDGES.filter(function (x) { return x.b === id && x.dash; }).map(function (x) { return entById[x.a].name; });
-      h += '<div class="kind">Type of document</div><h3>' + esc(d.name) + '</h3><p>' + esc(d.covers) + '</p><dl>';
-      h += '<dt>Legal force</dt><dd><span class="tag"><i class="sw ' + d.force + '"></i>' + FORCE[d.force] + '</span></dd>';
-      h += '<dt>Example</dt><dd><code>' + esc(d.eg) + '</code></dd>';
-      h += '<dt>Made by</dt><dd>' + esc(makers.join(', ') || 'None') + '</dd>';
-      if (hosts.length) h += '<dt>Related</dt><dd>' + esc(hosts.join(', ')) + '</dd>';
-      h += '<dt>Assistant</dt><dd><span class="tag"><i class="cov ' + d.cov + '"></i>' + COV[d.cov] + '</span></dd>';
-      h += '<dt>Used in</dt><dd>' + stepTags(usedIn(id)) + '</dd></dl>';
-    } else if (e) {
-      h += '<div class="kind">' + esc(e.g) + '</div><h3>' + esc(e.name) + '</h3><p>' + esc(e.does) + '</p><dl>';
-      h += '<dt>Makes</dt><dd>' + ((e.makes || []).length ? '<span class="tags">' + e.makes.map(function (m) { return '<span class="tag"><i class="sw ' + docById[m].force + '"></i>' + esc(docById[m].name) + '</span>'; }).join('') + '</span>' : 'No documents') + '</dd>';
-      if (e.decides) h += '<dt>Decides</dt><dd>' + esc(e.decides) + '</dd>';
-      if (e.hosts) h += '<dt>Related</dt><dd>' + esc(e.hosts.map(function (m) { return docById[m].name; }).join(', ')) + '</dd>';
-      h += '<dt>Workflow</dt><dd>' + stepTags(stepsFor(id)) + '</dd></dl>';
-    }
-    detail.innerHTML = h;
-    mark();
-  }
-  Object.keys(btns).forEach(function (k) { btns[k].addEventListener('click', function () { show(k); }); });
+  chips.forEach(function (c) { c.addEventListener('click', function () { applyLevel(c.dataset.level); }); });
+  var savedLevel = 'all';
+  try { savedLevel = localStorage.getItem('codemap-level') || 'all'; } catch (e) {}
+  if (!document.querySelector('.chip[data-level="' + savedLevel + '"]')) savedLevel = 'all';
+  applyLevel(savedLevel);
 
   // ---------------------------------------------------------------- lanes
   var lanes = document.getElementById('lanes'), sd = document.getElementById('stepdetail');
@@ -182,10 +107,5 @@
       '<div><div class="label">Who is involved</div><div class="tags" style="margin-top:6px">' + s.who.map(function (w) { return '<span class="tag">' + esc(entById[w].name) + '</span>'; }).join('') + '</div><div class="tool">Preview tool: ' + esc(s.tool) + '</div></div>';
   }
 
-  show('icc');
   pickStep('s1');
-  draw();
-  window.addEventListener('resize', function () { requestAnimationFrame(draw); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
-  if (window.ResizeObserver) new ResizeObserver(function () { requestAnimationFrame(draw); }).observe(grid);
 })();

@@ -159,43 +159,50 @@
     .tier .bar { width: 100% !important; }
   }
 
-  /* map */
-  .map { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr); gap: 0 64px; position: relative; }
-  .map svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-  .wires path { fill: none; stroke: var(--line); stroke-width: 1.25; }
-  .wires path.dash { stroke-dasharray: 4 4; }
-  .wires path.hi { stroke: var(--line-hi); stroke-width: 2; }
-  .col { position: relative; z-index: 1; display: grid; gap: 14px; align-content: start; }
-  .grp { display: grid; gap: 4px; }
-  .grp .label { margin-bottom: 2px; }
-  .pick {
-    display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
-    border: 1px solid var(--rule); background: var(--surface); padding: 7px 10px; cursor: pointer; font-size: 0.86rem;
+  /* entities */
+  .filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 18px; font-size: 0.85rem; }
+  .filter span { color: var(--muted); margin-right: 4px; }
+  .chip {
+    font: 500 0.82rem/1.3 var(--sans); padding: 6px 12px; border: 1px solid var(--rule);
+    background: transparent; color: var(--text); cursor: pointer;
   }
-  .pick:hover { background: var(--stone); }
-  .pick.on { background: var(--sel); border-color: var(--rust); }
-  .pick.rel { border-color: var(--rust); }
-  .pick.dim { opacity: 0.62; }
-  .pick .nm { flex: 1; min-width: 0; }
-  .pick .key { font-weight: 600; }
-  .detail { position: sticky; top: 16px; align-self: start; border: 1px solid var(--rule); background: var(--surface); padding: 16px 18px; z-index: 1; }
-  .detail .kind { font: 600 0.7rem/1.3 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--rust); }
-  .detail h3 { margin: 4px 0 8px; font: 400 1.35rem/1.25 var(--serif); }
-  .detail p { margin: 0 0 10px; font-size: 0.9rem; }
-  .detail dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 10px 0 0; font-size: 0.84rem; border-top: 1px solid var(--hair); padding-top: 10px; }
-  .detail dt { color: var(--muted); }
-  .detail dd { margin: 0; }
-  .detail code { font: 500 0.8rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  .tags { display: flex; flex-wrap: wrap; gap: 4px; }
-  .tag { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--hair); padding: 1px 7px; font-size: 0.78rem; }
-  @media (max-width: 980px) {
-    .map { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 40px; }
-    .detail { grid-column: 1 / -1; position: static; order: -1; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .groups { display: grid; gap: 28px; }
+  .groups h3 { font: 600 0.78rem/1.3 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--rust); margin: 0 0 10px; }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    border-top: 1px solid var(--rule); border-left: 1px solid var(--rule);
   }
-  @media (max-width: 640px) {
-    .map { grid-template-columns: 1fr; }
-    .map svg.wires { display: none; }
+  .ent {
+    background: var(--surface); padding: 14px 16px 16px;
+    border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+    display: flex; flex-direction: column; gap: 6px;
   }
+  .ent h4 { margin: 0; font: 400 1.12rem/1.3 var(--serif); }
+  .ent .role { margin: 0; font-size: 0.88rem; }
+  .ent .makes { margin: 4px 0 0; font-size: 0.78rem; color: var(--muted); }
+  .ent .makes b { font-weight: 600; color: var(--text); }
+  .ent.key { background: var(--stone); }
+
+  /* classes table */
+  .tablebox { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 860px; font-size: 0.86rem; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-top: 1px solid var(--hair); }
+  thead th {
+    border-top: 0; border-bottom: 1px solid var(--rule); font: 600 0.72rem/1.3 var(--sans);
+    letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); background: var(--surface);
+  }
+  td:first-child { font: 400 1rem/1.35 var(--serif); width: 17%; }
+  td code { font: 500 0.82rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: nowrap; }
+  .pill { display: inline-block; font: 600 0.7rem/1.6 var(--sans); letter-spacing: 0.05em; text-transform: uppercase; padding: 0 7px; border: 1px solid currentColor; white-space: nowrap; }
+  .pill.law { color: var(--text); }
+  .pill.proc { color: var(--muted); }
+  .pill.adv { color: var(--rust); }
+  .pill.full { color: var(--text); background: var(--stone); border-color: var(--stone); }
+  .pill.ref { color: var(--rust); }
+  .pill.none { color: var(--muted); }
+  .tablebox + .legend { margin-top: 12px; }
 
   /* workflow lanes */
   .lanes { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; }
@@ -231,8 +238,9 @@
     .stepdetail > div:first-child { border-top: 0; }
   }
 
-  .gap { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; margin-top: 18px; border: 1px solid var(--rust); background: var(--surface); padding: 14px 16px; max-width: 86ch; font-size: 0.9rem; }
-  .gap .cov { margin-top: 4px; }
+  .callout { border: 1px solid var(--rust); background: var(--surface); padding: 16px 18px; margin-top: 18px; max-width: 80ch; }
+  .callout p { margin: 0 0 8px; }
+  .callout p:last-child { margin: 0; }
   footer { border-top: 1px solid var(--rule); font-size: 0.8rem; color: var(--muted); }
   footer .wrap { padding-block: 16px 28px; }
   @media (prefers-reduced-motion: no-preference) { .pick, .stepbtn, .wires path { transition: background-color .15s, border-color .15s, opacity .15s, stroke .15s; } }
@@ -246,7 +254,8 @@
     <p class="lede">Four groups write the rules: the city, the State of Maine, the courts and private code publishers. This page shows who writes what, how much legal force each document has, and where the inspector uses it.</p>
     <nav class="toc" aria-label="Sections">
       <a href="#authority">Order of authority</a>
-      <a href="#map">Who makes what</a>
+      <a href="#entities">Who is involved</a>
+      <a href="#classes">Types of documents</a>
       <a href="#workflow">The inspector's workflow</a>
     </nav>
   </div>
@@ -286,28 +295,294 @@
       </div>
     </section>
 
-    <section id="map">
+    <section id="entities">
       <div class="sec-head">
         <span class="arrow" aria-hidden="true">&rarr;</span>
-        <h2>Who makes what</h2>
-        <p>Each line connects an organization to a type of document it makes. Select any box to see the details and its connections.</p>
+        <h2>Who is involved</h2>
+        <p>Select a level to show fewer cards. Each card tells what that organization makes or decides.</p>
       </div>
-      <div class="legend" style="margin-bottom:14px">
-        <span><i class="cov full"></i>Assistant has the full text</span>
-        <span><i class="cov partial"></i>Some text, or preview only</span>
-        <span><i class="cov ref"></i>Name and link only (copyright)</span>
-        <span><i class="cov"></i>Not included</span>
-        <span><svg width="26" height="8" aria-hidden="true"><path d="M0 4h26" stroke="currentColor" stroke-dasharray="4 4"/></svg>Hosts or provides the basis for</span>
+      <div class="filter" role="group" aria-label="Filter by level">
+        <span>Show</span>
+        <button type="button" class="chip" data-level="all" aria-pressed="true">All</button>
+        <button type="button" class="chip" data-level="city" aria-pressed="false">City</button>
+        <button type="button" class="chip" data-level="state" aria-pressed="false">State</button>
+        <button type="button" class="chip" data-level="court" aria-pressed="false">Courts</button>
+        <button type="button" class="chip" data-level="private" aria-pressed="false">Publishers and vendors</button>
+        <button type="button" class="chip" data-level="federal" aria-pressed="false">Federal</button>
       </div>
-      <div class="map" id="mapgrid">
-        <svg class="wires" id="wires" aria-hidden="true"></svg>
-        <div class="col" id="col-ent" aria-label="Organizations"></div>
-        <div class="col" id="col-doc" aria-label="Types of documents"></div>
-        <aside class="detail" id="detail" aria-live="polite"></aside>
+
+      <div class="groups">
+        <div>
+          <h3>City of Waterville</h3>
+          <div class="grid">
+            <article class="ent" data-level="city">
+              <h4>City Council</h4>
+              <p class="role">Adopts and changes ordinances and fee schedules. Gives staff permission to take enforcement cases to court.</p>
+              <p class="makes"><b>Makes:</b> City Code chapters, new laws, attachments</p>
+            </article>
+            <article class="ent key" data-level="city">
+              <h4>Code Enforcement Office</h4>
+              <p class="role">Three staff: Director Dan Bradstreet, Code Enforcement Officer Adam Bradstreet and Ordinance Compliance Officer Todd Buckmore. The office issues permits, does inspections, answers questions and enforces the code.</p>
+              <p class="makes"><b>Makes:</b> permits, certificates of occupancy, notices of violation, forms</p>
+            </article>
+            <article class="ent" data-level="city">
+              <h4>Planning Board</h4>
+              <p class="role">Reviews site plans, subdivisions and shoreland applications. The City Planner supports the board. The Code Director reports on approval conditions.</p>
+              <p class="makes"><b>Decides:</b> site plan, subdivision and shoreland approvals</p>
+            </article>
+            <article class="ent" data-level="city">
+              <h4>Board of Zoning Appeals</h4>
+              <p class="role">Hears appeals of inspector decisions. An appeal must be filed within 30 days. The board makes a new decision on the full facts. The board also gives variances.</p>
+              <p class="makes"><b>Decides:</b> appeals, variances (&sect; 275-6.2)</p>
+            </article>
+            <article class="ent" data-level="city">
+              <h4>Fire Department</h4>
+              <p class="role">Does the life safety review for building permits. Keeps the rental registry. Inspects for business licenses and short-term rentals.</p>
+              <p class="makes"><b>Makes:</b> life safety reviews, the rental registry</p>
+            </article>
+            <article class="ent" data-level="city">
+              <h4>City Solicitor</h4>
+              <p class="role">The lawyer for the city. Handles court cases. Answers legal questions that the inspector cannot answer alone.</p>
+              <p class="makes"><b>Makes:</b> legal opinions, court filings</p>
+            </article>
+            <article class="ent" data-level="city">
+              <h4>Electrical and plumbing inspectors</h4>
+              <p class="role">The Municipal Electrical Inspector checks work on one- and two-family houses (&sect; 127-9). The Local Plumbing Inspector issues plumbing and septic permits. The city does not publish who holds these positions.</p>
+              <p class="makes"><b>Makes:</b> electrical and plumbing permits, inspections</p>
+            </article>
+          </div>
+        </div>
+
+        <div>
+          <h3>State of Maine</h3>
+          <div class="grid">
+            <article class="ent" data-level="state">
+              <h4>Maine Legislature</h4>
+              <p class="role">Writes the statutes in the Maine Revised Statutes (M.R.S.). Title 30-A sets the duties, powers and penalties of the inspector.</p>
+              <p class="makes"><b>Makes:</b> statutes</p>
+            </article>
+            <article class="ent" data-level="state">
+              <h4>Maine Office of Community Affairs (MOCA)</h4>
+              <p class="role">Trains and certifies code enforcement officers. This program was in the Department of Economic and Community Development (DECD) before. MOCA publishes the building code rules, the certification rules and the training manuals.</p>
+              <p class="makes"><b>Makes:</b> MUBEC and certification rules, guidance manuals</p>
+            </article>
+            <article class="ent" data-level="state">
+              <h4>State Fire Marshal</h4>
+              <p class="role">Enforces the Life Safety Code (NFPA 101) for the state. Issues construction and accessibility permits for many commercial and multifamily buildings.</p>
+              <p class="makes"><b>Makes:</b> state fire and accessibility permits</p>
+            </article>
+            <article class="ent" data-level="state">
+              <h4>Department of Environmental Protection (DEP)</h4>
+              <p class="role">Writes the shoreland zoning rules. Each town ordinance must agree with these rules. Reviews work near protected natural resources.</p>
+              <p class="makes"><b>Makes:</b> 06-096 CMR ch. 1000, NRPA permits</p>
+            </article>
+            <article class="ent" data-level="state">
+              <h4>Department of Health and Human Services (DHHS)</h4>
+              <p class="role">Writes the rule for septic systems. The rule controls septic design, the HHE-200 form and the septic work of the plumbing inspector.</p>
+              <p class="makes"><b>Makes:</b> 10-144 CMR ch. 241</p>
+            </article>
+            <article class="ent" data-level="state">
+              <h4>Licensing boards</h4>
+              <p class="role">The plumbing and electrical licensing boards adopt the plumbing code and the National Electrical Code. Local inspectors apply these codes.</p>
+              <p class="makes"><b>Makes:</b> plumbing and electrical code rules</p>
+            </article>
+          </div>
+        </div>
+
+        <div>
+          <h3>Courts</h3>
+          <div class="grid">
+            <article class="ent" data-level="court">
+              <h4>District Court</h4>
+              <p class="role">Hears land use citations under Rule 80K. This is how the city gets civil penalties. A certified inspector with permission can present the case for the city.</p>
+              <p class="makes"><b>Decides:</b> violations, penalties, orders</p>
+            </article>
+            <article class="ent" data-level="court">
+              <h4>Superior Court</h4>
+              <p class="role">Hears appeals of decisions by the Board of Zoning Appeals and the Planning Board under Rule 80B.</p>
+              <p class="makes"><b>Decides:</b> appeals of board decisions</p>
+            </article>
+            <article class="ent" data-level="court">
+              <h4>Maine Supreme Judicial Court</h4>
+              <p class="role">Writes the Maine Rules of Civil Procedure. Decides appeals. Its decisions apply to all towns.</p>
+              <p class="makes"><b>Makes:</b> court rules, case law</p>
+            </article>
+          </div>
+        </div>
+
+        <div>
+          <h3>Publishers and vendors</h3>
+          <div class="grid">
+            <article class="ent key" data-level="private">
+              <h4>International Code Council (ICC)</h4>
+              <p class="role">A private nonprofit organization. It writes the model building codes: IRC, IBC, IEBC, IECC and IMC. Officials, builders and engineers help write the codes, and a new edition comes every 3 years. Maine adopts the 2021 editions by rule. The ICC holds the copyright: the codes are free to read online, but copies and search cost money. The ICC also owns General Code.</p>
+              <p class="makes"><b>Makes:</b> model building codes</p>
+            </article>
+            <article class="ent" data-level="private">
+              <h4>General Code (eCode360)</h4>
+              <p class="role">Shows the official City Code online at ecode360.com/WA3904. The ICC owns General Code since 2017. The eCode360 terms of use limit copies of the text.</p>
+              <p class="makes"><b>Shows:</b> the City Code online</p>
+            </article>
+            <article class="ent" data-level="private">
+              <h4>NFPA</h4>
+              <p class="role">The National Fire Protection Association. It writes NFPA 101, the Life Safety Code, and NFPA 70, the National Electrical Code.</p>
+              <p class="makes"><b>Makes:</b> fire and electrical standards</p>
+            </article>
+            <article class="ent" data-level="private">
+              <h4>IAPMO, ASHRAE, ASTM</h4>
+              <p class="role">IAPMO writes the Uniform Plumbing Code. ASHRAE writes standards for ventilation and energy (62.1, 62.2, 90.1). ASTM writes test standards, for example E1465 for radon.</p>
+              <p class="makes"><b>Makes:</b> standards that the codes refer to</p>
+            </article>
+          </div>
+        </div>
+
+        <div>
+          <h3>Federal</h3>
+          <div class="grid">
+            <article class="ent" data-level="federal">
+              <h4>FEMA</h4>
+              <p class="role">The Federal Emergency Management Agency. It makes the flood hazard maps and operates the National Flood Insurance Program. Chapter 145 (floodplains) of the City Code follows this program. The inspector is the city Floodplain Administrator.</p>
+              <p class="makes"><b>Makes:</b> flood insurance rate maps</p>
+            </article>
+          </div>
+        </div>
       </div>
-      <div class="gap">
-        <i class="cov ref" aria-hidden="true"></i>
-        <div><strong>The largest gap.</strong> The ICC codes contain the rules that the inspector checks on site: stairs, guards, fire separations, insulation. The assistant can name them and link the free ICC viewer. It cannot show the text without an ICC license. The city web page also lists old editions (2015 MUBEC, 2017 NEC).</div>
+    </section>
+
+    <section id="classes">
+      <div class="sec-head">
+        <span class="arrow" aria-hidden="true">&rarr;</span>
+        <h2>Types of documents</h2>
+        <p>Each source that the inspector uses is one of these types. The last column tells how much text the Waterville assistant can show.</p>
+      </div>
+      <div class="tablebox">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Type</th>
+              <th scope="col">Who makes it</th>
+              <th scope="col">Example and citation</th>
+              <th scope="col">Legal force</th>
+              <th scope="col">What it covers</th>
+              <th scope="col">In the assistant</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>City Charter</td>
+              <td>Voters and the City Council</td>
+              <td><code>Charter Art. IV, &sect; 9</code></td>
+              <td><span class="pill law">Binding</span></td>
+              <td>The structure of the city government</td>
+              <td><span class="pill full">Full text</span></td>
+            </tr>
+            <tr>
+              <td>City ordinances</td>
+              <td>City Council</td>
+              <td><code>&sect; 275-4.26</code> (Ch. 275 Zoning)</td>
+              <td><span class="pill law">Binding</span></td>
+              <td>38 chapters: zoning, property maintenance, building, rentals, floodplains, licenses</td>
+              <td><span class="pill full">Full text</span></td>
+            </tr>
+            <tr>
+              <td>New laws</td>
+              <td>City Council</td>
+              <td>An adopted ordinance that is not yet in the City Code</td>
+              <td><span class="pill law">Binding</span></td>
+              <td>Recent changes</td>
+              <td><span class="pill full">Full text</span></td>
+            </tr>
+            <tr>
+              <td>Code attachments</td>
+              <td>City Council</td>
+              <td>Ch. 173 Appendix A fee schedule</td>
+              <td><span class="pill law">Binding</span></td>
+              <td>Fee schedules, appendices, committee charges, personnel policies</td>
+              <td><span class="pill full">Full text</span></td>
+            </tr>
+            <tr>
+              <td>City forms</td>
+              <td>Code Enforcement Office, Fire Department</td>
+              <td>Building Permit Application, General Life Safety Review</td>
+              <td><span class="pill proc">Procedure</span></td>
+              <td>What an applicant submits, the necessary inspections, the fees on the form</td>
+              <td><span class="pill full">Full text</span> preview only</td>
+            </tr>
+            <tr>
+              <td>Maine statutes</td>
+              <td>Maine Legislature</td>
+              <td><code>30-A M.R.S. &sect; 4452</code></td>
+              <td><span class="pill law">Binding</span></td>
+              <td>Inspector powers, penalties, appeals, dangerous buildings</td>
+              <td><span class="pill full">Full text</span> some sections</td>
+            </tr>
+            <tr>
+              <td>State rules</td>
+              <td>State agencies</td>
+              <td><code>10-144 CMR ch. 241</code></td>
+              <td><span class="pill law">Binding</span></td>
+              <td>Building code adoption, septic systems, shoreland zoning, certification</td>
+              <td><span class="pill full">Full text</span></td>
+            </tr>
+            <tr>
+              <td>Model codes</td>
+              <td>The ICC writes them. The state adopts them by rule.</td>
+              <td><code>2021 IRC</code>, <code>2021 IECC</code></td>
+              <td><span class="pill law">Binding</span> after adoption</td>
+              <td>Structure, exits, fire separation, energy, mechanical systems</td>
+              <td><span class="pill ref">Reference only</span> copyright</td>
+            </tr>
+            <tr>
+              <td>Referenced standards</td>
+              <td>NFPA, IAPMO, ASHRAE, ASTM</td>
+              <td><code>NFPA 101</code>, <code>NEC</code>, <code>ASHRAE 90.1</code></td>
+              <td><span class="pill law">Binding</span> after adoption</td>
+              <td>Life safety, electrical, plumbing, ventilation, test methods</td>
+              <td><span class="pill ref">Reference only</span> copyright</td>
+            </tr>
+            <tr>
+              <td>Court rules</td>
+              <td>Maine Supreme Judicial Court</td>
+              <td><code>M.R. Civ. P. 80K</code></td>
+              <td><span class="pill proc">Procedure</span></td>
+              <td>Land use citations (80K), appeals (80B), inspection warrants (80E)</td>
+              <td><span class="pill full">Full text</span> preview only</td>
+            </tr>
+            <tr>
+              <td>Case law</td>
+              <td>Maine courts</td>
+              <td><code>Mills v. Eliot, 2008 ME 134</code></td>
+              <td><span class="pill law">Binding</span> precedent</td>
+              <td>How to interpret statutes and ordinances</td>
+              <td><span class="pill none">Not included</span></td>
+            </tr>
+            <tr>
+              <td>Guidance manuals</td>
+              <td>State training program (MOCA, before that DECD)</td>
+              <td>Court Rule 80K Manual (2017)</td>
+              <td><span class="pill adv">Advisory</span></td>
+              <td>How to inspect, enforce and write decisions. Some parts are old.</td>
+              <td><span class="pill full">Full text</span></td>
+            </tr>
+            <tr>
+              <td>Staff notes</td>
+              <td>The assistant team. The inspector reviews them.</td>
+              <td>"16-642 CMR is now listed as 08-003 CMR"</td>
+              <td><span class="pill adv">Advisory</span></td>
+              <td>New rule numbers, old editions, separate penalty levels</td>
+              <td><span class="pill full">Full text</span> staff only</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="legend">
+        <span><span class="pill law">Binding</span> the inspector must apply it</span>
+        <span><span class="pill proc">Procedure</span> tells how to do the work</span>
+        <span><span class="pill adv">Advisory</span> explains; has no legal force</span>
+      </div>
+      <div class="callout">
+        <p><strong>The largest gap.</strong> The model codes contain the technical rules that the inspector checks on site. Examples are stair dimensions, guard heights, fire separations and insulation values. The assistant can name these rules and give a link to the free ICC viewer. It cannot show the text. To show the text, the city must have a license from the ICC. We do not know if the city has one.</p>
+        <p>Editions also change. The city website shows the 2015 MUBEC and the 2017 NEC. The state adopted the 2021 ICC codes from April 7, 2025.</p>
       </div>
     </section>
 
