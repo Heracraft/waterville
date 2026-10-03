@@ -152,7 +152,8 @@ def test_out_of_scope_card_still_routes_hazards():
 def test_public_prompt_rules():
     p = prompts.PUBLIC_SYSTEM_PROMPT
     assert "Never state that no permit, license or approval is needed as a final answer" in p
-    assert CONFIRM in p
+    # The confirm line comes from CONFIRM_RULE, or from the checklist card when one is shown.
+    assert CONFIRM in prompts.CONFIRM_RULE and CONFIRM in prompts.CHECKLIST_NOTE
     assert "does not give landlord-tenant or legal advice" in p
     assert "licensed land surveyor" in p
     assert "Never turn away a report of unsafe or unsanitary conditions" in p

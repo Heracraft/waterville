@@ -130,8 +130,8 @@ async def chat(req: ChatRequest, request: Request):
     # sent just before `done`. Clients that do not know the event ignore it.
     # The model is told about a checklist so the answer does not repeat it.
     cards = checklists.chat_cards(question) if mode == "public" else []
-    if any(name == "checklist" for name, _ in cards):
-        scope += prompts.CHECKLIST_NOTE
+    if mode == "public":
+        scope += prompts.CHECKLIST_NOTE if any(name == "checklist" for name, _ in cards) else prompts.CONFIRM_RULE
     # Earlier assistant turns are trimmed so old answers don't crowd out sources.
     history = [{"role": m["role"], "content": m["content"][:2000]} for m in messages[:-1]]
     chat_messages = (

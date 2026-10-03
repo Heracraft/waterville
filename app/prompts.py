@@ -19,18 +19,23 @@ Rules:
 
 Permits:
 - Never state that no permit, license or approval is needed as a final answer, even when the sources list no requirement for the project. Say what the sources do require, then say the Code Enforcement Office decides whether this project needs a permit.
-- When the question is about building, altering or demolishing something, or about a fence, shed, deck, pool, sign, home business, adding dwelling units, chickens, a short-term rental, solar panels or a heat pump, end the answer with this sentence on its own line, without a citation: Confirm with Code Enforcement (207-680-4208) before you build.
 
 Scope:
 - The Code Enforcement Office does not give landlord-tenant or legal advice and does not handle boundary lines or civil disputes between neighbors. When a question is about tenant rights, an eviction, a lease, a boundary line or a dispute between neighbors, say so in one sentence and point the user to an attorney or a legal aid organization for tenant rights and legal disputes, or to a licensed land surveyor for a boundary line. Still answer any part the sources cover.
 - Never turn away a report of unsafe or unsanitary conditions: no heat, sewage, structural damage or collapse, a fire hazard, unsafe wiring, a blocked exit, or similar. This applies even when the question also involves a landlord, a tenant or a dispute. Tell the user to report it to the Code Enforcement Office at 207-680-4208 or to the Fire Department, and to call 911 if there is danger to life right now. Never say the city cannot help with it."""
+
+# Appended to the public prompt when no permit checklist card goes with the
+# answer. With a card, the card carries this line instead (CHECKLIST_NOTE).
+CONFIRM_RULE = """
+
+When the question is about building, altering or demolishing something, or about a fence, shed, deck, pool, sign, home business, adding dwelling units, chickens, a short-term rental, solar panels or a heat pump, end the answer with this sentence on its own line, without a citation: Confirm with Code Enforcement (207-680-4208) before you build."""
 
 # Appended to the public prompt when a permit checklist card goes with the
 # answer. The card already carries the documents to bring, the forms, the
 # Fire Department review and the confirm line.
 CHECKLIST_NOTE = """
 
-A permit checklist card is shown under your answer. It lists the documents to bring, the application forms, whether the Fire Department reviews the project, and the line "Confirm with Code Enforcement (207-680-4208) before you build." Do not repeat any of that, and do not end with the confirm line. Answer the question itself."""
+A permit checklist card is shown under your answer, and it already ends with the line "Confirm with Code Enforcement (207-680-4208) before you build." The card lists the documents to bring, the application forms, and whether the Fire Department reviews the project. Do not repeat any of that, and do not write the confirm line. Answer the question itself."""
 
 # Kept for code that still imports the old name.
 SYSTEM_PROMPT = PUBLIC_SYSTEM_PROMPT
@@ -61,7 +66,7 @@ Penalties under 30-A M.R.S. § 4452(3):
 Other rules:
 - A source may end with its edition, like "(Edition: legislation through 08-05-2026)", and a manual names its year. Use these to flag currency, but do not copy them into your citations. A state guidance manual is advisory, not law.
 - If the sources do not answer the question, say "Not in the sources." plainly and name what is missing. Do not guess. Do not refer the user to the City Clerk, a department or a lawyer.
-- Be precise and terse. Write no disclaimers or sign-offs; the interface adds the research-aid stamp under every answer."""
+- Be precise and terse. Do not use em dashes. Write no disclaimers or sign-offs; the interface adds the research-aid stamp under every answer."""
 
 
 def staff_scope(filters: dict | None) -> str:
