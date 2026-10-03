@@ -70,9 +70,14 @@ for n in "$APP" "$JOB"; do
   [ "$n" != "$PROD_APP" ] && [ "$n" != "$PROD_JOB" ] || die "preview name $n is a production name"
 done
 
+# Sign in as the service principal when its variables are set; otherwise use
+# the current az login (az account show must succeed).
+SP_LOGIN=1
 for v in AZURE_CLIENT_ID AZURE_CLIENT_SECRET AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID; do
-  [ -n "${!v:-}" ] || die "$v is not set"
+  [ -n "${!v:-}" ] || SP_LOGIN=0
 done
+[ "$SP_LOGIN" = 1 ] || az account show -o none 2>/dev/null \
+  || die "set AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID and AZURE_SUBSCRIPTION_ID, or run az login"
 for t in az jq curl uv; do command -v "$t" >/dev/null || die "$t is not installed"; done
 [ "$WHAT_IF_ONLY" = 1 ] || [ -n "${IMAGE:-}" ] || command -v docker >/dev/null || die "docker is not installed (or set IMAGE)"
 
@@ -81,11 +86,15 @@ chmod 700 "$WORK"
 trap 'rm -rf "$WORK"' EXIT
 
 export AZURE_CORE_ONLY_SHOW_ERRORS=1 AZURE_EXTENSION_USE_DYNAMIC_INSTALL=yes_without_prompt
-log "Signing in as service principal"
-# The secret goes in on stdin (az reads "@-"), never on the command line where
-# ps or /proc/*/cmdline would show it. printf is a shell builtin.
-printf '%s' "$AZURE_CLIENT_SECRET" | az login --service-principal -u "$AZURE_CLIENT_ID" -p @- --tenant "$AZURE_TENANT_ID" -o none
-az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+if [ "$SP_LOGIN" = 1 ]; then
+  log "Signing in as service principal"
+  # The secret goes in on stdin (az reads "@-"), never on the command line where
+  # ps or /proc/*/cmdline would show it. printf is a shell builtin.
+  printf '%s' "$AZURE_CLIENT_SECRET" | az login --service-principal -u "$AZURE_CLIENT_ID" -p @- --tenant "$AZURE_TENANT_ID" -o none
+  az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+else
+  log "Using the current az login ($(az account show --query name -o tsv))"
+fi
 
 LOCATION=$(az containerapp env show -g "$RG" -n "$ENV_NAME" --query location -o tsv) \
   || die "Container Apps environment $ENV_NAME not found in $RG; deploy production first (infra/deploy.sh)"
