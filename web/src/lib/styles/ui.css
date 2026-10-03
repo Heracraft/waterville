@@ -1,0 +1,80 @@
+/* Shared primitives for the pages added with the SvelteKit app.
+   app.css is the public page's stylesheet, ported verbatim from
+   app/web/style.css; this file only adds to it and reuses its tokens
+   (--rule, --surface, --accent, --serif, --sans and the rest).
+   Ledger look: 1px ink rules, square corners, no shadows. */
+
+/* Compact title block for staff pages and tools. */
+header.site.compact .wrap { padding-block: 16px 0; }
+header.site.compact .meta { margin-bottom: 22px; }
+header.site.compact h1 { font-size: clamp(1.8rem, 4.4vw, 2.4rem); margin-bottom: 0; }
+header.site.compact:not(:has(.staff-nav)) .wrap { padding-bottom: 26px; }
+header.site a.home { color: inherit; text-decoration: none; }
+
+/* A page heading inside main: serif title with an optional lede. */
+.page-head { margin: 0 0 24px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+.page-title { margin: 0; font: 300 clamp(1.6rem, 3.6vw, 2.1rem)/1.2 var(--serif); color: var(--text); }
+.page-lede { margin: 8px 0 0; max-width: 42em; color: var(--muted); }
+.eyebrow { display: block; margin-bottom: 6px; color: var(--accent); font: 600 0.8rem var(--sans); letter-spacing: 0.01em; }
+
+/* A surface with an ink rule; .sheet.accent adds the rust top rule the answers use. */
+.sheet { background: var(--surface); border: 1px solid var(--rule); padding: 20px 24px; }
+.sheet.accent { border-top: 3px solid var(--accent); }
+.sheet + .sheet { margin-top: 20px; }
+.sheet > :first-child { margin-top: 0; }
+.sheet > :last-child { margin-bottom: 0; }
+.sheet h2, .sheet h3 { font: 600 1rem/1.4 var(--sans); margin: 0 0 10px; }
+@media (max-width: 640px) { .sheet { padding: 16px; } }
+
+/* Buttons: rust primary, ruled secondary. */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  border: 1px solid var(--accent); border-radius: 0; background: var(--accent); color: var(--accent-text);
+  font: 600 0.9rem var(--sans); letter-spacing: 0.01em; padding: 9px 18px; text-decoration: none;
+  transition: filter 0.15s, background-color 0.15s;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: 0.45; cursor: default; filter: none; }
+.btn.secondary { background: transparent; color: var(--text); border-color: var(--rule); }
+.btn.secondary:hover { background: var(--surface-hover); filter: none; }
+.btn.small { padding: 5px 10px; font-size: 0.8rem; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Form fields: a ruled box on the surface color, rust edge on focus. */
+.field { display: grid; gap: 6px; margin-bottom: 16px; align-content: start; }
+.field > span, .field > label, .field-label { font: 600 0.85rem var(--sans); color: var(--text); }
+.field .help { font-size: 0.82rem; color: var(--muted); }
+.input, .field input:not([type="checkbox"]):not([type="radio"]), .field select, .field textarea {
+  width: 100%; border: 1px solid var(--rule); border-radius: 0; background: var(--surface); color: var(--text);
+  font: 400 1rem/1.4 var(--sans); padding: 9px 12px;
+}
+.field textarea { font-family: var(--serif); min-height: 6em; resize: vertical; }
+.input:focus, .field input:focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent);
+}
+.check { display: flex; gap: 10px; align-items: flex-start; }
+.check input { accent-color: var(--accent); margin-top: 0.3em; }
+
+/* Ledger table: ink rules, header row on the page color. */
+.ledger { width: 100%; border-collapse: collapse; font: 0.92rem/1.45 var(--sans); background: var(--surface); border: 1px solid var(--rule); }
+.ledger th, .ledger td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.ledger th { background: var(--bg); font-weight: 600; border-bottom-color: var(--rule); }
+.ledger tr:last-child td { border-bottom: 0; }
+.table-scroll { overflow-x: auto; }
+
+.tag-pill { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 0 8px; font: 600 0.78rem/1.6 var(--sans); }
+.muted { color: var(--muted); }
+.error-text { color: var(--error); }
+.notice { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; margin: 0 0 16px; font-size: 0.92rem; }
+
+/* Staff pages: main content under the compact header. */
+main.wrap.staff-main { padding-top: 28px; }
+
+@media print {
+  header.site, .staff-nav, form#ask, .no-print, .panel, .panel-backdrop { display: none !important; }
+  body { background: #fff; color: #000; }
+  main.wrap { padding: 0; max-width: none; }
+}
+
+/* Header buttons keep their label on one line at phone width. */
+.theme-toggle { white-space: nowrap; }

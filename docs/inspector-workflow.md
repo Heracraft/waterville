@@ -140,7 +140,7 @@ Unless noted, the city sources are https://waterville-me.gov/218/Code-Enforcemen
 - **Intake.**
   - The online Report a Concern form covers potholes, streetlights, traffic signals and trash only (https://waterville-me.gov/FormCenter/General-Forms-4/Report-Concerns-65).
   - A property-maintenance complaint means calling or emailing the CEO to book an appointment, filling out a paper complaint form and bringing a photo.
-  - Common categories in Maine towns include junk and unregistered vehicles, which Ch. 205 covers (two or more unregistered vehicles, § 205-4C), and automobile graveyards and junkyards (30-A §3751 et seq., listed in §4452(5)). Volume in Waterville is unknown.
+  - Common categories in Maine towns include junk and unregistered vehicles, which Ch. 205 covers (two or more unregistered or uninspected vehicles, § 205-2), and automobile graveyards and junkyards (30-A §3751 et seq., listed in §4452(5)). Volume in Waterville is unknown.
   - Habitability complaints (no heat, sewage, unsafe wiring) may also involve the local health officer under 22 M.R.S. §451 et seq. **(unverified; who holds that role in Waterville is unknown)**.
 - **Process.** The steps below come from the 2017 MOCA Legal Issues Manual, chs.6-7, and are training recommendations unless a statute is cited:
   1. Detect and log the violation, then do the site visit and take photos.

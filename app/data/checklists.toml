@@ -1,0 +1,900 @@
+# Public permit tools (A1, A3, A4): permit-type checklists, the permit
+# router and the published fee formulas. Read by app/routers/checklists.py.
+#
+# Sources, checked 2026-10-03:
+#   City Code text in output/markdown/code/ (eCode360, legislation through
+#   08-05-2026). Section URLs come from output/chunks.jsonl.
+#   City forms listed on https://waterville-me.gov/225/Building-Permit-Applications
+#   (Building Permit Application, Change of Use or Owner, Electrical Permit,
+#   Electrical Service Connection, Plumbing Permit, Sign, Subsurface
+#   Wastewater) and the Fire Department's General Life Safety Review form
+#   (DocumentCenter/View/904).
+#
+# Rules for every entry, from docs/inspector-workflow.md section 4(a):
+#   - Never say a permit is not needed. Say what the sources require and send
+#     the rest to the office.
+#   - End with the confirm line.
+#   - `says` lines carry figures exactly as the code states them.
+#
+# Prose follows the project's writing rules: no em dashes.
+
+checked = "2026-10-03"
+office = "Code Enforcement Office, 7 College Avenue, Waterville"
+office_phone = "207-680-4208"
+office_hours = "Monday to Thursday, 7:00 a.m. to 5:00 p.m."
+confirm_line = "Confirm with Code Enforcement (207-680-4208) before you build."
+applications_page = "https://waterville-me.gov/225/Building-Permit-Applications"
+tax_map_page = "https://waterville-me.gov/316/Online-Services"
+
+# ------------------------------------------------------------------ forms
+
+[forms.building]
+title = "Building Permit Application"
+url = "https://www.waterville-me.gov/DocumentCenter/View/1336/Building-Permit-Application-PDF"
+who = "Code Enforcement"
+
+[forms.change_of_use]
+title = "Change of Use or Owner Permit Application"
+url = "https://www.waterville-me.gov/DocumentCenter/View/1337/Change-of-Use-Owner-Permit-Application-PDF"
+who = "Code Enforcement"
+
+[forms.electrical]
+title = "Electrical Permit Application"
+url = "https://www.waterville-me.gov/DocumentCenter/View/1419/Electrical-Permit-Application-PDF"
+who = "Municipal Electrical Inspector (one- and two-family homes)"
+
+[forms.electrical_service]
+title = "Electrical Service Connection Application"
+url = "https://www.waterville-me.gov/DocumentCenter/View/1338/Electrical-Service-Connection-ApplicationPDF"
+who = "Code Enforcement"
+
+[forms.plumbing]
+title = "Plumbing Permit Application"
+url = "https://www.waterville-me.gov/DocumentCenter/View/247/Plumbing-Permit-Application-PDF"
+who = "Local Plumbing Inspector"
+
+[forms.sign]
+title = "Sign Application"
+url = "https://www.waterville-me.gov/DocumentCenter/View/248/Sign-Permit-Application-PDF"
+who = "Code Enforcement"
+
+[forms.subsurface]
+title = "Subsurface Wastewater Disposal System Permit Application"
+url = "https://www.waterville-me.gov/DocumentCenter/View/249/Subsurface-Wastewater-Disposal-System-Permit-Application-PDF"
+who = "Local Plumbing Inspector"
+
+[forms.life_safety]
+title = "General Life Safety Review (Fire Department)"
+url = "https://www.waterville-me.gov/DocumentCenter/View/904/General-Life-Safety-Review-PDF"
+who = "Waterville Fire Department"
+
+# ------------------------------------------------------------------ what to bring
+# Mirrors the fields of the Building Permit Application, pages 1 to 3 and
+# the site plan requirement on page 5.
+
+[bring]
+building = [
+  "Map and lot number, lot size and zone (from the city's online tax map, or ask the office)",
+  "Site location (street address)",
+  "Owner, applicant and contractor names, addresses, phone numbers and email",
+  "A short description of the scope of work",
+  "Dimensions of the proposed structure",
+  "Foundation type: full 8 ft, 5 ft frost wall, pier or slab",
+  "Setbacks of existing and proposed structures: front, sides and rear",
+  "Lot frontage and lot depth",
+  "Percent of the lot covered by buildings, and percent usable open area (lawn, driveways)",
+  "Total construction cost (building construction only; the form excludes purchase price, site work, equipment, furniture, sprinklers, plumbing and HVAC)",
+  "A site plan drawn to scale showing every building, the sewage disposal system, driveways and turnarounds, and abutting lot and street lines, with distances to each property line",
+]
+survey_note = "If a property line is in doubt, the Code Enforcement Officer may ask for a boundary survey or mortgage inspection plan."
+inspections = "The building permit form calls for at least three inspections: foundation, framing before it is covered, and a final before occupancy. A permit is void if work does not start within six months."
+
+# ------------------------------------------------------------------ checklists (A1)
+# `patterns` are case-insensitive regular expressions matched against the
+# question. When several topics match, the one with more matching patterns
+# wins; a tie goes to the topic listed first, so specific topics come first.
+
+[[checklist]]
+id = "conversion"
+title = "Converting a building to three or more units"
+summary = "Adding units to an existing house or building, up to three or beyond."
+patterns = [
+  '\b(three|four|five|six|3|4|5|6)[- ]?(unit|units|family|apartments?|dwelling units)\b',
+  '\btriplex\b',
+  '\bmulti-?family\b',
+  '\bconvert\w*\b.{0,40}\b(apartments?|units?)\b',
+  '\b(add|adding|create|creating|another)\b.{0,25}\b(apartment|dwelling unit|unit)\b',
+]
+bring_building = true
+forms = ["building", "change_of_use", "life_safety"]
+bring = [
+  "Floor plans of each unit, existing and proposed",
+  "The number of units now and after the work, and the parking you will provide",
+  "Lot area, so the office can check the minimum land per dwelling unit for your zone",
+]
+notes = [
+  "In the R-A zone and the zones that allow its uses, the Code Enforcement Officer may approve conversions of existing buildings to create as many as three units, if the conversion is not a subdivision. Larger projects go to the Planning Board.",
+  "A change of occupancy calls for the Fire Department's General Life Safety Review. Ask whether your conversion counts as one.",
+]
+fire_review = "likely"
+
+[[checklist.sections]]
+citation = "§ 275-5.1B(4)"
+url = "https://ecode360.com/38457195"
+says = "New multifamily dwellings and conversions follow § 275-4.20 and Chapter 244. The Code Enforcement Officer may approve conversions of existing buildings to create as many as three units, if those conversions do not constitute subdivisions."
+
+[[checklist.sections]]
+citation = "§ 275-4.20"
+url = "https://ecode360.com/38456786"
+says = "Multifamily developments (three or more dwelling units) may be authorized by the Planning Board, with minimum land per dwelling unit, frontage and setbacks set by district."
+
+[[checklist.sections]]
+citation = "§ 275-6.4"
+url = "https://ecode360.com/38457736"
+says = "Site plan review by the Planning Board: which projects need it and which are exempt."
+
+[[checklist]]
+id = "short_term_rental"
+title = "Short-term rental"
+summary = "Renting a dwelling unit or rooms for stays of less than 30 days."
+patterns = [
+  '\bshort[- ]term rentals?\b',
+  '\bair ?bnb\b',
+  '\bvrbo\b',
+  '\bvacation rentals?\b',
+  '\brent\w*\b.{0,30}\b(nightly|by the night|weekends?)\b',
+]
+bring_building = false
+forms = []
+bring = [
+  "The address, and whether you live there full time (owner-occupied) or not",
+  "The number of rental rooms and the size of each (each must be at least 120 square feet)",
+  "Where guests will park (at least one space for each rental room)",
+  "For a non-owner-occupied rental: the license fee of $120, paid before the City Clerk issues the license",
+]
+notes = [
+  "Short-term rentals are allowed in all residential zones except the Residential-A zone. Short-term rental of an accessory dwelling unit is prohibited in all residential zones.",
+  "No short-term rental form is posted online. Ask the City Clerk for the license application and the Fire Department for the inspection.",
+]
+fire_review = "no"
+
+[[checklist.sections]]
+citation = "§ 275-4.35"
+url = "https://ecode360.com/38457184"
+says = "Not allowed in the Residential-A zone. At least one parking space for each rental room; each rental room at least 120 square feet. A non-owner-occupied rental needs a Fire Department inspection under NFPA 101 and an annual license; the license fee is $120."
+
+[[checklist]]
+id = "home_occupation"
+title = "Home occupation (business at home)"
+summary = "Running a business from your dwelling unit."
+patterns = [
+  '\bhome occupations?\b',
+  '\bhome[- ]based business\b',
+  '\bhome business\b',
+  '\bbusiness\b.{0,30}\b(from|out of|at|in)\b.{0,10}\b(my|our|the)\b.{0,10}\b(home|house|apartment)\b',
+  '\b(salon|daycare|day care|bakery|workshop)\b.{0,30}\b(home|house)\b',
+]
+bring_building = false
+forms = []
+bring = [
+  "A description of the business, its hours and how many people will work in it (no more than two, including the owner)",
+  "The floor area used for the business and the floor area of the dwelling unit (no more than 500 square feet or 25%, whichever is less)",
+  "Where clients will park (side or rear yard, not the front yard)",
+  "The size and placement of any sign (one sign, no larger than five by 24 inches, affixed to the home)",
+  "An operable fire extinguisher in the business area; the Fire Department inspects before the permit",
+]
+notes = [
+  "A business conducted by an occupant, with no regular client or delivery visits and no sign, is not treated as a special exception under § 275-4.16A(2). Ask the office whether your business fits that description before you rely on it.",
+  "Where a home occupation needs approval, the Code Enforcement Officer decides it as a special exception after notice to neighbors (§ 275-5.20).",
+  "No home occupation form is posted online. Ask the office which application to file.",
+]
+fire_review = "no"
+
+[[checklist.sections]]
+citation = "§ 275-4.16"
+url = "https://ecode360.com/38456708"
+says = "Not more than two persons, including the owner. Not more than 500 square feet or 25% of the floor area of the dwelling unit, whichever is less. One sign, no larger than five inches by 24 inches, affixed to the home. Fire Department inspection before the permit; an operable fire extinguisher in the business area."
+
+[[checklist.sections]]
+citation = "§ 275-5.20"
+url = "https://ecode360.com/38457601"
+says = "Special exceptions: the notice and decision process the Code Enforcement Officer follows."
+
+[[checklist]]
+id = "chickens"
+title = "Backyard chickens"
+summary = "Keeping up to six hens for personal use."
+patterns = [
+  '\bchickens?\b',
+  '\bhens?\b',
+  '\bhen ?houses?\b',
+  '\bchicken coops?\b',
+  '\bcoops?\b',
+  '\broosters?\b',
+]
+bring_building = false
+forms = []
+bring = [
+  "Your lot size (at least 8,000 square feet is required)",
+  "A sketch showing the henhouse and pen with distances to the side and rear lot lines (at least 15 feet) and to the nearest neighboring residence (at least 20 feet)",
+  "Henhouse floor area (at least four square feet per bird) and pen size (at least 60 square feet)",
+  "The number of hens (no more than six; no roosters)",
+  "The $25 inspection fee",
+]
+notes = [
+  "Henhouses and pens are not allowed in front yards.",
+  "In the R-A zone, raising chickens is a special exception (§ 275-5.1C(1)).",
+  "No chicken permit form is posted online. Ask the office for the application and to book the inspection.",
+]
+fire_review = "no"
+
+[[checklist.sections]]
+citation = "§ 275-4.33"
+url = "https://ecode360.com/38457149"
+says = "No more than six hens per lot; no roosters. Land area of at least 8,000 square feet. Henhouses and pens at least 15 feet from side and rear property lines and at least 20 feet from the nearest residence; not in front yards. An inspection by the Code Enforcement Officer is required, and a permit fee of $25 will be charged for the inspection."
+
+[[checklist]]
+id = "demolition"
+title = "Demolition"
+summary = "Tearing down a building or structure, or part of one."
+patterns = [
+  '\bdemolish\w*\b',
+  '\bdemolition\b',
+  '\btear(ing)? down\b',
+  '\bknock(ing)? down\b',
+  '\braze\b',
+]
+bring_building = true
+forms = ["building"]
+bring = [
+  "What will be removed, and what will stay on the lot",
+  "Whether the property is in a historic district or is a historic landmark",
+  "How utilities will be disconnected, and where debris will go",
+  "For a building damaged by fire or another casualty: the date of the damage",
+]
+notes = [
+  "Demolishing a historic landmark or a contributing structure in a historic district needs a certificate of appropriateness first (§ 161-6D, § 161-7A).",
+  "Asbestos notification to the Maine Department of Environmental Protection may apply before demolition. That rule is not in these sources; check with DEP.",
+]
+fire_review = "no"
+
+[[checklist.sections]]
+citation = "§ 127-2"
+url = "https://ecode360.com/38454333"
+says = "Permits are required prior to the start of any construction, alteration, removal or demolition of any and all buildings or structures."
+
+[[checklist.sections]]
+citation = "§ 161-6"
+url = "https://ecode360.com/45005630"
+says = "A certificate of appropriateness is needed to demolish a historic landmark, individual historic property or contributing structure in a historic district."
+
+[[checklist.sections]]
+citation = "§ 205-6"
+url = "https://ecode360.com/38529529"
+says = "A building destroyed by fire or other causes must be made secure within 24 hours, and a permit for demolition or reconstruction obtained within 90 days. Work must begin no later than 120 days from the date of the fire or casualty."
+
+[[checklist]]
+id = "solar"
+title = "Solar panels"
+summary = "Rooftop or ground-mounted solar for a home or business."
+patterns = [
+  '\bsolar\b',
+  '\bphotovoltaic\b',
+  '\bpv (panels?|system|array)\b',
+]
+bring_building = true
+forms = ["building", "electrical", "life_safety"]
+bring = [
+  "The panel layout, mounting method and system size",
+  "Equipment specifications; for solar, the fee calculation may include the cost of equipment being installed",
+  "Location of the solar shutoffs",
+  "Plans to train the Fire Department on the system, which the Fire Department requires of contractors",
+]
+notes = [
+  "A ground-mounted array of 1,750 square feet or more is a solar farm, with its own zoning rules and Planning Board site plan review (§ 275-4.34).",
+  "In a historic district, solar panels on a contributing property that are visible from the street need a certificate of appropriateness (§ 161-6F).",
+]
+fire_review = "yes"
+
+[[checklist.sections]]
+citation = "§ 127-2"
+url = "https://ecode360.com/38454333"
+says = "Permits are required prior to the start of any construction or alteration of buildings or structures."
+
+[[checklist.sections]]
+citation = "§ 275-4.34"
+url = "https://ecode360.com/38457171"
+says = "Solar farms (ground-mounted, 1,750 square feet or more) need rezoning and site plan review by the Planning Board."
+
+[[checklist.sections]]
+citation = "§ 161-6"
+url = "https://ecode360.com/45005630"
+says = "In a historic district, solar panels and heat pumps on contributing properties, visible from the street, need a certificate of appropriateness."
+
+[[checklist]]
+id = "heat_pump"
+title = "Heat pump"
+summary = "Installing a heat pump or mini-split system."
+patterns = [
+  '\bheat ?pumps?\b',
+  '\bmini[- ]?splits?\b',
+  '\bductless\b',
+]
+bring_building = false
+forms = ["electrical"]
+bring = [
+  "The make, model and electrical rating of the indoor and outdoor units",
+  "Where the outdoor unit will sit, with its distance to the property lines",
+  "Your electrician's license number (the electrical form asks for it)",
+  "Whether the property is in a historic district",
+]
+notes = [
+  "The building permit form says separate permits are required for electrical, plumbing and mechanical installations where applicable. No mechanical permit form is posted online; ask the office what your installation needs.",
+  "In a historic district, a heat pump on a contributing property visible from the street needs a certificate of appropriateness (§ 161-6F).",
+]
+fire_review = "no"
+
+[[checklist.sections]]
+citation = "§ 127-10"
+url = "https://ecode360.com/38454352"
+says = "Municipal electrical permits are required prior to the start of any construction work on single-family and two-family occupancies. Other electrical work is permitted and inspected under state law."
+
+[[checklist.sections]]
+citation = "§ 161-6"
+url = "https://ecode360.com/45005630"
+says = "In a historic district, heat pumps on contributing properties, visible from the street, need a certificate of appropriateness."
+
+[[checklist]]
+id = "pool"
+title = "Swimming pool"
+summary = "An in-ground or above-ground pool."
+patterns = [
+  '\b(swimming )?pools?\b',
+]
+bring_building = true
+forms = ["building", "electrical"]
+bring = [
+  "Pool size and type (in-ground or above-ground)",
+  "Distance from the pool to the side and rear lot lines",
+  "The fence or enclosure: height (at least six feet for an outdoor in-ground pool) and gate",
+  "The electrical work for pumps and lighting (the electrical form lists a swimming pool fee)",
+]
+notes = [
+  "A swimming pool is an accessory structure, so the accessory structure setbacks for your zone apply.",
+]
+fire_review = "no"
+
+[[checklist.sections]]
+citation = "§ 275-4.26B(3)"
+url = "https://ecode360.com/38456882"
+says = "Outdoor in-ground pools must be enclosed by a fence not less than six feet in height and designed to prevent ingress by children."
+
+[[checklist.sections]]
+citation = "§ 275-5.3D"
+url = "https://ecode360.com/38457241"
+says = "District dimensional tables set accessory structure setbacks; swimming pools are accessory structures. For example, R-C side and rear yards for accessory structures: five feet; R-A: 10 feet (§ 275-5.1D)."
+
+[[checklist]]
+id = "deck"
+title = "Deck or porch"
+summary = "Adding or rebuilding a deck, porch or similar extension of the house."
+patterns = [
+  '\bdecks?\b',
+  '\bporch(es)?\b',
+]
+bring_building = true
+forms = ["building"]
+bring = [
+  "Deck size, height above grade and the footing or pier plan",
+  "Distance from the deck to the front, side and rear lot lines",
+  "Stair, guard and railing details",
+]
+notes = [
+  "A deck is part of the principal structure, so the principal building setbacks apply, not the smaller accessory structure setbacks.",
+  "In the shoreland zone, an attached deck counts toward expansion of a structure (§ 275-3.2) and the shoreland rules in § 275-4.27 apply.",
+]
+fire_review = "maybe"
+
+[[checklist.sections]]
+citation = "§ 127-2"
+url = "https://ecode360.com/38454333"
+says = "Permits are required prior to the start of any construction, alteration, removal or demolition of any and all buildings or structures."
+
+[[checklist.sections]]
+citation = "§ 275-5.3D"
+url = "https://ecode360.com/38457241"
+says = "A deck or similar extension of the principal structure is considered part of the principal structure. For example, R-C side yard 10 feet and rear yard 20 feet for the principal building."
+
+[[checklist]]
+id = "shed"
+title = "Shed or detached garage"
+summary = "A shed, detached garage or other accessory building."
+patterns = [
+  '\bsheds?\b',
+  '\boutbuildings?\b',
+  '\baccessory (building|structure)s?\b',
+  '\bdetached garages?\b',
+  '\bstorage (building|shed)s?\b',
+  '\bgarages?\b',
+]
+bring_building = true
+forms = ["building"]
+bring = [
+  "Shed or garage dimensions and height",
+  "Distance to the side and rear lot lines",
+  "Total lot coverage of all buildings after the work",
+]
+notes = [
+  "The building permit form has a box for an outbuilding up to 10 by 10 feet. Larger buildings follow the general building permit process.",
+  "Sheds and detached garages are accessory structures, with their own side and rear setbacks in each zone.",
+]
+fire_review = "maybe"
+
+[[checklist.sections]]
+citation = "§ 127-2"
+url = "https://ecode360.com/38454333"
+says = "Permits are required prior to the start of any construction, alteration, removal or demolition of any and all buildings or structures."
+
+[[checklist.sections]]
+citation = "§ 275-5.3D"
+url = "https://ecode360.com/38457241"
+says = "Detached private garages, swimming pools, sheds and portable shelters are accessory structures. R-C side and rear yards for accessory structures: five feet. R-A: 10 feet (§ 275-5.1D)."
+
+[[checklist]]
+id = "sign"
+title = "Sign"
+summary = "A business, home occupation or property sign."
+patterns = [
+  '\bsign (permit|permits|application|regulations?)\b',
+  '\bsignage\b',
+  '\b(business|yard|store|shop|real estate|freestanding|illuminated|lighted|digital|changeable|wall|roof) signs?\b',
+  '\b(put|putting|hang|hanging|install|installing|erect|erecting|post|posting) (up )?an? (\w+ )?sign\b',
+  '\bbillboards?\b',
+]
+bring_building = false
+forms = ["sign"]
+bring = [
+  "Sign location and the zone",
+  "Each sign's width, height and overall height (the sign form asks for all three)",
+  "Contractor name, if one is installing it",
+  "For a wall sign: the size of the wall, since no more than 20% of a wall can be devoted to advertising in commercial and industrial zones",
+]
+notes = [
+  "In residential and institutional zones, signs may not flash or be animated, and one sign is allowed per property.",
+]
+fire_review = "no"
+
+[[checklist.sections]]
+citation = "§ 275-4.28"
+url = "https://ecode360.com/38457093"
+says = "Residential and institutional zones: no sign larger than 16 inches by 24 inches for professional offices or other permitted uses; home occupations one sign no larger than five inches by 24 inches. Commercial and industrial zones: freestanding advertising space not over 12 feet in height or 25 feet in length; no more than 20% of a wall devoted to advertising."
+
+[[checklist]]
+id = "fence"
+title = "Fence"
+summary = "A fence or wall in a residential zone."
+patterns = [
+  '\bfenc(e|es|ing)\b',
+]
+bring_building = false
+forms = []
+bring = [
+  "Fence height and material",
+  "A sketch of where the fence runs, with the property lines and any street corner",
+  "For a fence over six feet: why the height is needed and how it is built",
+  "Map and lot number, and the zone",
+]
+notes = [
+  "Fences over six feet in a residential zone need the Code Enforcement Officer's approval.",
+  "The building permit form has no fence box. Ask the office whether your fence needs a permit before you build.",
+  "Locating a property line is your responsibility. The office does not settle boundary disputes; a licensed land surveyor can mark the line.",
+]
+fire_review = "no"
+
+[[checklist.sections]]
+citation = "§ 275-4.26B"
+url = "https://ecode360.com/38456882"
+says = "Walls or fences not exceeding six feet in height may be erected on property lines in residential zones, subject to corner clearances. Fences exceeding six feet need the Code Enforcement Officer's approval: not a safety hazard, no harm to neighboring property values, and sturdy enough for the height."
+
+[[checklist.sections]]
+citation = "§ 275-4.3D(16)"
+url = "https://ecode360.com/38456517"
+says = "No plantings, fences or other obstructions may be installed at any intersection that would diminish the minimum required sight distance."
+
+# ------------------------------------------------------------------ triage (A2)
+# Questions that must reach Code Enforcement or Fire, and questions the
+# office does not handle. Shown as a card with the answer. Life safety wins
+# when both match.
+
+[[triage]]
+id = "life_safety"
+kind = "urgent"
+title = "Report this to Code Enforcement or the Fire Department"
+patterns = [
+  '\bno heat\b',
+  '\b(heat|heating|furnace|boiler)\b.{0,30}\b(off|out|broken|not working|doesn.t work|isn.t working|won.t)\b',
+  '\bwithout heat\b',
+  '\bsewage\b',
+  '\bsewer\b.{0,20}\b(back|overflow|leak)',
+  '\bseptic\b.{0,20}\b(back|overflow|fail)',
+  '\b(collaps\w*|caving in|sagging|structural damage|structurally unsafe|unsafe structure)\b',
+  '\bfire hazard\b',
+  '\b(exposed|sparking|bare|unsafe) (wires|wiring)\b',
+  '\bcarbon monoxide\b',
+  '\bsmoke detectors?\b.{0,20}\b(missing|none|no|broken)\b',
+  '\bno (smoke|co) (detectors?|alarms?)\b',
+  '\b(blocked|locked) (exit|fire escape|egress)\b',
+  '\bunsafe (building|house|apartment)\b',
+  '\bno (running )?water\b',
+  '\bmold\b',
+  '\brats?\b|\bvermin\b|\bcockroach\w*\b',
+]
+lines = [
+  "For danger to life right now (fire, gas smell, collapse), call 911.",
+  "Unsafe or unsanitary conditions in a building, such as no heat, sewage, structural damage or a fire hazard, go to Code Enforcement at 207-680-4208. The Code Enforcement Officer and the Fire Chief can order an unsafe building vacated (§ 210-10).",
+  "Property maintenance complaints are taken by appointment. You can prepare a printable complaint sheet to bring.",
+]
+links = [
+  { label = "Prepare a complaint sheet", href = "/complaint" },
+]
+
+[[triage]]
+id = "out_of_scope"
+kind = "elsewhere"
+title = "The Code Enforcement Office does not handle this"
+patterns = [
+  '\bevict\w*\b',
+  '\bsecurity deposit\b',
+  '\blease\b.{0,30}\b(break|terminate|end|rights?)\b',
+  '\btenant.{0,10}rights?\b',
+  '\b(rent|rental) (increase|raise)\b',
+  '\bboundary (line )?dispute\b',
+  '\bproperty line dispute\b',
+  '\bencroach\w*\b',
+  '\bsue\b|\blawsuit\b|\bsmall claims\b',
+  '\bneighbor\w*\b.{0,40}\b(on my (land|property)|over the line)\b',
+]
+lines = [
+  "The office does not give landlord-tenant or legal advice and does not handle civil or boundary disputes. For tenant rights, an attorney or a legal aid organization can help. For a boundary line, a licensed land surveyor can mark it, and an attorney can advise on a dispute.",
+  "If a rental unit has unsafe conditions (no heat, sewage, structural damage, a fire hazard), that is a code matter: call Code Enforcement at 207-680-4208.",
+]
+links = []
+
+# ------------------------------------------------------------------ permit router (A3)
+# Projects shown on /permits. `defaults` pre-set the Fire review questions;
+# the resident can change them. `permits` name forms above.
+
+[[project]]
+id = "fence"
+label = "Fence or wall"
+checklist = "fence"
+permits = []
+ask_office = "Ask the office whether your fence needs a building permit. A fence over six feet in a residential zone needs the Code Enforcement Officer's approval."
+defaults = {}
+
+[[project]]
+id = "shed"
+label = "Shed or detached garage"
+checklist = "shed"
+permits = ["building"]
+defaults = { new_construction = true }
+
+[[project]]
+id = "deck"
+label = "Deck or porch"
+checklist = "deck"
+permits = ["building"]
+defaults = { new_construction = true }
+
+[[project]]
+id = "pool"
+label = "Swimming pool"
+checklist = "pool"
+permits = ["building", "electrical"]
+defaults = {}
+
+[[project]]
+id = "addition"
+label = "Addition or attached garage"
+permits = ["building"]
+defaults = { new_construction = true }
+
+[[project]]
+id = "new_home"
+label = "New house or building"
+permits = ["building"]
+defaults = { new_construction = true }
+
+[[project]]
+id = "renovation"
+label = "Renovation or remodel"
+permits = ["building"]
+defaults = {}
+
+[[project]]
+id = "conversion"
+label = "Add units (three or more)"
+checklist = "conversion"
+permits = ["building", "change_of_use"]
+defaults = { change_of_occupancy = true }
+
+[[project]]
+id = "change_of_use"
+label = "Change of use or new business in a building"
+permits = ["change_of_use"]
+defaults = { change_of_occupancy = true }
+
+[[project]]
+id = "home_occupation"
+label = "Business at home"
+checklist = "home_occupation"
+permits = []
+ask_office = "No home occupation form is posted online. Ask the office which application to file; the Fire Department inspects the business area first."
+defaults = {}
+
+[[project]]
+id = "short_term_rental"
+label = "Short-term rental"
+checklist = "short_term_rental"
+permits = []
+ask_office = "A non-owner-occupied short-term rental needs a license from the City Clerk ($120 a year) and a Fire Department inspection."
+defaults = {}
+
+[[project]]
+id = "chickens"
+label = "Backyard chickens"
+checklist = "chickens"
+permits = []
+ask_office = "Ask the office for the chicken permit and to book the henhouse inspection ($25)."
+defaults = {}
+
+[[project]]
+id = "sign"
+label = "Sign"
+checklist = "sign"
+permits = ["sign"]
+defaults = {}
+
+[[project]]
+id = "solar"
+label = "Solar panels"
+checklist = "solar"
+permits = ["building", "electrical"]
+defaults = { solar = true }
+
+[[project]]
+id = "heat_pump"
+label = "Heat pump or mini-split"
+checklist = "heat_pump"
+permits = ["electrical"]
+ask_office = "Ask the office whether your installation needs a mechanical permit; no mechanical form is posted online."
+defaults = {}
+
+[[project]]
+id = "demolition"
+label = "Demolition"
+checklist = "demolition"
+permits = ["building"]
+defaults = {}
+
+# Questions shown with every project. `fire` marks the triggers printed on
+# the General Life Safety Review form.
+
+[[question]]
+id = "new_construction"
+label = "New construction or an addition"
+help = "A new building, or adding floor area to one."
+fire = true
+
+[[question]]
+id = "renovation_over_75"
+label = "Renovating more than 75% of the occupied space"
+help = "The Fire Department counts this as new construction."
+fire = true
+
+[[question]]
+id = "life_safety_change"
+label = "Work that may change exits, alarms, sprinklers or other life safety parts"
+help = "Stairs, exits, fire alarms, sprinklers, fire separations."
+fire = true
+
+[[question]]
+id = "change_of_occupancy"
+label = "A change of occupancy"
+help = "For example a house becoming apartments, or a shop becoming a restaurant."
+fire = true
+
+[[question]]
+id = "solar"
+label = "A solar system"
+help = "The Fire Department requires contractors to train its crews on the system."
+fire = true
+
+[[question]]
+id = "electrical"
+label = "Electrical work"
+help = "New wiring, circuits, a new service or appliances."
+
+[[question]]
+id = "plumbing"
+label = "Plumbing work"
+help = "New fixtures, water heaters, drains or a septic system."
+
+[[question]]
+id = "historic"
+label = "The property is in a historic district or is a historic landmark"
+help = "Ask the Planning Department if you are not sure."
+
+[[question]]
+id = "shoreland"
+label = "Within 250 feet of the Kennebec River or Messalonskee Stream, 75 feet of a stream, or 25 feet of a minor waterway"
+help = "The shoreland zone (§ 275-3.2): 250 feet of the Kennebec River or Messalonskee Stream, 75 feet of the normal high water line of a stream, or 25 feet of a minor waterway on the Shoreland Zoning Appendix. Ask the office if unsure."
+
+# ------------------------------------------------------------------ fees (A4)
+# Published formulas only. Building permit fees: § 127-3A points to a fee
+# schedule "available from the City offices and/or on the City website"; no
+# such schedule was found online on 2026-10-03.
+
+[fees]
+building_note = "The building permit fee schedule is not published online. Section 127-3A says fees are set in a schedule available from the City offices. Call Code Enforcement at 207-680-4208 for the building permit fee."
+building_quote = "Fees are as provided for in the Maine Uniform Building and Energy Code (MUBEC) and as set forth in the fee schedule available from the City offices and/or on the City website."
+building_citation = "§ 127-3A"
+building_url = "https://ecode360.com/38454336"
+after_the_fact = "Permits applied for after work has started may be charged double the amount of the fee, subject to a maximum of $500. Failure to acquire a permit within 30 calendar days of a violation notice increases the fee to $1,000 (§ 127-3B for building permits, § 127-10B for electrical permits)."
+
+[fees.life_safety]
+title = "General Life Safety Review (Fire Department)"
+rate = "0.0015"
+source = "General Life Safety Review form, page 3"
+source_url = "https://www.waterville-me.gov/DocumentCenter/View/904/General-Life-Safety-Review-PDF"
+formula = "1.5% of 1/10 of the cost of construction (multiplier of 0.0015). Example on the form: $100,000 x 0.0015 = $150."
+excludes = "The cost counts only the building and the parts of it the State Fire Marshal's Office generally reviews. It leaves out purchase price, site work, equipment, furniture, sprinkler systems, plumbing and HVAC (unless part of a smoke removal system). Solar projects may include the cost of equipment being installed."
+
+[fees.electrical]
+title = "Electrical permit (one- and two-family homes)"
+source = "Electrical Permit Application"
+source_url = "https://www.waterville-me.gov/DocumentCenter/View/1419/Electrical-Permit-Application-PDF"
+scope = "The Municipal Electrical Inspector permits electrical work at single-family and two-family occupancies (§ 127-9, § 127-10A). Other electrical work is permitted under state law."
+minimum_note = "The form lists a minimum fee for each occupancy. It does not say whether the minimum is added to the line items or is a floor; this estimate treats it as a floor. The office confirms the fee."
+
+[[fees.electrical.minimum]]
+id = "single_family"
+label = "Residential single family"
+cents = 4500
+
+[[fees.electrical.minimum]]
+id = "two_family"
+label = "Residential two-family"
+cents = 7500
+
+[[fees.electrical.minimum]]
+id = "temporary"
+label = "Temporary service"
+cents = 2700
+
+[[fees.electrical.item]]
+id = "service_800"
+group = "Services, single and three phase"
+label = "Service, 1 and 3 phase through 800A"
+cents = 7500
+
+[[fees.electrical.item]]
+id = "service_801"
+group = "Services, single and three phase"
+label = "Service, 801 amp and larger"
+cents = 8500
+
+[[fees.electrical.item]]
+id = "panel"
+group = "Services, single and three phase"
+label = "Branch circuit panels, each"
+cents = 750
+
+[[fees.electrical.item]]
+id = "opening"
+group = "Wiring"
+label = "Openings (outlet, light, switch), each"
+cents = 50
+
+[[fees.electrical.item]]
+id = "appliance_240"
+group = "Appliances"
+label = "240 volt appliances (range, oven, water heater, dryer, air conditioner), each"
+cents = 300
+
+[[fees.electrical.item]]
+id = "appliance_120"
+group = "Appliances"
+label = "120 volt appliances (compactor, dishwasher, disposal, air conditioner), each"
+cents = 300
+
+[[fees.electrical.item]]
+id = "heat_kw"
+group = "Domestic heat"
+label = "Electric heat, per kW"
+cents = 100
+
+[[fees.electrical.item]]
+id = "heat_other"
+group = "Domestic heat"
+label = "Gas, oil or other heat"
+cents = 500
+
+[[fees.electrical.item]]
+id = "mobile_home"
+group = "Homes and pools"
+label = "Mobile home"
+cents = 2700
+
+[[fees.electrical.item]]
+id = "modular_home"
+group = "Homes and pools"
+label = "Modular home"
+cents = 2700
+
+[[fees.electrical.item]]
+id = "pool"
+group = "Homes and pools"
+label = "Swimming pool"
+cents = 1000
+
+[[fees.electrical.item]]
+id = "alarm"
+group = "Alarm systems"
+label = "Alarm systems (fire, burglar), each"
+cents = 1000
+
+[[fees.electrical.item]]
+id = "transformer_vault"
+group = "Transformers"
+label = "Transformer vaults, each"
+cents = 2000
+
+[[fees.electrical.item]]
+id = "transformer_25"
+group = "Transformers"
+label = "Transformers 0 to 25 KVA, each"
+cents = 1000
+
+[[fees.electrical.item]]
+id = "transformer_200"
+group = "Transformers"
+label = "Transformers 26 to 200 KVA, each"
+cents = 1400
+
+[[fees.electrical.item]]
+id = "transformer_over"
+group = "Transformers"
+label = "Transformers over 200 KVA, each"
+cents = 2000
+
+[[fees.electrical.item]]
+id = "generator"
+group = "Generators and alternate energy"
+label = "Generators, each"
+cents = 3000
+
+[[fees.electrical.item]]
+id = "photovoltaic"
+group = "Generators and alternate energy"
+label = "Photovoltaic system, each"
+cents = 7500
+
+[[fees.electrical.item]]
+id = "reinstall"
+group = "Other"
+label = "Re-install electrical service after a siding job"
+cents = 2700
+
+# Fixed fees printed in the City Code.
+[[fees.fixed]]
+label = "Chicken permit inspection"
+cents = 2500
+citation = "§ 275-4.33F"
+url = "https://ecode360.com/38457149"
+
+[[fees.fixed]]
+label = "Non-owner-occupied short-term rental license, per year"
+cents = 12000
+citation = "§ 275-4.35D(2)"
+url = "https://ecode360.com/38457184"

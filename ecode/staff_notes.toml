@@ -1,0 +1,164 @@
+# Staff notes: curated currency and conflict notes for the staff research desk.
+#
+# Each note becomes a `staff_note` chunk in the index. Staff searches include
+# them; public searches never do (app/search.py STAFF_ONLY_TYPES). They exist
+# because a fact the model needs, like a rule renumbering, belongs in a
+# numbered source it can cite, not in the prompt.
+#
+# Fields:
+#   id       stable slug; the chunk id is ext-staff-note-<id>
+#   title    one line; the citation is "Staff note: <title>"
+#   body     plain text; quotes are copied word for word from the sources
+#   sources  https URLs, primary sources first; the first one is the chunk's link
+#   checked  the date someone last read every source against the body
+#   status   "draft" until the Code Enforcement Officer reviews the note, then "reviewed"
+#   topics   optional search words
+#
+# Rules: every statement comes from a listed source. Name conflicts; do not
+# resolve them. No em dashes. A wrong "current" claim is worse than none, so
+# when a source changes, fix the note or delete it.
+
+[[note]]
+id = "rule-renumbering-08-003"
+title = "MUBEC and CEO certification rules renumbered: 16-642 CMR is now 08-003 CMR"
+checked = "2026-10-03"
+status = "draft"
+topics = ["16-642 CMR", "08-003 CMR", "16-219 CMR ch. 52", "MUBEC", "renumbering", "MOCA"]
+sources = [
+  "https://www.maine.gov/moca/programs/code-enforcement/laws-rules/rules",
+  "https://www.maine.gov/moca/programs/code-enforcement/laws-rules",
+  "https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/003c002-2025-042-NSC.docx",
+  "https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/003c001%20%28see%20PL%202025%2C%20c.%20388%29_0.docx",
+]
+body = """
+The Maine Office of Community Affairs (MOCA) publishes the building code and code enforcement certification rules as 08-003 CMR. Manuals, forms and older City documents still cite the old numbers. Cite the 08-003 number, and give the old number in parentheses when the document you are answering about uses it.
+
+Each 08-003 chapter states its former number in its title:
+- 08-003 CMR ch. 1, Certification standards for municipal code enforcement officers and third-party inspectors (formerly 16-219 CMR ch. 52)
+- 08-003 CMR ch. 2, MUBEC administrative procedures (formerly 16-642 CMR ch. 1)
+- 08-003 CMR ch. 3, MUBEC third-party inspectors (formerly 16-642 CMR ch. 2)
+- 08-003 CMR ch. 4, Commercial Building Code of Maine, 2021 IBC (formerly 16-642 CMR ch. 3)
+- 08-003 CMR ch. 5, Existing Building Code, 2021 IEBC (formerly 16-642 CMR ch. 4)
+- 08-003 CMR ch. 6, Residential Building Code, 2021 IRC (formerly 16-642 CMR ch. 5)
+- 08-003 CMR ch. 7, Energy Code, 2021 IECC (formerly 16-642 CMR ch. 6)
+- 08-003 CMR ch. 8, Mechanical Code, 2021 IMC (formerly 16-642 CMR ch. 7)
+
+Every MUBEC chapter number moved up by one. "Chapter 5" is the residential code under the old numbering and the existing building code under the new one, so check which numbering a document uses before you quote it.
+
+Each chapter ends with a note like this one from ch. 2: "The authority to administer and enforce this rule (formerly 16-642 C.M.R. Ch. 1) was transferred to the Maine Office of Community Affairs on September 24, 2025 pursuant to PL 2025, c. 388." MOCA's Laws and Rules page says: "The current Rule Chapters 2 through 8 were adopted and went into effect on April 7, 2026." That page gives no separate date for chapter 1.
+"""
+
+[[note]]
+id = "city-page-code-editions"
+title = "Code editions: the City web page lists older editions than the adopting sections"
+checked = "2026-10-03"
+status = "draft"
+topics = ["code edition", "2015 MUBEC", "2017 NEC", "NFPA 101", "2021 IRC", "2021 IBC", "web page"]
+sources = [
+  "https://waterville-me.gov/218/Code-Enforcement",
+  "https://ecode360.com/38454332",
+  "https://ecode360.com/38454348",
+  "https://ecode360.com/44573322",
+  "https://www.waterville-me.gov/DocumentCenter/View/1336/Building-Permit-Application-PDF",
+  "https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/003c004%20%28see%20PL%202025%2C%20c.%20388%29.docx",
+  "https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/003c006%20%28see%20PL%202025%2C%20c.%20388%29.docx",
+]
+body = """
+The City's Code Enforcement web page says "The City of Waterville has adopted the following codes" and lists "2015 Maine Uniform Building and Energy Code", "State of Maine Plumbing Code", "2017 National Electrical Code" and "NFPA 101 Life Safety Code - Current Edition Adopted by the State of Maine". That list is web page text. The City Code sections that adopt the codes name no fixed edition:
+- § 127-1 adopts the Maine Uniform Building and Energy Code (MUBEC); "This code, as amended from time to time, will be kept on file in the office of the Code Enforcement Officer".
+- § 127-8 adopts the "National Electrical Code" "(current edition adopted by the State of Maine)".
+- § 210-1 adopts MUBEC, "the latest edition of the Uniform Fire Code (NFPA 1), and the latest edition of the Life Safety Code (NFPA 101)".
+
+The current MUBEC rules adopt the 2021 model codes. 08-003 CMR ch. 4 says: "“IBC” means the 2021 International Building Code, published by the International Code Council, Inc." 08-003 CMR ch. 6 says: "“IRC” means the 2021 International Residential Code, published by the International Code Council, Inc."
+
+The building permit application has a third version: "All work must be done in accordance with Maine Uniform Building & Energy Code and National Fire Protection Association Life Safety Code 101, 2018 Edition."
+
+When an answer turns on an edition, cite the City Code section and the state rule, not the web page or the form, and say that the web page lists an older edition. These sources do not say which National Electrical Code or NFPA 101 edition the state has adopted.
+"""
+
+[[note]]
+id = "penalty-tiers-4452-3"
+title = "Civil penalties under 30-A M.R.S. § 4452(3): keep the paragraphs apart"
+checked = "2026-10-03"
+status = "draft"
+topics = ["penalty", "fine", "4452", "resource protection", "per day", "repeat violation", "275-6.1"]
+sources = [
+  "https://legislature.maine.gov/statutes/30-A/title30-Asec4452.html",
+  "https://ecode360.com/38457655",
+  "https://ecode360.com/38454346",
+]
+body = """
+Section 4452(3) sets separate ranges. Quote the paragraph that fits the violation, and do not carry one paragraph's figures into another.
+- Paragraph A: "The minimum penalty for starting construction or undertaking a land use activity without a required permit is $100, and the maximum penalty is $2,500."
+- Paragraph B: "The minimum penalty for a specific violation is $100, and the maximum penalty is $5,000."
+- Paragraph B-1: "Notwithstanding paragraph B, the maximum penalty is $10,000 for any violation of a law or an ordinance set forth in subsection 5, paragraph Q, if the violation occurs within an area zoned for resource protection." Subsection 5, paragraph Q covers "Shoreland zoning ordinances adopted pursuant to Title 38, sections 435 to 447, including those that were state-imposed".
+- Paragraph F: "The maximum penalty may exceed the amounts set forth in paragraphs B and B-1, but may not exceed $25,000, when it is shown that there has been a previous conviction of the same party within the past 2 years for a violation of the same law or ordinance." The test is a prior conviction. A prior notice of violation or complaint is not one.
+- Paragraph H lets the maximum rise when the economic benefit of the violation exceeds the penalties: "The maximum civil penalty may not exceed an amount equal to twice the economic benefit resulting from the violation."
+- The opening sentence of subsection 3: "Except for paragraph H, monetary penalties may be assessed on a per-day basis and are civil penalties."
+- Paragraph D: "If the municipality is the prevailing party, the municipality must be awarded reasonable attorney fees, expert witness fees and costs, unless the court finds that special circumstances make the award of these fees and costs unjust."
+
+Conflict in the City Code. § 275-6.1A(3)(d) says: "The minimum penalty for starting construction or undertaking a land use activity without a required permit is $100, and the maximum per-day penalty is $2,500. However, in a Resource Protection District within the shoreland zone, the maximum penalty is increased to $5,000." That $5,000 figure differs from the $10,000 in paragraph B-1. Name both figures and their sources; the City Solicitor decides which one a court filing relies on.
+
+For building code violations, § 127-7 points to the statute: "Penalties for violations of the Maine Uniform Building and Energy Code (MUBEC) shall be in accordance with the civil penalties provided in 30-A M.R.S. § 4452(3), as amended from time to time."
+"""
+
+[[note]]
+id = "nov-appealability-2691-4"
+title = "Appeals of notices of violation: 30-A M.R.S. § 2691(4) and the Waterville ordinances"
+checked = "2026-10-03"
+status = "draft"
+topics = ["notice of violation", "NOV", "appeal", "Zoning Board of Appeals", "2691", "80B", "45 days", "30 days"]
+sources = [
+  "https://legislature.maine.gov/statutes/30-A/title30-Asec2691.html",
+  "https://ecode360.com/38457665",
+  "https://www.courts.maine.gov/rules/text/MRCivPPlus/mr_civ_p_80b_plus_2021-03-16.pdf",
+]
+body = """
+30-A M.R.S. § 2691(4) says: "Absent an express provision in a charter or ordinance that certain decisions of its code enforcement officer or board of appeals are only advisory or may not be appealed, a notice of violation or an enforcement order by a code enforcement officer under a land use ordinance is reviewable on appeal by the board of appeals and in turn by the Superior Court under the Maine Rules of Civil Procedure, Rule 80B. Any such decision that is not timely appealed is subject to the same preclusive effect as otherwise provided by law."
+
+The same subsection limits the board: "No board may assert jurisdiction over any matter unless the municipality has by charter or ordinance specified the precise subject matter that may be appealed to the board and the official or officials whose action or nonaction may be appealed to the board."
+
+Waterville. § 275-6.2E(1) gives the Zoning Board of Appeals power to hear appeals "where it is alleged that there is an error in any order, decision, requirement, interpretation or ruling made by the Code Enforcement Officer in the administration or enforcement of this chapter. All appeals shall be made by any interested party within 30 days of a decision rendered by the Code Enforcement Officer." It adds: "The appeal shall be heard de novo." That text covers Chapter 275 (zoning). We found no appeal provision in Chapter 127 (building) or Chapter 205 (property maintenance) in the eCode360 text dated legislation through 08-05-2026. Before a notice under another chapter states appeal rights, check that chapter and ask the City Solicitor.
+
+Superior Court. § 2691(3)(G): "Any party may take an appeal, within 45 days of the date of the vote on the original decision, to Superior Court from any order, relief or denial in accordance with the Maine Rules of Civil Procedure, Rule 80B." Rule 80B(b) sets 30 days only "if no time limit is specified by statute".
+"""
+
+[[note]]
+id = "permit-decision-30-days-4103"
+title = "30-A M.R.S. § 4103(3): no written decision in 30 days is a refusal"
+checked = "2026-10-03"
+status = "draft"
+topics = ["4103", "30 days", "permit", "refusal", "deemed denied", "building permit"]
+sources = [
+  "https://legislature.maine.gov/statutes/30-A/title30-Asec4103.html",
+]
+body = """
+30-A M.R.S. § 4103(3) says: "An application for a permit must be in writing and shall be signed by the applicant and directed to the licensing authority. The failure of the licensing authority to issue a written notice of its decision, directed to the applicant, within 30 days from the date when the application is filed, constitutes a refusal of the permit."
+
+The section starts: "The provisions of this section apply to any ordinance described in section 4101." Whether § 4103(3) governs a Waterville building permit issued under Chapter 127 and MUBEC is a legal question for the City Solicitor. Present the 30 days as the statute's text with that caveat, not as a settled City deadline.
+
+§ 4103(5) allows an appeal "from the licensing authority's refusal to grant a permit, to the municipal officers or to a board of appeals established under section 2691".
+
+§ 4103(3) also bars some permits until another approval is in hand: a Title 38, section 413 license (paragraph A), subdivision approval (paragraph B), proof of property tax payment for a mobile home moved from another municipality (paragraph C), and a Department of Transportation driveway, entrance or traffic movement permit (paragraph D).
+"""
+
+[[note]]
+id = "manual-agency-names"
+title = "Agency names and rule numbers in the state training manuals are dated"
+checked = "2026-10-03"
+status = "draft"
+topics = ["State Planning Office", "SPO", "DECD", "MOCA", "manual", "training", "certification"]
+sources = [
+  "https://www.maine.gov/moca/sites/maine.gov.moca/files/80k-manual-2017.pdf",
+  "https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/003c001%20%28see%20PL%202025%2C%20c.%20388%29_0.docx",
+  "https://www.maine.gov/moca/programs/code-enforcement/laws-rules/rules",
+]
+body = """
+The CEO training manuals in these sources name the agency that ran the training and certification program when each was written. The Shoreland Zoning Manual (2008), the Zoning and Land Use Regulations Manual (2010) and the 2009 information guide name the State Planning Office. The 2017 Legal Issues and Court Rule 80K manuals name the Department of Economic and Community Development (DECD), Office of Community Development.
+
+The 2017 Court Rule 80K manual explains the first change: "One of the effects of LD 1903, enacted by the 125th Legislature on April 24, 2012, was to dismantle the State Planning Office and to assign its various responsibilities and programs to other state departments and agencies."
+
+The certification rule now in force is 08-003 CMR ch. 1, which notes that authority over it "was transferred to the Maine Office of Community Affairs on September 24, 2025 pursuant to PL 2025, c. 388." MOCA's Code Enforcement Rules page lists it with the MUBEC chapters.
+
+Use the manuals for practice guidance. For who certifies, which rule applies and contact details, cite the statute or 08-003 CMR, not the manual. Rule numbers in the manuals (16-642 CMR) are the old numbers; see the staff note on the renumbering.
+"""

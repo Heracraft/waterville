@@ -1,0 +1,46 @@
+# Penalty computation fields for the Rule 80K packet and cover memo.
+# The tiers live in app/routers/drafts.py (PENALTY_TIERS), read from
+# 30-A M.R.S. § 4452(3) and § 205-8 of the City Code on 2026-10-03.
+# Placeholders: {penalty_tier_text}, {penalty_range_per_day}, {penalty_days},
+# {penalty_min_total}, {penalty_max_total}, {penalty_requested_total},
+# {penalty_verify}, {penalty_warnings}, {penalty_note}; plus {inclusive_days}.
+
+[[fields]]
+name = "penalty_tier"
+label = "Penalty tier for the computation"
+kind = "select"
+options_from = "penalty_tiers"
+required = true
+section = "Penalty"
+help = "Paragraph F needs a previous conviction of the same party within 2 years for the same law or ordinance. A repeat complaint or an earlier notice is not a conviction."
+
+[[fields]]
+name = "violation_start"
+label = "First day of the violation counted"
+kind = "date"
+required = true
+section = "Penalty"
+help = "For Chapter 205, the first day after the correction deadline (§ 205-8)."
+
+[[fields]]
+name = "violation_end"
+label = "Last day counted"
+kind = "date"
+required = true
+section = "Penalty"
+help = "Usually the day you prepare the complaint. Dates are inclusive."
+
+[[fields]]
+name = "penalty_per_day"
+label = "Per-day penalty to request (optional)"
+kind = "number"
+section = "Penalty"
+help = "Leave blank to show only the range."
+
+[[computed]]
+name = "inclusive_days"
+span = ["violation_start", "violation_end"]
+
+[[computed]]
+name = "penalty"
+penalty = { tier = "penalty_tier", start = "violation_start", end = "violation_end", per_day = "penalty_per_day" }

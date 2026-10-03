@@ -1,0 +1,581 @@
+# Project gates (B8): the approvals a project needs before, and after, its
+# building permit. Read by app/gates.py and served at POST /api/staff/gates.
+#
+# Each gate has a `phase` (the order approvals must clear in), the authority
+# that grants it, its citation, a verbatim quote of the controlling text and
+# where that text came from (`source`: a file under output/markdown/code/ or
+# a URL), and `verified`:
+#   true   the quote was matched word for word against the primary source,
+#          and the text applies to Waterville on its face.
+#   false  either the text could not be confirmed, or it is a state or
+#          utility gate whose reach in Waterville has not been confirmed
+#          ("unverified for Waterville"). The UI says "check before relying".
+#
+# `when` lists the situations that raise the gate. Each has `all`, a list of
+# conditions that must all hold, and a `reason` shown to the user. A
+# condition is "field op value" with op one of == != > >= < <= in; values are
+# numbers, true/false, 'quoted strings' or ['lists']. `unless` (optional)
+# lists conditions that, when all hold, drop the gate (an exemption), with
+# `exempt_reason`. Field names are the inputs in app/gates.py plus these
+# derived fields:
+#   footprint_plus_impervious  footprint + impervious
+#   construction               project_type in new_building, addition
+#   building_work              construction, alteration, change_of_use or demolition
+#   nonresidential             use other than one_two_family
+#   demolishing                project_type demolition, or the demolition flag
+#   historic_any               historic is not 'none'
+#
+# Prose follows the project's writing rules: no em dashes.
+
+checked_default = "2026-10-03"
+
+[[phase]]
+n = 1
+label = "Board approvals"
+summary = "Planning Board and Zoning Board of Appeals decisions that must come before any permit."
+
+[[phase]]
+n = 2
+label = "Historic preservation"
+summary = "A certificate of appropriateness comes before the building permit."
+
+[[phase]]
+n = 3
+label = "Fire Department"
+summary = "Life safety review, system permits and the Fire Chief's site inspection."
+
+[[phase]]
+n = 4
+label = "State and utility gates"
+summary = "Approvals from state agencies and utilities. Unverified for Waterville: raised in review, check before relying."
+
+[[phase]]
+n = 5
+label = "Street and system permits"
+summary = "Public Works, plumbing, subsurface wastewater and electrical permits."
+
+[[phase]]
+n = 6
+label = "Floodplain"
+summary = "The flood hazard development permit, in addition to every other permit."
+
+[[phase]]
+n = 7
+label = "Building permit"
+summary = "Issued by Code Enforcement once the gates above have cleared."
+
+[[phase]]
+n = 8
+label = "During and after construction"
+summary = "Inspections, certificates of compliance and occupancy."
+
+# ------------------------------------------------------------ phase 1
+
+[[gate]]
+id = "pb-site-plan"
+phase = 1
+authority = "Planning Board"
+title = "Site plan review permit"
+citation = "Waterville City Code § 275-6.4C; § 244-2.2B"
+url = "https://ecode360.com/38457736"
+source = "output/markdown/code/244-subdivision-of-land-site-plan-review.md"
+quote = '''No building permit or plumbing permit or certificate of occupancy shall be issued by the municipal officers or Code Enforcement Officer for any use or development within the scope of this chapter unless and until a site plan of development or subdivision application has been reviewed and approved by the Planning Board.'''
+verified = true
+blocks = "No building permit, plumbing permit or certificate of occupancy until the Planning Board approves (§ 244-2.2B)."
+unless = ["use == 'one_two_family'", "subdivision == false", "units <= 2"]
+exempt_reason = "One- and two-family structures on a single lot outside a subdivision are exempt from site plan review (§ 275-6.4B(1), (2)). In the shoreland zone, § 275-4.27C to G still apply."
+
+[[gate.when]]
+all = ["construction == true", "footprint_plus_impervious > 5000"]
+reason = "Building footprint plus impervious area is {footprint_plus_impervious} sq ft, over 5,000 (§ 275-6.4C(1))."
+
+[[gate.when]]
+all = ["project_type == 'new_building'", "footprint >= 4000"]
+reason = "New building footprint of {footprint} sq ft, 4,000 or more (§ 275-6.4C(2))."
+
+[[gate.when]]
+all = ["project_type == 'addition'", "footprint >= 2000"]
+reason = "Addition footprint of {footprint} sq ft, 2,000 or more (§ 275-6.4C(3))."
+
+[[gate.when]]
+all = ["impervious >= 8000"]
+reason = "New impervious surface of {impervious} sq ft, 8,000 or more (§ 275-6.4C(4))."
+
+[[gate.when]]
+all = ["use_requires_site_plan == true", "project_type != 'change_of_use'"]
+reason = "The use is one Chapter 275 lists as needing site plan review regardless of size (§ 275-6.4C(5))."
+
+[[gate.when]]
+all = ["use_requires_site_plan == true", "project_type == 'change_of_use'"]
+reason = "Change of use to a use subject to site plan review (§ 275-6.4C(6))."
+
+[[gate]]
+id = "pb-subdivision"
+phase = 1
+authority = "Planning Board"
+title = "Subdivision approval"
+citation = "Waterville City Code Chapter 244; 30-A M.R.S. § 4103(3)(B)"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec4103.html"
+source = "https://legislature.maine.gov/statutes/30-A/title30-Asec4103.html"
+quote = '''The licensing authority may not issue any permit for a building or use within a subdivision, as defined in section 4401, subsection 4 , unless that subdivision has been approved in accordance with chapter 187, subchapter IV .'''
+verified = true
+note = "Verified on its own footing: Chapter 244 requires subdivision approval. The § 4103(3)(B) bar on permits adds to it; 30-A M.R.S. § 4101 applies that subchapter to any municipal ordinance requiring a permit in connection with the construction, demolition, improvement or alteration of any building, and the City Solicitor confirms its reach, as for the MaineDOT gate."
+blocks = "No permit for a building or use in the subdivision until it is approved."
+
+[[gate.when]]
+all = ["subdivision == true"]
+reason = "The project creates lots or units that make a subdivision, or sits in one not yet approved."
+
+[[gate]]
+id = "pb-shoreland"
+phase = 1
+authority = "Planning Board"
+title = "Shoreland zone approval"
+citation = "Waterville City Code § 275-4.27C, D, F"
+url = "https://ecode360.com/38456897"
+source = "output/markdown/code/275-zoning.md"
+quote = '''No structure shall be erected, expanded or moved, no new lot shall be created, no topography shall be altered by excavation or filling and no natural vegetation shall be cleared until plans have been submitted to and approved by the Planning Board.'''
+verified = true
+blocks = "The Planning Board approves issuance of the permit by the CEO (§ 275-4.27F). Activity abutting minor waterways goes to Maine DEP instead."
+
+[[gate.when]]
+all = ["shoreland == true", "construction == true"]
+reason = "A structure erected or expanded in the shoreland zone."
+
+[[gate.when]]
+all = ["shoreland == true", "project_type == 'site_work'"]
+reason = "Excavation, filling or clearing in the shoreland zone."
+
+[[gate.when]]
+all = ["shoreland == true", "subdivision == true"]
+reason = "A new lot in the shoreland zone."
+
+[[gate]]
+id = "pb-private-road"
+phase = 1
+authority = "Planning Board"
+title = "Private road approval"
+citation = "Waterville City Code § 275-4.24B"
+url = "https://ecode360.com/38456850"
+source = "output/markdown/code/275-zoning.md"
+quote = '''Private roads must be approved by the Planning Board. The Planning Board shall obtain a written report from a review team which includes the City Engineer, Public Works Director, the Fire Department and a Code Enforcement Officer.'''
+verified = true
+
+[[gate.when]]
+all = ["private_road == true"]
+reason = "Lots served by a private road (no more than three dwelling units, or a driveway without enough street frontage)."
+
+[[gate]]
+id = "zba-variance"
+phase = 1
+authority = "Zoning Board of Appeals"
+title = "Variance or appeal"
+citation = "Waterville City Code § 275-6.2E(4)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''Variances may be granted by the Board only where strict application of this chapter, or a provision thereof, would cause undue hardship to the petitioner and his property.'''
+verified = true
+blocks = "A variance must be recorded within 90 days or it is invalid (§ 275-6.2E(4)(h)); see the deadline calculator."
+
+[[gate.when]]
+all = ["needs_variance == true"]
+reason = "The project does not meet a dimensional or other requirement of Chapter 275."
+
+[[gate.when]]
+all = ["needs_variance == true", "shoreland == true"]
+reason = "Shoreland variance: the application goes to Maine DEP 20 days before the Board acts (§ 275-6.2E(4)(c))."
+
+# ------------------------------------------------------------ phase 2
+
+[[gate]]
+id = "coa"
+phase = 2
+authority = "Historic Preservation Commission"
+title = "Certificate of appropriateness"
+citation = "Waterville City Code § 161-6; § 161-7A"
+url = "https://ecode360.com/45005639"
+source = "output/markdown/code/161-historic-preservation.md"
+quote = '''When an activity requiring a certificate of appropriateness also requires a building and use permit from the Code Enforcement Officer, the applicant shall obtain the certificate of appropriateness before the Code Enforcement Officer issues a building and use permit.'''
+verified = true
+blocks = "No building and use permit until the certificate is issued (§ 161-7A). With site plan review, the certificate is a condition of Planning Board approval (§ 161-7B)."
+
+[[gate.when]]
+all = ["historic in ['contributing', 'landmark']", "project_type in ['addition', 'alteration']", "visible_from_street == true"]
+reason = "Exterior change visible from the street on a contributing property or landmark (§ 161-6B(1))."
+
+[[gate.when]]
+all = ["historic == 'noncontributing'", "project_type in ['addition', 'alteration']", "visible_from_street == true"]
+reason = "Noncontributing property in a historic district: a certificate is needed for major changes that affect the rhythm of surrounding properties (§ 161-6B(2)). Alterations that keep the size and footprint are exempt (§ 161-8E)."
+
+[[gate.when]]
+all = ["historic_any == true", "project_type == 'new_building'", "visible_from_street == true"]
+reason = "New construction visible from the street in a historic district (§ 161-6C)."
+
+[[gate.when]]
+all = ["historic in ['contributing', 'landmark']", "demolishing == true"]
+reason = "Demolition of a landmark or contributing structure (§ 161-6D)."
+
+[[gate.when]]
+all = ["historic in ['contributing', 'landmark']", "solar == true", "visible_from_street == true"]
+reason = "Solar panels visible from the street on a contributing property (§ 161-6F)."
+
+# ------------------------------------------------------------ phase 3
+
+[[gate]]
+id = "fire-lsr"
+phase = 3
+authority = "Fire Department"
+title = "General Life Safety Review"
+citation = "Waterville Fire Department, General Life Safety Review form; Waterville City Code § 127-4A, § 210-4A"
+url = "https://www.waterville-me.gov/DocumentCenter/View/904/General-Life-Safety-Review-PDF"
+source = "https://www.waterville-me.gov/DocumentCenter/View/904/General-Life-Safety-Review-PDF"
+quote = '''A General Life Safety Review is required when the following occurs: new construction/additions, (Renovations exceeding 75% of occupied space are considered new construction.) renovations that may alter life safety components, change of occupancy, and solar systems that requiring fire department training.'''
+verified = true
+note = "Fee: 0.15% of the adjusted construction cost (the form's multiplier of 0.0015). The triggers come from the Fire Department's form; § 127-4A authorizes the Fire Chief to review all development. The form does not exempt one- and two-family homes; confirm with the Fire Department."
+
+[[gate.when]]
+all = ["construction == true"]
+reason = "New construction or an addition."
+
+[[gate.when]]
+all = ["renovation_over_75 == true"]
+reason = "Renovation of more than 75% of the occupied space counts as new construction."
+
+[[gate.when]]
+all = ["life_safety_change == true"]
+reason = "Renovation that may alter life safety components."
+
+[[gate.when]]
+all = ["project_type == 'change_of_use'"]
+reason = "Change of occupancy."
+
+[[gate.when]]
+all = ["solar == true"]
+reason = "Solar system that calls for fire department training."
+
+[[gate]]
+id = "fire-site-inspection"
+phase = 3
+authority = "Fire Chief"
+title = "Fire Chief site inspection (may be required)"
+citation = "Waterville City Code § 127-4C; § 210-4C"
+url = "https://ecode360.com/38454339"
+source = "output/markdown/code/127-building-and-energy-code.md"
+quote = '''Prior to the construction of a new building, alteration, modification, or change of occupancy, the Fire Chief or Chief's designee shall have the authority to require an inspection of the activity site prior to approval of a construction permit application.'''
+verified = true
+
+[[gate.when]]
+all = ["project_type in ['new_building', 'alteration', 'change_of_use', 'addition']"]
+reason = "New building, alteration, modification or change of occupancy: the Fire Chief may require a site inspection before the construction permit."
+
+[[gate]]
+id = "fire-systems"
+phase = 3
+authority = "Fire Chief"
+title = "Sprinkler or fire alarm permit and review"
+citation = "Waterville City Code § 210-6B; § 127-4D"
+url = "https://ecode360.com/44573334"
+source = "output/markdown/code/210-public-safety.md"
+quote = '''Any person and/or business who or which installs, alters, or modifies either a sprinkler or fire alarm system is required to obtain a permit from the Fire Chief or Chief's designee.'''
+verified = true
+note = "The Fire Chief decides whether a building needs a sprinkler or fire alarm system (§ 210-11A, B)."
+
+[[gate.when]]
+all = ["sprinkler_alarm == true"]
+reason = "Sprinkler or fire alarm work."
+
+# ------------------------------------------------------------ phase 4 (state and utility, unverified for Waterville)
+
+[[gate]]
+id = "state-fire-marshal"
+phase = 4
+authority = "Office of the State Fire Marshal"
+title = "State Fire Marshal construction permit"
+citation = "25 M.R.S. § 2448"
+url = "https://legislature.maine.gov/statutes/25/title25sec2448.html"
+source = "https://legislature.maine.gov/statutes/25/title25sec2448.html"
+quote = '''A property owner, agent or representative of the owner may not construct, alter or change the use of any structure to become a public building without first obtaining from the Commissioner of Public Safety or from a municipality designated pursuant to section 2448‑A a permit for that purpose.'''
+verified = false
+scope = "state"
+note = "\"Public building\" in § 2448 covers places of assembly, mercantile occupancy over 3,000 sq ft, hotels and business occupancy of 2 or more stories, among others. Whether a given project, and which multifamily buildings, fall under it is unverified for Waterville."
+
+[[gate.when]]
+all = ["nonresidential == true", "building_work == true", "use != 'multifamily'"]
+reason = "Commercial, industrial, institutional or mixed use construction, alteration or change of use."
+
+[[gate.when]]
+all = ["use == 'multifamily'", "building_work == true"]
+reason = "Multifamily building: State Fire Marshal review often applies; confirm against § 2448 and the Fire Marshal's rules."
+
+[[gate]]
+id = "barrier-free"
+phase = 4
+authority = "Architect or engineer; State Fire Marshal"
+title = "Barrier-free (accessibility) certification"
+citation = "5 M.R.S. § 4594-F(6)"
+url = "https://legislature.maine.gov/statutes/5/title5sec4594-F.html"
+source = "https://legislature.maine.gov/statutes/5/title5sec4594-F.html"
+quote = '''If the costs of construction or alterations are at least $50,000, the builder of a facility to which this section applies must obtain a certification from an architect, professional engineer, certified interior designer or landscape architect who is licensed, certified or registered to practice under Title 32 and is practicing within the scope of that individual's profession that the plans meet the standards of construction required by this section.'''
+verified = false
+scope = "state"
+note = "Which facilities § 4594-F covers was not checked for this tool. 30-A § 4451(2-A) lists it among building standards laws."
+
+[[gate.when]]
+all = ["nonresidential == true", "building_work == true", "construction_cost >= 50000"]
+reason = "Construction or alteration cost of ${construction_cost}, at least $50,000."
+
+[[gate]]
+id = "mainedot-entrance"
+phase = 4
+authority = "Maine Department of Transportation"
+title = "MaineDOT driveway or entrance permit"
+citation = "30-A M.R.S. § 4103(3)(D); 23 M.R.S. §§ 704, 704-A"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec4103.html"
+source = "https://legislature.maine.gov/statutes/30-A/title30-Asec4103.html"
+quote = '''The licensing authority may not issue a permit for a building or use for which the applicant is required to obtain a driveway or entrance or traffic movement permit under Title 23, section 704 or 704‑A until the applicant has obtained that permit from the Department of Transportation.'''
+verified = false
+scope = "state"
+note = "The statute text is verified. 30-A M.R.S. § 4101 applies that subchapter to any municipal ordinance requiring a permit in connection with the construction, demolition, improvement or alteration of any building (Chapter 127 requires one, § 127-2), so § 4103 likely reaches a Waterville building permit; the City Solicitor confirms. Treated as unverified for Waterville, like the deadline calculator's § 4103(3) clock."
+
+[[gate.when]]
+all = ["state_road == true"]
+reason = "A new or changed driveway or entrance on a state or state-aid highway."
+
+[[gate]]
+id = "dep-nrpa"
+phase = 4
+authority = "Maine Department of Environmental Protection"
+title = "Natural Resources Protection Act permit"
+citation = "38 M.R.S. § 480-C"
+url = "https://legislature.maine.gov/statutes/38/title38sec480-C.html"
+source = "https://legislature.maine.gov/statutes/38/title38sec480-C.html"
+quote = '''A person may not perform or cause to be performed any activity listed in subsection 2 without first obtaining a permit from the department if the activity is located in, on or over any protected natural resource or is located adjacent to any of the following:'''
+verified = false
+scope = "state"
+
+[[gate.when]]
+all = ["near_protected_resource == true"]
+reason = "Work in, on, over or next to a protected natural resource (river, stream, wetland, significant habitat)."
+
+[[gate.when]]
+all = ["shoreland == true", "project_type == 'site_work'"]
+reason = "Soil disturbance or fill next to a river or stream may need an NRPA permit."
+
+[[gate]]
+id = "dep-asbestos"
+phase = 4
+authority = "Maine Department of Environmental Protection"
+title = "Asbestos notification before demolition"
+citation = "06-096 CMR ch. 425"
+url = "https://www.maine.gov/dep/waste/asbestos/"
+verified = false
+scope = "state"
+note = "Raised in review; the rule text was not checked for this tool. Confirm the notice period and the buildings it covers with DEP."
+
+[[gate.when]]
+all = ["demolishing == true"]
+reason = "Demolition."
+
+[[gate]]
+id = "utility-sewer-water"
+phase = 4
+authority = "Waterville Sewerage District; Kennebec Water District"
+title = "Sewer connection and water service approvals"
+citation = "District rules (not in the corpus)"
+url = "https://www.waterville-me.gov/"
+verified = false
+scope = "utility"
+note = "Raised in review. The districts' connection rules are not in the corpus; check with each district."
+
+[[gate.when]]
+all = ["sewer_water == true"]
+reason = "New or changed public sewer or water connection."
+
+# ------------------------------------------------------------ phase 5
+
+[[gate]]
+id = "dpw-street-opening"
+phase = 5
+authority = "Director of Public Works"
+title = "Street excavation permit"
+citation = "Waterville City Code § 238-11"
+url = "https://ecode360.com/39780547"
+source = "output/markdown/code/238-streets-and-sidewalks.md"
+quote = '''No person, firm, utility or corporation, except the Director of Public Works or his assistants in performance of official duties, shall break or dig up the ground or paving in any City street, way or place, or make excavation therein for any purpose without first obtaining a permit therefor from the Director of Public Works.'''
+verified = true
+
+[[gate.when]]
+all = ["street_work == true"]
+reason = "Digging in a City street, way or place (utility connections included)."
+
+[[gate.when]]
+all = ["sewer_water == true"]
+reason = "Utility connections usually open the street; confirm with Public Works."
+
+[[gate]]
+id = "dpw-driveway"
+phase = 5
+authority = "Director of Public Works"
+title = "Driveway entrance permit"
+citation = "Waterville City Code § 238-6A, B"
+url = "https://ecode360.com/39780535"
+source = "output/markdown/code/238-streets-and-sidewalks.md"
+quote = '''No person shall construct or maintain any driveway entrance or approach joining any public street in the City without a written permit from the Director of Public Works'''
+verified = true
+
+[[gate.when]]
+all = ["new_driveway == true"]
+reason = "A new driveway entrance, or a change to the grade or location of one, on a City street."
+
+[[gate]]
+id = "plumbing"
+phase = 5
+authority = "Local Plumbing Inspector"
+title = "Plumbing permit"
+citation = "30-A M.R.S. § 4215(1); Waterville City Code § 275-4.27H(12)(b) in the shoreland zone"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec4215.html"
+source = "https://legislature.maine.gov/statutes/30-A/title30-Asec4215.html"
+quote = '''A permit is required for the following activities and is valid for work commenced within 24 months after the permit is issued:'''
+verified = true
+note = "Activity A of § 4215(1) is \"The installation of plumbing into a building\". With site plan review, no plumbing permit issues before Planning Board approval (§ 244-2.2B)."
+
+[[gate.when]]
+all = ["plumbing == true"]
+reason = "Plumbing installed or altered."
+
+[[gate.when]]
+all = ["plumbing == true", "shoreland == true"]
+reason = "Shoreland zone: no building permit for work with plumbing until the plumbing permit is secured (§ 275-4.27H(12)(b))."
+
+[[gate]]
+id = "subsurface"
+phase = 5
+authority = "Local Plumbing Inspector"
+title = "Subsurface wastewater disposal permit (HHE-200)"
+citation = "10-144 CMR ch. 241 § 4(B)(6); 30-A M.R.S. § 4215(1)(B)"
+url = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+source = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+quote = '''A permit is required for installation of a subsurface wastewater disposal system or components thereof.'''
+verified = true
+note = "The LPI rejects an incomplete application within 14 days and issues within 20 days of completing review (§ 4(B)(1)); two inspections on 24 hours' notice."
+
+[[gate.when]]
+all = ["subsurface == true"]
+reason = "A new, replacement or expanded septic system."
+
+[[gate]]
+id = "electrical"
+phase = 5
+authority = "City Electrical Inspector"
+title = "Municipal electrical permit"
+citation = "Waterville City Code § 127-10A"
+url = "https://ecode360.com/38454352"
+source = "output/markdown/code/127-building-and-energy-code.md"
+quote = '''As provided for in § 127-2, municipal electrical permits are required prior to the start of any construction work on single-family and two-family occupancies.'''
+verified = true
+note = "Other electrical work is permitted and inspected under 32 M.R.S. chapter 17 (§ 127-10A)."
+
+[[gate.when]]
+all = ["electrical == true", "use == 'one_two_family'"]
+reason = "Electrical work in a one- or two-family occupancy."
+
+[[gate]]
+id = "electrical-state"
+phase = 5
+authority = "State electrical inspection"
+title = "Electrical permit and inspection under state law"
+citation = "Waterville City Code § 127-10A; 32 M.R.S. ch. 17"
+url = "https://ecode360.com/38454352"
+source = "output/markdown/code/127-building-and-energy-code.md"
+quote = '''Permitting and inspections for all other electrical work within the City of Waterville shall be performed in accordance with 32 M.R.S., Chapter 17'''
+verified = true
+
+[[gate.when]]
+all = ["electrical == true", "use != 'one_two_family'"]
+reason = "Electrical work outside one- and two-family occupancies."
+
+# ------------------------------------------------------------ phase 6
+
+[[gate]]
+id = "floodplain"
+phase = 6
+authority = "Code Enforcement Officer (Floodplain Administrator)"
+title = "Flood hazard development permit"
+citation = "Waterville City Code § 145-2; § 145-5F"
+url = "https://ecode360.com/38454417"
+source = "output/markdown/code/145-floodplain-management.md"
+quote = '''Before any construction or other development (as defined in § 145-13), including the placement of manufactured homes, begins within any areas of special flood hazard established in § 145-1, a flood hazard development permit shall be obtained from the Code Enforcement Officer. This permit shall be in addition to any other permits which may be required pursuant to the codes and ordinances of the City of Waterville, Maine.'''
+verified = true
+note = "New or substantially improved elevated structures get a two-part permit; Part II follows review of the Part I elevation certificate within 72 hours (§ 145-5F(1))."
+
+[[gate.when]]
+all = ["flood_zone == true"]
+reason = "Development in a special flood hazard area."
+
+# ------------------------------------------------------------ phase 7
+
+[[gate]]
+id = "building-permit"
+phase = 7
+authority = "Code Enforcement Officer"
+title = "Building permit"
+citation = "Waterville City Code § 127-2A"
+url = "https://ecode360.com/38454333"
+source = "output/markdown/code/127-building-and-energy-code.md"
+quote = '''Permits are required prior to the start of any construction, alteration, removal or demolition of any and all buildings or structures within the City of Waterville and as further explained in the duly adopted Maine Uniform Building and Energy Code (MUBEC), as amended from time to time.'''
+verified = true
+note = "The City's form voids the permit if construction has not started within six months of issue."
+
+[[gate.when]]
+all = ["building_work == true"]
+reason = "Construction, alteration, removal or demolition of a building or structure."
+
+# ------------------------------------------------------------ phase 8
+
+[[gate]]
+id = "inspections-co"
+phase = 8
+authority = "Code Enforcement Officer"
+title = "Inspections and certificate of occupancy"
+citation = "Waterville City Code § 127-6; Building Permit Application (form)"
+url = "https://www.waterville-me.gov/DocumentCenter/View/1336/Building-Permit-Application-PDF"
+source = "https://www.waterville-me.gov/DocumentCenter/View/1336/Building-Permit-Application-PDF"
+quote = '''NO BUILDING HEREAFTER ERECTED SHALL BE OCCUPIED OR USED, IN WHOLE OR IN PART, UNTIL A CERTIFICATE OF OCCUPANCY SHALL HAVE BEEN ISSUED BY THE CODE ENFORCEMENT OFFICER.'''
+verified = true
+note = "The form requires at least three inspections: foundation, framing before cover, and final before occupancy. Fire Department and Code Enforcement both inspect."
+
+[[gate.when]]
+all = ["construction == true"]
+reason = "A new building or addition."
+
+[[gate.when]]
+all = ["project_type in ['alteration', 'change_of_use']"]
+reason = "Alteration or change of use under a building permit."
+
+[[gate]]
+id = "floodplain-coc"
+phase = 8
+authority = "Code Enforcement Officer (Floodplain Administrator)"
+title = "Floodplain certificate of compliance"
+citation = "Waterville City Code § 145-7"
+url = "https://ecode360.com/38454534"
+source = "output/markdown/code/145-floodplain-management.md"
+quote = '''No land in a special flood hazard area shall be occupied or used and no structure which is constructed or substantially improved shall be occupied until a certificate of compliance is issued by the Code Enforcement Officer, subject to the following provisions:'''
+verified = true
+note = "The CEO acts within 10 working days of the applicant's written notice of completion (§ 145-7C)."
+
+[[gate.when]]
+all = ["flood_zone == true", "building_work == true"]
+reason = "A structure built or substantially improved in a special flood hazard area."
+
+# ------------------------------------------------------------ district notes
+
+[[district_note]]
+district = "RP"
+citation = "Waterville City Code § 275-5.16; § 275-6.2G(5)"
+url = "https://ecode360.com/38457503"
+text = "Resource Protection District: open space is the principal use, and the ZBA may not permit residential, commercial or industrial structures here except as § 275-4.2G provides."
+
+[[district_note]]
+district = "unknown"
+text = "No district chosen. The Official Zoning Map, the shoreland map and the flood insurance rate map are not in the corpus; check the parcel on the City's AxisGIS map."

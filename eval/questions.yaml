@@ -1,0 +1,201 @@
+# Staff eval set: 30 desk questions from docs/inspector-workflow.md section 2.
+#
+# Each question is asked in staff mode (cite-it prompt) by eval/run.py.
+#
+#   id        stable key, used in the results table
+#   step      the workflow step in section 2 it comes from
+#   question  what the inspector types at the desk
+#   expect    citations the answer should rest on. Each entry is one source;
+#             "A | B" means either one counts. Matching is on the source's
+#             `citation` field: "§ 205-7" matches "§ 205-7" and "§ 205-7A" but
+#             not "§ 205-70" or "§ 205-7.1".
+#   facts     optional regular expressions (case-insensitive) the answer text
+#             should contain, such as a figure or a period of days
+#   note      optional, why the expectation is what it is
+#
+# Expected citations were taken from the research report and checked against
+# the crawl in output/markdown/code/ and ecode/state_sources.toml on
+# 2026-10-03. Sources added for the preview (30-A §§ 2691, 4103, 4353, 4453,
+# 08-003 CMR, M.R. Civ. P. 80B/80E/80K, City forms, staff notes) exist only in
+# the preview index, so run the set against the preview.
+
+questions:
+  # ------------------------------------------------------------ 2.1 intake
+  - id: setback-rc
+    step: "2.1"
+    question: What are the minimum setbacks and lot size in the R-C district?
+    expect: ["§ 275-5.3"]
+    facts: ["setback|yard"]
+
+  - id: fence-height
+    step: "2.1"
+    question: A resident wants an 8-foot fence on the side lot line. What does the code require?
+    expect: ["§ 275-4.26"]
+    facts: ["6 (feet|ft|foot)|six feet"]
+
+  - id: chickens
+    step: "2.1"
+    question: What does a resident need to keep backyard chickens, and what does the inspection cost?
+    expect: ["§ 275-4.33"]
+    facts: ["\\$25"]
+
+  - id: home-occupation
+    step: "2.1"
+    question: What standards apply to a home occupation and who approves it?
+    expect: ["§ 275-4.16"]
+    facts: ["two persons|500 square feet"]
+
+  - id: short-term-rental
+    step: "2.6"
+    question: What license and inspection does a non-owner-occupied short-term rental need?
+    expect: ["§ 275-4.35"]
+    facts: ["\\$120"]
+
+  # ------------------------------------------------------------ 2.2 plan review
+  - id: site-plan-thresholds
+    step: "2.2"
+    question: Which projects need Planning Board site plan review before I can issue a building permit?
+    expect: ["§ 275-6.4", "§ 244-2.2 | § 275-6.4"]
+    note: "§ 275-6.4C holds the thresholds; § 244-2.2B says Planning Board approval comes first."
+
+  - id: historic-coa
+    step: "2.2"
+    question: When is a certificate of appropriateness required in a historic district before a permit?
+    expect: ["§ 161-7"]
+
+  - id: plumbing-before-building
+    step: "2.2"
+    question: Can I issue a building permit in the shoreland zone before the plumbing permit is issued?
+    expect: ["§ 275-4.27"]
+    facts: ["plumbing permit"]
+
+  - id: life-safety-review
+    step: "2.2"
+    question: When does a building permit need the Fire Department General Life Safety Review, and what is its fee?
+    expect: ["Waterville form: General Life Safety Review"]
+    facts: ["0?\\.15 ?%|0\\.0015"]
+
+  - id: permit-decision-30-days
+    step: "2.2"
+    question: If we do not decide a permit application within 30 days, is that a refusal under state law?
+    expect: ["30-A M.R.S. § 4103"]
+    facts: ["refusal"]
+
+  - id: subsurface-clocks
+    step: "2.2"
+    question: How fast must the LPI act on an HHE-200 subsurface application?
+    expect: ["10-144 CMR ch. 241"]
+    facts: ["14 days|20 days"]
+
+  # ------------------------------------------------------------ 2.3 permits and fees
+  - id: after-the-fact-fee
+    step: "2.3"
+    question: What is the fee for a building permit applied for after work started, and what happens after a violation notice?
+    expect: ["§ 127-3"]
+    facts: ["double", "\\$500", "\\$1,000"]
+
+  - id: building-fee-schedule
+    step: "2.3"
+    question: What is the building permit fee for a $200,000 single-family house?
+    expect: ["§ 127-3"]
+    facts: ["not in the sources|schedule"]
+    note: "The schedule is not online; the answer should say so instead of inventing a figure."
+
+  - id: code-editions
+    step: "2.3"
+    question: Which edition of the building code is in force in Waterville, and does the City web page agree?
+    expect: ["§ 127-1 | § 127-8 | Staff note: Code editions: the City web page lists older editions than the adopting sections"]
+
+  - id: mubec-renumbering
+    step: "2.3"
+    question: Where are the MUBEC administrative rules now that 16-642 CMR was renumbered?
+    expect: ["08-003 CMR ch. 2 | Staff note: MUBEC and CEO certification rules renumbered: 16-642 CMR is now 08-003 CMR"]
+    facts: ["08-003"]
+
+  # ------------------------------------------------------------ 2.4 inspections
+  - id: certificate-of-occupancy
+    step: "2.4"
+    question: When does the CEO issue a certificate of occupancy?
+    expect: ["§ 127-6"]
+
+  - id: third-party-inspections
+    step: "2.4"
+    question: Can I accept a third-party inspection report instead of inspecting myself?
+    expect: ["§ 127-5"]
+
+  - id: floodplain-certificate
+    step: "2.4"
+    question: How long do I have to act on a request for a floodplain certificate of compliance?
+    expect: ["§ 145-7"]
+    facts: ["10 working days"]
+
+  # ------------------------------------------------------------ 2.5 enforcement
+  - id: ch205-notice
+    step: "2.5"
+    question: What written notice does Chapter 205 require before the city can charge a penalty for a property maintenance violation, and who gets it?
+    expect: ["§ 205-7"]
+    facts: ["mortgagee"]
+
+  - id: ch205-penalty
+    step: "2.5"
+    question: What is the penalty for a Chapter 205 violation that is not corrected, and can the city abate it?
+    expect: ["§ 205-8 | § 205-7"]
+    facts: ["\\$100"]
+
+  - id: fire-damaged
+    step: "2.5"
+    question: What are the deadlines to secure and repair a fire-damaged building?
+    expect: ["§ 205-6"]
+    facts: ["24 hours", "90 days|120 days"]
+
+  - id: unregistered-vehicles
+    step: "2.5"
+    question: Is it a violation to keep two unregistered cars in a driveway?
+    expect: ["§ 205-2"]
+    facts: ["two or more"]
+
+  - id: penalty-tiers
+    step: "2.5"
+    question: What are the civil penalty ranges under 30-A § 4452 for work without a permit versus a specific violation?
+    expect: ["30-A M.R.S. § 4452"]
+    facts: ["\\$2,500", "\\$5,000"]
+
+  - id: penalty-repeat
+    step: "2.5"
+    question: The owner already got a second NOV. Can we ask the court for the $25,000 maximum?
+    expect: ["30-A M.R.S. § 4452"]
+    facts: ["previous conviction|prior conviction"]
+
+  - id: nov-appealable
+    step: "2.5"
+    question: Is a notice of violation under the zoning ordinance appealable to the Zoning Board of Appeals?
+    expect: ["30-A M.R.S. § 2691 | Staff note: Appeals of notices of violation: 30-A M.R.S. § 2691(4) and the Waterville ordinances", "§ 275-6.2"]
+
+  - id: zoning-enforcement-notice
+    step: "2.5"
+    question: When I find a zoning violation, who must I notify and how?
+    expect: ["§ 275-6.1"]
+
+  - id: rule-80k-court
+    step: "2.5"
+    question: What does a CEO need to bring a land use citation under Rule 80K in District Court?
+    expect: ["M.R. Civ. P. 80K | Court Rule 80K Manual (2017)", "30-A M.R.S. § 4453 | 30-A M.R.S. § 4452"]
+
+  - id: vacate-order
+    step: "2.5"
+    question: Can I order a building vacated in an emergency, and for how long?
+    expect: ["§ 210-10"]
+    facts: ["24 hours"]
+
+  # ------------------------------------------------------------ 2.6 to 2.8
+  - id: rental-registration
+    step: "2.6"
+    question: Is rental registration mandatory in Waterville and when do registrations expire?
+    expect: ["§ 215-4 | § 215-6"]
+    facts: ["October 31"]
+
+  - id: zba-timing
+    step: "2.7"
+    question: After a variance application is filed, when must the ZBA hearing be held, who gets notice, and how long is the appeal period after the decision?
+    expect: ["§ 275-6.2"]
+    facts: ["45 days", "300 feet", "14 days"]

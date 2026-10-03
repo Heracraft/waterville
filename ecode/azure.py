@@ -11,11 +11,24 @@ Environment:
   AZURE_OPENAI_EMBEDDING_DEPLOYMENT  deployment name of the embedding model
   AZURE_OPENAI_EMBEDDING_MODEL     text-embedding-3-large (default) | text-embedding-3-small | text-embedding-ada-002
   EMBEDDING_DIMENSIONS             vector size (default 3072 for 3-large, 1536 otherwise)
+  SEARCH_INDEX_UPDATE              always (default): PUT the index definition before
+                                   every push; never: leave the definition alone (the
+                                   preview job, whose identity may write documents in
+                                   its own index only; infra/deploy-preview.sh creates
+                                   and updates that index with `ensure-index`)
 
 Usage:
   python -m ecode.azure schema  [--out azure/index.json]   # print/write index JSON
   python -m ecode.azure validate [--chunks output/chunks.jsonl]
-  python -m ecode.azure push    [--chunks output/chunks.jsonl] [--recreate]
+  python -m ecode.azure push    [--chunks output/chunks.jsonl] [--recreate] [--changes-to auto|store|print|none]
+                                [--index-update always|never]
+  python -m ecode.azure ensure-index                       # create or update the index definition only
+  python -m ecode.azure changes [--chunks output/chunks.jsonl] [--changes-to ...]  # change alerts only, no push
+
+Change alerts (ecode.changes): before a push, the city chunks already in the
+index (id, content_hash, citation fields) are read and compared with the new
+chunks; after a successful upload each changed, added or removed citation is
+recorded in the store table `changes` (or printed when no store is configured).
 """
 
 from __future__ import annotations
@@ -30,6 +43,9 @@ import time
 from pathlib import Path
 
 import requests
+
+from . import changes as change_alerts
+from .export import content_hash
 
 SEARCH_API = "2024-07-01"
 AOAI_API = "2024-10-21"
@@ -87,6 +103,8 @@ def index_definition(name: str, dims: int, model: str, aoai_endpoint: str | None
         _f("municipality", filt=True, facet=True),
         _f("legislation_through"),
         _f("crawled_at", "Edm.DateTimeOffset", filt=True, sort=True),
+        # sha256 of `content` (ecode.export.content_hash); the refresh compares it to spot changed sections.
+        _f("content_hash", filt=True),
         {
             "name": VECTOR_FIELD,
             "type": "Collection(Edm.Single)",
@@ -269,11 +287,23 @@ def _env(name: str, default: str | None = None) -> str:
 
 def main(argv=None) -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", choices=["schema", "validate", "push"])
+    ap.add_argument("command", choices=["schema", "validate", "push", "changes", "ensure-index"])
     ap.add_argument("--chunks", default="output/chunks.jsonl")
     ap.add_argument("--out", help="write schema JSON here (schema command)")
     ap.add_argument("--recreate", action="store_true", help="delete and recreate the index before pushing")
     ap.add_argument("--batch", type=int, default=100, help="documents per upload request")
+    ap.add_argument(
+        "--changes-to",
+        choices=["auto", "store", "print", "none"],
+        default="auto",
+        help="where change alerts go: auto = the store table `changes` when STORAGE_TABLE_ENDPOINT is set, else stdout",
+    )
+    ap.add_argument(
+        "--index-update",
+        choices=["always", "never"],
+        default=os.environ.get("SEARCH_INDEX_UPDATE", "always"),
+        help="never: do not PUT the index definition (it must exist); for identities without index-management rights",
+    )
     args = ap.parse_args(argv)
 
     model = os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-large")
@@ -295,7 +325,20 @@ def main(argv=None) -> None:
             print(text, end="")
         return
 
+    if args.command == "ensure-index":
+        endpoint = _env("AZURE_SEARCH_ENDPOINT").rstrip("/")
+        search_auth = Auth("AZURE_SEARCH_API_KEY", SEARCH_SCOPE)
+        if os.environ.get("AZURE_OPENAI_API_KEY"):
+            index["vectorSearch"]["vectorizers"][0]["azureOpenAIParameters"]["apiKey"] = os.environ["AZURE_OPENAI_API_KEY"]
+        idx_url = f"{endpoint}/indexes/{name}?api-version={SEARCH_API}"
+        _retry(lambda: requests.put(idx_url, headers=search_auth.headers(), json=index, timeout=60), "create index")
+        print(f"index '{name}' ready", file=sys.stderr)
+        return
+
     chunks = [json.loads(line) for line in open(args.chunks, encoding="utf-8")]
+    for c in chunks:
+        # Chunk files written before content_hash existed get it here.
+        c.setdefault("content_hash", content_hash(c))
     errors = validate(chunks, index)
     if errors:
         print("\n".join(errors[:50]), file=sys.stderr)
@@ -312,13 +355,35 @@ def main(argv=None) -> None:
         # service calls Azure OpenAI with its own managed identity instead.
         index["vectorSearch"]["vectorizers"][0]["azureOpenAIParameters"]["apiKey"] = aoai_auth.key
 
+    # Read the old hashes first: --recreate deletes them. Change alerts are
+    # optional, so a failed read (a role gap, a 400) skips them for this run
+    # and never stops the push.
+    old_rows = None
+    if args.changes_to != "none":
+        try:
+            old_rows = index_rows(endpoint, name, search_auth)
+        except Exception as e:  # noqa: BLE001
+            print(f"change alerts: could not read the current index ({e}); no alerts this run", file=sys.stderr)
+            if args.command == "changes":
+                sys.exit(1)
+    if args.command == "changes":
+        result = change_alerts.diff(old_rows or [], chunks)
+        where = change_alerts.record(result, name, len(chunks), args.changes_to)
+        print(change_alerts.summary(result) + f" ({where})", file=sys.stderr)
+        return
+
     idx_url = f"{endpoint}/indexes/{name}?api-version={SEARCH_API}"
-    if args.recreate:
-        r = requests.delete(idx_url, headers=search_auth.headers(), timeout=60)
-        if r.status_code not in (204, 404):
-            sys.exit(f"delete index failed: {r.status_code} {r.text}")
-    _retry(lambda: requests.put(idx_url, headers=search_auth.headers(), json=index, timeout=60), "create index")
-    print(f"index '{name}' ready", file=sys.stderr)
+    if args.index_update == "never":
+        if args.recreate:
+            sys.exit("--recreate needs --index-update always")
+        print(f"index '{name}': definition left as it is (--index-update never)", file=sys.stderr)
+    else:
+        if args.recreate:
+            r = requests.delete(idx_url, headers=search_auth.headers(), timeout=60)
+            if r.status_code not in (204, 404):
+                sys.exit(f"delete index failed: {r.status_code} {r.text}")
+        _retry(lambda: requests.put(idx_url, headers=search_auth.headers(), json=index, timeout=60), "create index")
+        print(f"index '{name}' ready", file=sys.stderr)
 
     embedder = Embedder(
         _env("AZURE_OPENAI_ENDPOINT"),
@@ -354,6 +419,48 @@ def main(argv=None) -> None:
         batch = [{"@search.action": "delete", "id": k} for k in stale[i : i + 1000]]
         _retry(lambda: requests.post(docs_url, headers=search_auth.headers(), json={"value": batch}, timeout=300), "delete")
     print(f"removed {len(stale)} stale documents", file=sys.stderr)
+
+    if old_rows is not None:
+        result = change_alerts.diff(old_rows, chunks)
+        try:
+            where = change_alerts.record(result, name, len(chunks), args.changes_to)
+        except Exception as e:  # noqa: BLE001
+            # The push already succeeded; keep the alerts in the job log.
+            print(f"change alerts: could not write to the store ({e}); printing instead", file=sys.stderr)
+            where = change_alerts.record(result, name, len(chunks), "print")
+        print(change_alerts.summary(result) + f" ({where})", file=sys.stderr)
+
+
+def index_rows(endpoint: str, name: str, auth: Auth, types: tuple[str, ...] = change_alerts.CHANGE_TYPES) -> list[dict] | None:
+    """City rows already in the index, for change alerts. None when the index does not exist yet."""
+    r = requests.get(f"{endpoint}/indexes/{name}?api-version={SEARCH_API}", headers=auth.headers(), timeout=60)
+    if r.status_code == 404:
+        return None
+    if r.status_code == 403:
+        # An identity with document rights on this index only cannot read its
+        # definition; the definition is the current schema (ensure-index).
+        have = set(change_alerts.INDEX_FIELDS)
+    elif r.status_code >= 300:
+        raise RuntimeError(f"read index {name} failed: {r.status_code} {r.text[:500]}")
+    else:
+        have = {f["name"] for f in r.json().get("fields", [])}
+    select = ",".join(f for f in change_alerts.INDEX_FIELDS if f in have)
+    url = f"{endpoint}/indexes/{name}/docs/search?api-version={SEARCH_API}"
+    rows: list[dict] = []
+    while True:
+        body = {
+            "search": "*",
+            "filter": f"search.in(source_type, '{','.join(types)}')",
+            "select": select,
+            "top": 1000,
+            "skip": len(rows),
+            "orderby": "id",
+        }
+        r = _retry(lambda: requests.post(url, headers=auth.headers(), json=body, timeout=120), "read index rows")
+        page = [{k: v for k, v in d.items() if not k.startswith("@")} for d in r.json()["value"]]
+        rows += page
+        if len(page) < 1000:
+            return rows
 
 
 def _all_keys(endpoint: str, name: str, auth: Auth) -> list[str]:

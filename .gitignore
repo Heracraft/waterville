@@ -4,3 +4,4 @@ __pycache__/
 data/raw/
 output/embeddings-cache-*.jsonl
 .playwright-mcp/
+.data/

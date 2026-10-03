@@ -140,7 +140,7 @@ The `infra/` folder deploys a public question-and-answer site that uses the inde
 
 - **Azure AI Search** (Basic, semantic ranker on the standard plan) contains the index.
 - **Azure OpenAI** has two deployments: `embedding` (text-embedding-3-large) and `chat`. Key authentication is off for the account.
-- **Container Apps** runs `waterville-app`. This is the FastAPI chat API. It also serves the web UI from `app/web/`. It runs 1 to 2 replicas. One replica stays warm, so there is no cold start. Set `MIN_REPLICAS=0` to scale to zero when idle (the first request then waits about 20 seconds).
+- **Container Apps** runs `waterville-app`. This is the FastAPI chat API. It also serves the web UI, the SvelteKit build of `web/`. It runs 1 to 2 replicas. One replica stays warm, so there is no cold start. Set `MIN_REPLICAS=0` to scale to zero when idle (the first request then waits about 20 seconds).
 - **A Container Apps job** (`waterville-refresh`) runs each Monday at 07:00 UTC. The job crawls eCode360 again, does the completeness check and updates the index. It also deletes sections that the code no longer contains. If the crawl is not complete, the job stops before it changes the index.
 - **Azure Container Registry** (Basic) keeps the image. **Log Analytics** keeps the logs.
 
@@ -213,8 +213,26 @@ The fixed cost is approximately $85 to $100 each month. Most of this cost is AI 
 ```bash
 export AZURE_SEARCH_ENDPOINT=... AZURE_OPENAI_ENDPOINT=... AZURE_OPENAI_CHAT_DEPLOYMENT=chat
 # Uses your az login (DefaultAzureCredential); or set AZURE_SEARCH_API_KEY / AZURE_OPENAI_API_KEY
+(cd web && pnpm install && pnpm build)   # the UI; FastAPI serves web/build
 uv run uvicorn app.main:app --reload
 ```
+
+With no Azure access, `FAKE_AZURE=1` serves search results and answers from `tests/fixtures/`. For UI work, run `cd web && API_PORT=8000 pnpm dev`, which proxies `/api` to the backend. Tests: `uv run pytest -q`, and in `web/`, `pnpm check`, `pnpm test` and `pnpm test:e2e`.
+
+## Preview deployment
+
+The staff desk and the new public tools run as a preview next to production: container app `waterville-preview` and manual job `waterville-preview-refresh` in the same Container Apps environment, with their own identities, storage account and search index (`waterville-code-preview`). The preview reuses the registry, AI Search, Azure OpenAI and the log workspace and changes none of them. Details are in [docs/preview.md](docs/preview.md).
+
+```bash
+export AZURE_CLIENT_ID=... AZURE_CLIENT_SECRET=... AZURE_TENANT_ID=... AZURE_SUBSCRIPTION_ID=...
+infra/deploy-preview.sh --what-if   # read only
+infra/deploy-preview.sh             # build, push, deploy infra/preview.bicep, load the index, smoke test
+```
+
+- The script deploys only `infra/preview.bicep`. It stops when a what-if shows a change to anything other than new or preview resources, and it checks afterwards that `waterville-app` and `waterville-refresh` still run the same revision and image.
+- Without `STAFF_USERS`, the first deploy creates a demo staff account `inspector` and writes its password to `~/waterville-preview-credentials.txt` (mode 600). Make real accounts with `uv run python -m app.auth hash NAME`.
+- `infra/refresh-preview.sh` reloads the preview index. The first deploy runs it (20 to 40 minutes).
+- `uv run python eval/run.py --url <preview URL>` asks the 30 staff questions in `eval/questions.yaml` and writes `eval/results-<date>.md` with citation scores and a column for the CEO's marks. `node eval/e2e.mjs --url <preview URL>` walks a browser through every public and staff feature.
 
 ## Run the scraper again
 
@@ -241,8 +259,8 @@ Each run also does a completeness check:
 - `ecode/chunk.py`: puts text into chunks by token count.
 - `ecode/export.py`: the pipeline, and the writers for all output files.
 - `ecode/azure.py`: the Azure AI Search index schema, validation and push. Supports API keys or Entra ID.
-- `app/main.py`: the public chat API. It does hybrid search with the semantic ranker, streams answers with citations and applies rate limits.
-- `app/web/`: the web UI, in plain HTML, CSS and JS.
+- `app/`: the FastAPI app. `app/main.py` registers the routers in `app/routers/` and serves the web UI; `app/search.py` does hybrid search with the semantic ranker; `app/llm.py` streams answers with citations; `app/ratelimit.py` applies rate limits.
+- `web/`: the web UI, a SvelteKit app (Svelte 5, TypeScript) built to static files with `pnpm build`.
 - `infra/main.bicep`, `infra/deploy.sh`, `infra/refresh.sh`, `Dockerfile`: the Azure deployment.
 
 Other eCode360 codes possibly work with `--customer <ID>`. We tested only WA3904. The index name, the name "Waterville" in the defaults and the text of the chunk header come from the site. For a different code, change `AZURE_SEARCH_INDEX`.

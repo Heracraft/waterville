@@ -1,0 +1,6 @@
+{
+ "_comment": "Canned model output for FAKE_AZURE=1. {label1}, {quote1}, {label2} and {quote2} are filled from the first two numbered sources in the prompt.",
+ "public": "{label1} says: \"{quote1}\" [1]\n\n{label2} adds: \"{quote2}\" [2]\n\nThis is a sample answer from the offline test mode. It quotes the first two sources so the citation chips and the source panel have real text to show.",
+ "staff": "**{label1}; {label2}**\n\n> {quote1} [1]\n\n> {quote2} [2]\n\nSample answer from the offline test mode. A live answer traces the enforcement chain here and names any conflict or stale edition between the sources.",
+ "complete": "Sample text from the offline test mode."
+}

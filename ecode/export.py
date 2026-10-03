@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 import json
 import logging
 import re
@@ -30,12 +31,22 @@ def key(text: str) -> str:
     return re.sub(r"[^A-Za-z0-9_\-=]", "_", text)
 
 
+def content_hash(chunk: dict) -> str:
+    """Hash of the text a chunk serves (header line, breadcrumb and body).
+
+    The index stores it, so the refresh can tell which sections changed
+    before it pushes (ecode.changes). Crawl dates and the edition date are not
+    part of `content`, so an unchanged section keeps its hash across crawls.
+    """
+    return hashlib.sha256((chunk.get("content") or "").encode("utf-8")).hexdigest()[:32]
+
+
 @dataclass
 class SourceDoc:
     """One ingestible document: a code chapter, a PDF attachment or a new law."""
 
     doc_id: str
-    source_type: str  # code_chapter | attachment | new_law | state_* | model_code_ref (see state.py)
+    source_type: str  # code_chapter | attachment | new_law | state_* | model_code_ref | city_form | staff_note (see state.py)
     title: str
     url: str
     markdown_path: str
@@ -374,6 +385,7 @@ class Exporter:
                 row = {k: c.get(k) for k in fields}
                 if row.get("ordinances") is None:
                     row["ordinances"] = []
+                row["content_hash"] = content_hash(row)
                 fh.write(json.dumps(row, ensure_ascii=False) + "\n")
         with open(self.out / "documents.jsonl", "w", encoding="utf-8") as fh:
             for d in self.docs:

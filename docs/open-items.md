@@ -11,6 +11,8 @@ Status on 2026-10-02. The state sources from the September 29 kickoff email are 
 
 ## 1. Better labels on state manual chunks
 
+**Status: done (2026-10-03).** `ecode/headings.py` works out a heading trail for each manual page, and `ecode/state.py` adds it to the chunk header and `breadcrumb`, for example `Court Rule 80K Manual (2017) > Chapter Four: How to Prepare the Land Use Citation and Complaint > B. Required Attachments, page 24`. It reaches the index on the next refresh. See "Changes" in `docs/staff-preview-spec.md`.
+
 **Problem.** Chunks from the state manuals show up in answers to unrelated city questions. For example, a question about backyard chickens returns two chunks from the Shoreland Zoning Manual (2008). The model ignores them, so the answers are correct. But these chunks use search slots that better sources could use.
 
 **Cause.** Each manual chunk has only the manual name and a page number in its header and `breadcrumb`. For example: `Shoreland Zoning Manual (2008), page 24`. The semantic ranker cannot tell what the chunk is about from this header.

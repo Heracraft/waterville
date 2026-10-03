@@ -1,0 +1,208 @@
+{
+	"note": "Outputs of the original app/web/source.js (deleted after the SvelteKit port), frozen for the parity test.",
+	"blocks": [
+		{
+			"type": "p",
+			"md": "Sec. 22-41. Fences.",
+			"text": "Sec. 22-41. Fences."
+		},
+		{
+			"type": "p",
+			"md": "(a) No fence in a residential zone shall exceed six (6) feet in height. (b) Fences in the front yard shall not exceed four (4) feet.",
+			"text": "(a) No fence in a residential zone shall exceed six (6) feet in height. (b) Fences in the front yard shall not exceed four (4) feet."
+		},
+		{
+			"type": "tr",
+			"table": 1,
+			"cells": [
+				"Use",
+				"Fee"
+			],
+			"head": true,
+			"text": "Use | Fee"
+		},
+		{
+			"type": "tr",
+			"table": 1,
+			"cells": [
+				"Short-term rental license",
+				"$150.00"
+			],
+			"head": false,
+			"text": "Short-term rental license | $150.00"
+		},
+		{
+			"type": "tr",
+			"table": 1,
+			"cells": [
+				"Renewal",
+				"$75"
+			],
+			"head": false,
+			"text": "Renewal | $75"
+		},
+		{
+			"type": "p",
+			"md": "The following are prohibited:",
+			"text": "The following are prohibited:"
+		},
+		{
+			"type": "li",
+			"depth": 0,
+			"md": "barbed wire below 6 feet",
+			"text": "barbed wire below 6 feet"
+		},
+		{
+			"type": "li",
+			"depth": 0,
+			"md": "electric fences",
+			"text": "electric fences"
+		},
+		{
+			"type": "li",
+			"depth": 1,
+			"md": "except agricultural",
+			"text": "except agricultural"
+		},
+		{
+			"type": "h",
+			"level": 2,
+			"md": "Penalties",
+			"text": "Penalties"
+		},
+		{
+			"type": "p",
+			"md": "A violation is subject to a fine of $100 per day under 30-A M.R.S. 4452.",
+			"text": "A violation is subject to a fine of $100 per day under 30-A M.R.S. 4452."
+		}
+	],
+	"occ": [
+		{
+			"sentence": "A fence in a residential zone can be up to 6 feet tall.",
+			"matches": [
+				[
+					1,
+					[
+						"6 ft"
+					]
+				]
+			],
+			"html": "<p data-b=\"0\">Sec. 22-41. Fences.</p><p data-b=\"1\" class=\"hl\">(a) No fence in a residential zone shall exceed six (6) feet in height. (b) Fences in the front yard shall not exceed four (4) feet.</p><div class=\"tbl\"><table><thead><tr data-b=\"2\"><th>Use</th><th>Fee</th></tr></thead><tbody><tr data-b=\"3\"><td>Short-term rental license</td><td>$150.00</td></tr><tr data-b=\"4\"><td>Renewal</td><td>$75</td></tr></tbody></table></div><p data-b=\"5\">The following are prohibited:</p><ul><li><div data-b=\"6\">barbed wire below 6 feet</div></li><li><div data-b=\"7\">electric fences</div><ul><li><div data-b=\"8\">except agricultural</div></li></ul></li></ul><h4 data-b=\"9\">Penalties</h4><p data-b=\"10\">A violation is subject to a fine of $100 per day under 30-A M.R.S. 4452.</p>"
+		},
+		{
+			"sentence": "In the front yard the limit is 4 feet.",
+			"matches": [
+				[
+					1,
+					[
+						"4 ft"
+					]
+				]
+			],
+			"html": "<p data-b=\"0\">Sec. 22-41. Fences.</p><p data-b=\"1\" class=\"hl\">(a) No fence in a residential zone shall exceed six (6) feet in height. (b) Fences in the front yard shall not exceed four (4) feet.</p><div class=\"tbl\"><table><thead><tr data-b=\"2\"><th>Use</th><th>Fee</th></tr></thead><tbody><tr data-b=\"3\"><td>Short-term rental license</td><td>$150.00</td></tr><tr data-b=\"4\"><td>Renewal</td><td>$75</td></tr></tbody></table></div><p data-b=\"5\">The following are prohibited:</p><ul><li><div data-b=\"6\">barbed wire below 6 feet</div></li><li><div data-b=\"7\">electric fences</div><ul><li><div data-b=\"8\">except agricultural</div></li></ul></li></ul><h4 data-b=\"9\">Penalties</h4><p data-b=\"10\">A violation is subject to a fine of $100 per day under 30-A M.R.S. 4452.</p>"
+		},
+		{
+			"sentence": "A short-term rental license costs $150.",
+			"matches": [
+				[
+					3,
+					[
+						"$150"
+					]
+				]
+			],
+			"html": "<p data-b=\"0\">Sec. 22-41. Fences.</p><p data-b=\"1\">(a) No fence in a residential zone shall exceed six (6) feet in height. (b) Fences in the front yard shall not exceed four (4) feet.</p><div class=\"tbl\"><table><thead><tr data-b=\"2\"><th>Use</th><th>Fee</th></tr></thead><tbody><tr data-b=\"3\" class=\"hl\"><td>Short-term rental license</td><td>$150.00</td></tr><tr data-b=\"4\"><td>Renewal</td><td>$75</td></tr></tbody></table></div><p data-b=\"5\">The following are prohibited:</p><ul><li><div data-b=\"6\">barbed wire below 6 feet</div></li><li><div data-b=\"7\">electric fences</div><ul><li><div data-b=\"8\">except agricultural</div></li></ul></li></ul><h4 data-b=\"9\">Penalties</h4><p data-b=\"10\">A violation is subject to a fine of $100 per day under 30-A M.R.S. 4452.</p>"
+		},
+		{
+			"sentence": "Renewals cost $75.",
+			"matches": [
+				[
+					4,
+					[
+						"$75"
+					]
+				]
+			],
+			"html": "<p data-b=\"0\">Sec. 22-41. Fences.</p><p data-b=\"1\">(a) No fence in a residential zone shall exceed six (6) feet in height. (b) Fences in the front yard shall not exceed four (4) feet.</p><div class=\"tbl\"><table><thead><tr data-b=\"2\"><th>Use</th><th>Fee</th></tr></thead><tbody><tr data-b=\"3\"><td>Short-term rental license</td><td>$150.00</td></tr><tr data-b=\"4\" class=\"hl\"><td>Renewal</td><td>$75</td></tr></tbody></table></div><p data-b=\"5\">The following are prohibited:</p><ul><li><div data-b=\"6\">barbed wire below 6 feet</div></li><li><div data-b=\"7\">electric fences</div><ul><li><div data-b=\"8\">except agricultural</div></li></ul></li></ul><h4 data-b=\"9\">Penalties</h4><p data-b=\"10\">A violation is subject to a fine of $100 per day under 30-A M.R.S. 4452.</p>"
+		},
+		{
+			"sentence": "Barbed wire below 6 feet is prohibited.",
+			"matches": [
+				[
+					6,
+					[
+						"6 ft"
+					]
+				]
+			],
+			"html": "<p data-b=\"0\">Sec. 22-41. Fences.</p><p data-b=\"1\">(a) No fence in a residential zone shall exceed six (6) feet in height. (b) Fences in the front yard shall not exceed four (4) feet.</p><div class=\"tbl\"><table><thead><tr data-b=\"2\"><th>Use</th><th>Fee</th></tr></thead><tbody><tr data-b=\"3\"><td>Short-term rental license</td><td>$150.00</td></tr><tr data-b=\"4\"><td>Renewal</td><td>$75</td></tr></tbody></table></div><p data-b=\"5\">The following are prohibited:</p><ul><li><div data-b=\"6\" class=\"hl\">barbed wire below 6 feet</div></li><li><div data-b=\"7\">electric fences</div><ul><li><div data-b=\"8\">except agricultural</div></li></ul></li></ul><h4 data-b=\"9\">Penalties</h4><p data-b=\"10\">A violation is subject to a fine of $100 per day under 30-A M.R.S. 4452.</p>"
+		},
+		{
+			"sentence": "See Sec. 22-41 for details.",
+			"matches": [],
+			"html": "<p data-b=\"0\">Sec. 22-41. Fences.</p><p data-b=\"1\">(a) No fence in a residential zone shall exceed six (6) feet in height. (b) Fences in the front yard shall not exceed four (4) feet.</p><div class=\"tbl\"><table><thead><tr data-b=\"2\"><th>Use</th><th>Fee</th></tr></thead><tbody><tr data-b=\"3\"><td>Short-term rental license</td><td>$150.00</td></tr><tr data-b=\"4\"><td>Renewal</td><td>$75</td></tr></tbody></table></div><p data-b=\"5\">The following are prohibited:</p><ul><li><div data-b=\"6\">barbed wire below 6 feet</div></li><li><div data-b=\"7\">electric fences</div><ul><li><div data-b=\"8\">except agricultural</div></li></ul></li></ul><h4 data-b=\"9\">Penalties</h4><p data-b=\"10\">A violation is subject to a fine of $100 per day under 30-A M.R.S. 4452.</p>"
+		}
+	],
+	"sentencesFor": {
+		"1": [
+			"A fence in a residential zone can be up to 6 feet tall.",
+			"In the front yard the limit is 4 feet.",
+			"Barbed wire below 6 feet is prohibited."
+		],
+		"2": [
+			"A short-term rental license costs $150.",
+			"Renewals cost $75."
+		],
+		"3": [
+			"See Sec. 22-41 for details."
+		]
+	},
+	"figureSpans": [
+		{
+			"start": 5,
+			"end": 10,
+			"key": "22-41"
+		},
+		{
+			"start": 73,
+			"end": 81,
+			"key": "6 ft"
+		},
+		{
+			"start": 144,
+			"end": 152,
+			"key": "4 ft"
+		},
+		{
+			"start": 213,
+			"end": 220,
+			"key": "$150"
+		},
+		{
+			"start": 235,
+			"end": 238,
+			"key": "$75"
+		},
+		{
+			"start": 292,
+			"end": 298,
+			"key": "6 ft"
+		},
+		{
+			"start": 390,
+			"end": 394,
+			"key": "$100"
+		},
+		{
+			"start": 409,
+			"end": 413,
+			"key": "30-a"
+		},
+		{
+			"start": 421,
+			"end": 425,
+			"key": "4452"
+		}
+	],
+	"inlineMd": "a <br> <em>b</em> <em>c</em> <strong>d</strong>"
+}

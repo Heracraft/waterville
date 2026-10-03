@@ -1,0 +1,1420 @@
+# Legal clocks for the deadline calculator (B7), read by app/routers/deadlines.py.
+#
+# Every rule names its trigger event, its offset, how the days are counted,
+# the controlling citation, where the text came from and a verbatim quote of
+# that text. `verified = true` means the quote was matched word for word
+# against the primary source named in `source`:
+#   - a path under output/markdown/code/ is the eCode360 crawl in this repo
+#     (legislation through 08-05-2026); tests/test_deadlines.py re-checks
+#     every one of those quotes against the file on each test run.
+#   - a URL is a state primary source (legislature.maine.gov, courts.maine.gov,
+#     maine.gov) or a City form. Those quotes were matched against the text
+#     fetched on `checked`.
+# `verified = false` means the clock could not be confirmed from primary text.
+# The calculator still shows it, labeled "Unverified, check before relying".
+#
+# `applies = "check"` marks a clock whose text is verified but whose reach in
+# Waterville is not settled (a state model ordinance, or a statute whose
+# application to a Waterville permit is a question for the City Solicitor).
+#
+# Fields per rule:
+#   id, triggers (event ids), label, actor, kind ("deadline": act by this date;
+#   "lapse": a right or approval ends; "earliest": not before this date),
+#   amount, unit ("days", "working_days", "hours", "months", "annual"),
+#   direction ("after" or "before" the trigger), convention (see
+#   [conventions]), citation, url, source, quote, verified, checked,
+#   applies ("waterville" or "check"), caution, note, also (related text).
+# Prose here follows the project's writing rules: no em dashes.
+
+checked_default = "2026-10-03"
+
+# ------------------------------------------------------------ conventions
+
+[conventions.rule6a]
+label = "Court rule 6(a)"
+summary = "Day of the event not counted. If the last day is a Saturday, Sunday or Maine legal holiday, the period runs to the next day that is none of those. Periods under 7 days skip intermediate weekends and holidays."
+citation = "M.R. Civ. P. 6(a)"
+url = "https://courts.maine.gov/rules/text/mr_civ_p_only_2026-06-01.pdf"
+quote = '''In computing any period of time prescribed or allowed by these rules, by order of court, or by any applicable statute, the day of the act, event, or default after which the designated period of time begins to run is not to be included. The last day of the period so computed is to be included, unless it is a Saturday, a Sunday, or a legal holiday, in which event the period runs until the end of the next day which is not a Saturday, a Sunday, or a holiday. When the period of time prescribed or allowed is less than 7 days, intermediate Saturdays, Sundays and legal holidays shall be excluded in the computation.'''
+caution = "Court-ordered clerk's office closures also count as holidays under Rule 6(a). The calculator does not know about them."
+
+[conventions.app1a]
+label = "Appellate rule 1A"
+summary = "Same as Rule 6(a): day of the event not counted, a last day on a weekend or Maine legal holiday rolls to the next court day. Periods of 6 days or fewer skip intermediate weekends and holidays."
+citation = "M.R. App. P. 1A"
+url = "https://www.courts.maine.gov/rules/text/mr_app_p_only_2024-11-01.pdf"
+quote = '''In computing any period of time prescribed or allowed by these Rules, by order of court, or by any applicable statute, the day of the act, event, or default after which the designated period of time begins to run is not to be included. The last day of the period so computed is to be included, unless it is a Saturday, a Sunday, or a legal holiday, in which event the period runs until the end of the next day which is not a Saturday, a Sunday, or a legal holiday.'''
+caution = "Court-ordered clerk's office closures also extend a deadline. The calculator does not know about them."
+
+[conventions.city_calendar]
+label = "City, calendar days"
+summary = "Day of the event not counted; every calendar day after it counts. The City Code has no rule that moves a last day falling on a closed day, so the date stands. When City Hall is closed that day, the calculator also gives the last open day before it."
+citation = "No counting rule in the City Code; Rule 6(a) style start"
+caution = "Whether a filing due on a day City Hall is closed may be made on the next open day is a question for the City Solicitor. Plan on the last open day before."
+
+[conventions.city_working_days]
+label = "City working days"
+summary = "Day of the event not counted. Counts only days City Hall is open: Monday to Thursday, less the City holidays of § 56-5.1. City Hall has been closed on Fridays since January 3, 2025."
+citation = "Waterville City Code § 56-5.1; City Hall hours (Mon-Thu, 7:00 am to 5:30 pm)"
+url = "https://ecode360.com/39780157"
+source = "output/markdown/code/056-personnel.md"
+quote = '''For employees working a four-day week: Unless designated as a Monday holiday, when a holiday falls on a Friday or Saturday, the employee will receive 10 hours of floating holiday leave (FHL) time. When it falls on a Sunday, the following Monday shall be observed.'''
+caution = "The Code does not define \"working days\". The calculator counts City Hall open days and also shows the Monday to Friday count, which ends earlier."
+
+[conventions.clock_hours]
+label = "Clock hours"
+summary = "Counted hour by hour from the time entered, weekends and holidays included."
+citation = "Plain reading of the text"
+
+[conventions.calendar_months]
+label = "Calendar months"
+summary = "\"Month\" means a calendar month. The clock ends on the same day number N months later; when that month is shorter (a January 31 start, or February 29 a year on), it ends on the month's last day."
+citation = "1 M.R.S. § 72(11-C)"
+url = "https://legislature.maine.gov/statutes/1/title1sec72.html"
+quote = '''"Month" means a calendar month.'''
+caution = "The month-end rule for short months is the calculator's convention. No Waterville or Maine text settles it."
+
+[conventions.city_before]
+label = "Days before an event"
+summary = "\"At least N days before\": the event day is not counted, so the act is due N days before the event date. If that day City Hall is closed, the calculator moves it back to the last open day."
+
+[conventions.annual]
+label = "Fixed annual date"
+summary = "A date set by the text, such as October 31 each year. The calculator gives the next one on or after the date entered."
+
+# ------------------------------------------------------------ calendars
+
+[calendar.court]
+label = "Maine legal holidays (courts)"
+citation = "4 M.R.S. § 1051"
+url = "https://legislature.maine.gov/statutes/4/title4sec1051-1.html"
+quote = '''Court may not be held on Sunday or any day designated for the annual Thanksgiving; New Year's Day, January 1st; Martin Luther King, Jr., Day, the 3rd Monday in January; Washington's Birthday, the 3rd Monday in February; Patriot's Day, the 3rd Monday in April; Memorial Day, the last Monday in May, but if the Federal Government designates May 30th as the date for observance of Memorial Day, the 30th of May; Juneteenth, June 19th; the 4th of July; Labor Day, the first Monday of September; Indigenous Peoples Day, the 2nd Monday in October; Veterans Day, November 11th; or on Christmas Day.'''
+note = "A holiday that falls on a Sunday is observed the Monday after. Thanksgiving is taken as the fourth Thursday of November."
+
+[calendar.city]
+label = "City Hall closed days"
+citation = "Waterville City Code § 56-5.1; City Hall hours"
+url = "https://ecode360.com/39780157"
+source = "output/markdown/code/056-personnel.md"
+quote = '''When it falls on a Sunday, the following Monday shall be observed.'''
+note = "City Hall is open Monday to Thursday, 7:00 am to 5:30 pm, and closed Fridays (four-day week since January 3, 2025, per the City's notice and website). Closed as well on the twelve holidays of § 56-5.1A, using the dates in 4 M.R.S. § 1051; a Sunday holiday closes the Monday after. A holiday on a Friday or Saturday does not move. Extra days granted under § 56-5.1E or F are not known to the calculator."
+
+# ------------------------------------------------------------ triggers
+
+[[trigger]]
+id = "ceo-decision"
+group = "Zoning Board of Appeals"
+label = "CEO decision rendered (zoning)"
+help = "A written order, decision, requirement, interpretation or ruling of the Code Enforcement Officer under Chapter 275."
+
+[[trigger]]
+id = "zba-application-filed"
+group = "Zoning Board of Appeals"
+label = "ZBA application filed"
+help = "The date on the dated receipt the CEO issues at filing (§ 275-6.2H(2))."
+
+[[trigger]]
+id = "zba-hearing"
+group = "Zoning Board of Appeals"
+label = "ZBA hearing date set"
+help = "Enter the hearing date. The notice clocks count back from it."
+
+[[trigger]]
+id = "zba-decision"
+group = "Zoning Board of Appeals"
+label = "ZBA decision (vote on the original application)"
+help = "Clocks for any decision. For a grant or a denial, pick that event to see its extra clocks as well."
+
+[[trigger]]
+id = "zba-grant"
+group = "Zoning Board of Appeals"
+label = "ZBA grants an appeal or variance"
+help = "Shows the general decision clocks plus recording and lapse."
+
+[[trigger]]
+id = "zba-denial"
+group = "Zoning Board of Appeals"
+label = "ZBA denies an application"
+help = "Shows the general decision clocks plus reconsideration and the one-year bar."
+
+[[trigger]]
+id = "pb-variance-notice-received"
+group = "Zoning Board of Appeals"
+label = "Planning Board receives notice of a ZBA variance decision"
+help = "Starts the Planning Board's 10 working days to petition for reconsideration of a variance grant (§ 275-6.2E(4)(i)[2])."
+
+[[trigger]]
+id = "zba-reconsider-petition-filed"
+group = "Zoning Board of Appeals"
+label = "Planning Board petition for reconsideration received by the ZBA Chair"
+
+[[trigger]]
+id = "zba-reconsider-petition-notice"
+group = "Zoning Board of Appeals"
+label = "ZBA Chair notifies the applicant and abutters of the petition"
+
+[[trigger]]
+id = "zba-reconsideration-decision"
+group = "Zoning Board of Appeals"
+label = "ZBA decision on reconsideration"
+
+[[trigger]]
+id = "pb-application-received"
+group = "Planning Board"
+label = "Site plan or subdivision application received"
+help = "Minor subdivisions and development sites (Article VII of Chapter 244). Major projects under Articles VIII and IX run the same 30-day clocks."
+
+[[trigger]]
+id = "pb-application-complete"
+group = "Planning Board"
+label = "Complete application submitted"
+
+[[trigger]]
+id = "pb-hearing"
+group = "Planning Board"
+label = "Planning Board hearing date"
+help = "Enter the hearing date. Notice clocks count back from it; the decision clock counts forward."
+
+[[trigger]]
+id = "pb-final-approval"
+group = "Planning Board"
+label = "Final plan approved and signed"
+
+[[trigger]]
+id = "pb-decision"
+group = "Planning Board"
+label = "Planning Board vote on the final site plan decision"
+
+[[trigger]]
+id = "coa-meeting"
+group = "Historic preservation"
+label = "Commission meeting that considered a COA"
+
+[[trigger]]
+id = "coa-decision"
+group = "Historic preservation"
+label = "Commission decision on a COA"
+
+[[trigger]]
+id = "fp-part1-ec-received"
+group = "Floodplain"
+label = "Part I \"under construction\" elevation certificate received"
+help = "Enter the time of receipt as well; this clock runs in hours."
+needs_time = true
+
+[[trigger]]
+id = "fp-completion-notice"
+group = "Floodplain"
+label = "Written notice that development is complete"
+
+[[trigger]]
+id = "fp-decision-received"
+group = "Floodplain"
+label = "Written floodplain decision received"
+
+[[trigger]]
+id = "fp-appeal-received"
+group = "Floodplain"
+label = "Floodplain appeal request received by the ZBA"
+
+[[trigger]]
+id = "fp-hearing-closed"
+group = "Floodplain"
+label = "Floodplain appeal hearing closed"
+
+[[trigger]]
+id = "fp-zba-decision"
+group = "Floodplain"
+label = "ZBA decision on a floodplain appeal"
+
+[[trigger]]
+id = "fp-project-complete"
+group = "Floodplain"
+label = "Project complete (map change shown)"
+
+[[trigger]]
+id = "sl-expansion-approved"
+group = "Shoreland"
+label = "Expansion of a nonconforming structure approved"
+
+[[trigger]]
+id = "sl-damage"
+group = "Shoreland"
+label = "Nonconforming structure damaged, destroyed or removed (50% or less)"
+
+[[trigger]]
+id = "sl-application-received"
+group = "Shoreland"
+label = "Shoreland permit application received (state model rule)"
+
+[[trigger]]
+id = "sl-application-complete"
+group = "Shoreland"
+label = "Complete shoreland application received (state model rule)"
+
+[[trigger]]
+id = "sl-permit-issued"
+group = "Shoreland"
+label = "Shoreland permit issued (state model rule)"
+
+[[trigger]]
+id = "casualty"
+group = "Property maintenance and safety"
+label = "Fire or other casualty"
+help = "Enter the time of the fire as well for the 24-hour clock."
+needs_time = true
+
+[[trigger]]
+id = "vacate-order"
+group = "Property maintenance and safety"
+label = "Emergency order to vacate posted"
+needs_time = true
+
+[[trigger]]
+id = "violation-notice"
+group = "Permits"
+label = "Violation notice issued (work without a permit)"
+
+[[trigger]]
+id = "bp-application-filed"
+group = "Permits"
+label = "Building permit application filed"
+
+[[trigger]]
+id = "bp-issued"
+group = "Permits"
+label = "Building permit issued"
+
+[[trigger]]
+id = "plumbing-permit-issued"
+group = "Permits"
+label = "Plumbing permit issued"
+
+[[trigger]]
+id = "hhe-received"
+group = "Subsurface wastewater"
+label = "HHE-200 application received"
+
+[[trigger]]
+id = "hhe-review-complete"
+group = "Subsurface wastewater"
+label = "LPI review of a conforming application complete"
+
+[[trigger]]
+id = "subsurface-permit-issued"
+group = "Subsurface wastewater"
+label = "Disposal system permit issued"
+
+[[trigger]]
+id = "subsurface-ready"
+group = "Subsurface wastewater"
+label = "System ready for inspection"
+help = "Enter the time the system will be ready; the notice is due 24 hours before."
+needs_time = true
+
+[[trigger]]
+id = "rental-transfer"
+group = "Rental registration"
+label = "Rental building bought, transferred or converted"
+
+[[trigger]]
+id = "rental-co-issued"
+group = "Rental registration"
+label = "Certificate of occupancy issued for a new rental building"
+
+[[trigger]]
+id = "rental-cycle"
+group = "Rental registration"
+label = "Any date (annual registration cycle)"
+
+[[trigger]]
+id = "80e-presentation"
+group = "Court"
+label = "Planned presentation of an 80E warrant application"
+needs_time = true
+
+[[trigger]]
+id = "80e-warrant-issued"
+group = "Court"
+label = "Administrative inspection warrant issued (Rule 80E)"
+
+[[trigger]]
+id = "80e-executed"
+group = "Court"
+label = "Administrative inspection warrant executed"
+
+[[trigger]]
+id = "80k-judgment"
+group = "Court"
+label = "District Court judgment entered on the docket (Rule 80K)"
+
+[[trigger]]
+id = "gov-action-notice"
+group = "Court"
+label = "Notice of a governmental action (Rule 80B, no statute period)"
+
+# ------------------------------------------------------------ rules: Zoning Board of Appeals
+
+[[rule]]
+id = "zba-admin-appeal-30"
+triggers = ["ceo-decision"]
+label = "Last day to appeal the CEO decision to the ZBA"
+actor = "Any interested party"
+kind = "deadline"
+amount = 30
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 275-6.2E(1)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''All appeals shall be made by any interested party within 30 days of a decision rendered by the Code Enforcement Officer.'''
+verified = true
+note = "Under 30-A M.R.S. § 2691(4), a notice of violation or enforcement order is appealable to the ZBA unless an ordinance says otherwise."
+
+[[rule]]
+id = "zba-hearing-45"
+triggers = ["zba-application-filed"]
+label = "ZBA public hearing must be held by"
+actor = "City (CEO schedules)"
+kind = "deadline"
+amount = 45
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 275-6.2H(3)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''The Code Enforcement Officer shall immediately schedule a public hearing to be held within 45 days of the filing of the application.'''
+verified = true
+
+[[rule]]
+id = "zba-publication-14"
+triggers = ["zba-hearing"]
+label = "First newspaper publication of the hearing notice"
+actor = "City"
+kind = "deadline"
+amount = 14
+unit = "days"
+direction = "before"
+convention = "city_before"
+citation = "Waterville City Code § 275-6.2H(4)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''Notice of the day, time and place of the hearing shall be given to the applicant and shall be published at least two times in a newspaper in general circulation in Waterville, the first publication to be not less than 14 days before the date of the hearing.'''
+verified = true
+note = "Check the newspaper's own deadline for placing the notice, which falls earlier."
+
+[[rule]]
+id = "zba-mailing-14"
+triggers = ["zba-hearing"]
+label = "Mail the notice to owners within 300 feet"
+actor = "City (CEO)"
+kind = "deadline"
+amount = 14
+unit = "days"
+direction = "before"
+convention = "city_before"
+citation = "Waterville City Code § 275-6.2H(5)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''The Code Enforcement Officer shall send a copy of the notice by first class mail to the owners of all property within 300 feet of the property in question at least 14 days in advance of the hearing.'''
+verified = true
+
+[[rule]]
+id = "zba-shoreland-dep-20"
+triggers = ["zba-hearing"]
+label = "Shoreland variance: application to Maine DEP"
+actor = "City"
+kind = "deadline"
+amount = 20
+unit = "days"
+direction = "before"
+convention = "city_before"
+citation = "Waterville City Code § 275-6.2E(4)(c)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''Applications for variances within the shoreland zone must be submitted to Maine DEP 20 days before action is taken by the Zoning Board of Appeals.'''
+verified = true
+note = "Counted back from the hearing date on the assumption the Board acts that night. Only for variances in the shoreland zone."
+
+[[rule]]
+id = "zba-written-decision-7"
+triggers = ["zba-decision", "zba-grant", "zba-denial"]
+label = "Written notice of the decision to the applicant"
+actor = "City (ZBA)"
+kind = "deadline"
+amount = 7
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 275-6.2H(12); 30-A M.R.S. § 2691(3)(E)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''The applicant shall be notified in writing of the finding and decision of the Board within seven days of the Board's decision, with copies sent to the Code Enforcement Officer and the municipal officers.'''
+verified = true
+
+[[rule.also]]
+citation = "30-A M.R.S. § 2691(3)(E)"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec2691.html"
+quote = '''Notice of any decision must be mailed or hand delivered to the petitioner, the petitioner's representative or agent, the planning board, agency or office and the municipal officers within 7 days of the board's decision.'''
+
+[[rule]]
+id = "zba-reconsider-request-10"
+triggers = ["zba-decision", "zba-grant", "zba-denial"]
+label = "Request to reconsider (any party)"
+actor = "Any party"
+kind = "deadline"
+amount = 10
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "30-A M.R.S. § 2691(3)(F); Waterville City Code § 275-6.2E(4)(i)[4]"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec2691.html"
+source = "https://legislature.maine.gov/statutes/30-A/title30-Asec2691.html"
+quote = '''A request to the board to reconsider a decision must be filed within 10 days of the decision that is to be reconsidered.'''
+verified = true
+note = "The state limit covers a request by any party. The City text sets the same 10 days for an applicant's request to reconsider a denial. After a variance grant, the Planning Board has its own clock (§ 275-6.2E(4)(i)[2]); pick \"Planning Board receives notice of a ZBA variance decision\" to see it."
+
+[[rule.also]]
+citation = "Waterville City Code § 275-6.2E(4)(i)[4]"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''If the request is made by the applicant it must be filed within 10 days of the decision that is to be reconsidered.'''
+
+[[rule]]
+id = "pb-reconsider-petition-10wd"
+triggers = ["pb-variance-notice-received"]
+label = "Planning Board petition to reconsider a variance grant"
+actor = "City (Planning Board)"
+kind = "deadline"
+amount = 10
+unit = "working_days"
+direction = "after"
+convention = "city_working_days"
+citation = "Waterville City Code § 275-6.2E(4)(i)[2]"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''Any such petition for reconsideration must be filed with the Chairman of the Zoning Board of Appeals within 10 working days of the Planning Board's receipt of the notice of the Zoning Board of Appeals' action on the variance application.'''
+verified = true
+note = "Only when the Planning Board made an advisory recommendation under § 275-6.2E(H)(6), and only on a majority vote at a public meeting (§ 275-6.2E(4)(i)[1])."
+
+[[rule]]
+id = "zba-reconsider-petition-notice-5wd"
+triggers = ["zba-reconsider-petition-filed"]
+label = "ZBA Chair notifies the applicant and abutters of the petition"
+actor = "City (ZBA Chair)"
+kind = "deadline"
+amount = 5
+unit = "working_days"
+direction = "after"
+convention = "city_working_days"
+citation = "Waterville City Code § 275-6.2E(4)(i)[3]"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''Upon receipt of that petition, the Chairman of the Zoning Board of Appeals shall, within five working days, notify the applicant and abutting landowners who were notified of the original application.'''
+verified = true
+
+[[rule]]
+id = "zba-reconsider-petition-hearing-10wd"
+triggers = ["zba-reconsider-petition-notice"]
+label = "ZBA public hearing on the petition to reconsider"
+actor = "City (ZBA)"
+kind = "deadline"
+amount = 10
+unit = "working_days"
+direction = "after"
+convention = "city_working_days"
+citation = "Waterville City Code § 275-6.2E(4)(i)[3]"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''Within 10 working days of such notice, the Zoning Board of Appeals shall conduct a public hearing to reconsider the variance application.'''
+verified = true
+
+[[rule]]
+id = "zba-reconsider-45"
+triggers = ["zba-decision", "zba-grant", "zba-denial"]
+label = "Last day for the ZBA to vote and act on reconsideration"
+actor = "City (ZBA)"
+kind = "deadline"
+amount = 45
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "30-A M.R.S. § 2691(3)(F); Waterville City Code § 275-6.2E(4)(i)[4]"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec2691.html"
+source = "https://legislature.maine.gov/statutes/30-A/title30-Asec2691.html"
+quote = '''A vote to reconsider and the action taken on that reconsideration must occur and be completed within 45 days of the date of the vote on the original decision.'''
+verified = true
+
+[[rule.also]]
+citation = "Waterville City Code § 275-6.2E(4)(i)[4]"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''The Zoning Board of Appeals may reconsider any decision denying an application within 45 days of the Board's initial decision.'''
+
+[[rule]]
+id = "zba-80b-45"
+triggers = ["zba-decision", "zba-grant", "zba-denial"]
+label = "Appeal to Superior Court (Rule 80B)"
+actor = "Any aggrieved party"
+kind = "deadline"
+amount = 45
+unit = "days"
+direction = "after"
+convention = "rule6a"
+citation = "Waterville City Code § 275-6.2F; 30-A M.R.S. § 2691(3)(G)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''Any person or persons or any taxpayer, board, department or bureau of the City aggrieved by any decision of the Zoning Board of Appeals on an original application must file an appeal in accordance with Rule 80B of the Maine Rules of Civil Procedure within 45 days of the decision.'''
+verified = true
+caution = "Under 30-A § 2691(3)(H), a ZBA decision is final only when the project has every required municipal approval; a denial is final at once. If another board reviews the project last, 30-A § 4482-A may govern the appeal period."
+
+[[rule.also]]
+citation = "30-A M.R.S. § 2691(3)(G)"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec2691.html"
+quote = '''Any party may take an appeal, within 45 days of the date of the vote on the original decision, to Superior Court from any order, relief or denial in accordance with the Maine Rules of Civil Procedure, Rule 80B.'''
+
+[[rule]]
+id = "zba-variance-record-90"
+triggers = ["zba-grant"]
+label = "Record the variance certificate at the Registry of Deeds"
+actor = "Applicant"
+kind = "lapse"
+amount = 90
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 275-6.2E(4)(h); 30-A M.R.S. § 4353(5)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''Failure by the applicant to record the certificate in the Kennebec Registry of Deeds within 90 days of approval renders the variance invalid.'''
+verified = true
+note = "Variances only. The state text counts from the date stated on the final written approval; if that is later than the vote, its 90 days end later, and the earlier City date is the safe one."
+
+[[rule.also]]
+citation = "30-A M.R.S. § 4353(5)"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec4353.html"
+quote = '''This certificate must be recorded in the local registry of deeds within 90 days of the date of the final written approval of the variance or the variance is void.'''
+
+[[rule]]
+id = "zba-commence-6mo"
+triggers = ["zba-grant"]
+label = "Construction must start or the grant expires"
+actor = "Applicant"
+kind = "lapse"
+amount = 6
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "Waterville City Code § 275-6.2H(13)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''If the Zoning Board of Appeals grants an appeal or variance, the applicant's legal rights, determined thereby, shall expire if any construction or alteration involved is not commenced within six months or not substantially completed within one year of the date on which the appeal or variance was granted.'''
+verified = true
+
+[[rule]]
+id = "zba-complete-1yr"
+triggers = ["zba-grant"]
+label = "Work must be substantially complete or the grant expires"
+actor = "Applicant"
+kind = "lapse"
+amount = 12
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "Waterville City Code § 275-6.2H(13)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''If the Zoning Board of Appeals grants an appeal or variance, the applicant's legal rights, determined thereby, shall expire if any construction or alteration involved is not commenced within six months or not substantially completed within one year of the date on which the appeal or variance was granted.'''
+verified = true
+
+[[rule]]
+id = "zba-reapply-bar-1yr"
+triggers = ["zba-denial"]
+label = "Earliest hearing of a new application on the same subject"
+actor = "Applicant"
+kind = "earliest"
+amount = 12
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "Waterville City Code § 275-6.2H(14)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''After a decision has been made by the Zoning Board of Appeals, a new application on essentially the same subject shall not be heard within one year from the date of the denial by the Board of the first appeal'''
+verified = true
+note = "The bar has exceptions: reconsideration under E(4)(i)[4], or unanimous Planning Board approval on the findings H(14) lists."
+
+[[rule]]
+id = "zba-reconsidered-appeal-15"
+triggers = ["zba-reconsideration-decision"]
+label = "Appeal of a reconsidered decision to Superior Court"
+actor = "Any aggrieved party"
+kind = "deadline"
+amount = 15
+unit = "days"
+direction = "after"
+convention = "rule6a"
+citation = "Waterville City Code § 275-6.2F; 30-A M.R.S. § 2691(3)(F)"
+url = "https://ecode360.com/38457665"
+source = "output/markdown/code/275-zoning.md"
+quote = '''An appeal of a reconsidered decision must be filed within 15 days after the decision on reconsideration.'''
+verified = true
+
+[[rule.also]]
+citation = "30-A M.R.S. § 2691(3)(F)"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec2691.html"
+quote = '''Notwithstanding paragraph G , appeal of a reconsidered decision must be made within 15 days after the decision on reconsideration or within the applicable time period under section 4482-A if the final municipal review of the project is by a municipal administrative review board other than a board of appeals.'''
+
+# ------------------------------------------------------------ rules: Planning Board
+
+[[rule]]
+id = "pb-complete-30"
+triggers = ["pb-application-received"]
+label = "Tell the applicant whether the application is complete"
+actor = "City (Planning Board)"
+kind = "deadline"
+amount = 30
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 244-7.2B"
+url = "https://ecode360.com/38455847"
+source = "output/markdown/code/244-subdivision-of-land-site-plan-review.md"
+quote = '''Within 30 days from receipt of an application, the Planning Board shall notify the applicant in writing either that the application is complete or, if incomplete, the specific additional material needed to make a complete application.'''
+verified = true
+note = "Same 30 days for major projects: preliminary plans (§ 244-8.1B) and final plans (§ 244-9.1B)."
+
+[[rule]]
+id = "pb-hearing-30"
+triggers = ["pb-application-complete"]
+label = "Planning Board public hearing must be held by"
+actor = "City (Planning Board)"
+kind = "deadline"
+amount = 30
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 244-7.2E"
+url = "https://ecode360.com/38455847"
+source = "output/markdown/code/244-subdivision-of-land-site-plan-review.md"
+quote = '''The Planning Board shall hold a public hearing within 30 days of the submission of a completed application.'''
+verified = true
+
+[[rule]]
+id = "pb-publication-10"
+triggers = ["pb-hearing"]
+label = "First newspaper publication of the hearing notice"
+actor = "City"
+kind = "deadline"
+amount = 10
+unit = "days"
+direction = "before"
+convention = "city_before"
+citation = "Waterville City Code § 244-7.2E"
+url = "https://ecode360.com/38455847"
+source = "output/markdown/code/244-subdivision-of-land-site-plan-review.md"
+quote = '''Notice of the day, time and place of the hearing shall be given to the applicant and shall be published at least two times in a newspaper of general circulation in the City, the date of the first publication to be at least 10 days prior to the date of the hearing.'''
+verified = true
+note = "Final plans for major projects also need the notice posted in three prominent places 10 days ahead (§ 244-9.1H)."
+
+[[rule]]
+id = "pb-abutters-14"
+triggers = ["pb-hearing"]
+label = "Developer's certified mail to abutters"
+actor = "Developer"
+kind = "deadline"
+amount = 14
+unit = "days"
+direction = "before"
+convention = "city_before"
+citation = "Waterville City Code § 244-7.2F"
+url = "https://ecode360.com/38455847"
+source = "output/markdown/code/244-subdivision-of-land-site-plan-review.md"
+quote = '''As soon as the hearing date is established, and at least 14 days prior to that hearing, the developer shall notify, by certified mail, all owners of property abutting the proposed development, specifying the location of the proposed development and a general description of the project.'''
+verified = true
+
+[[rule]]
+id = "pb-decision-30"
+triggers = ["pb-hearing"]
+label = "Planning Board order granting or denying"
+actor = "City (Planning Board)"
+kind = "deadline"
+amount = 30
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 244-7.2G, H"
+url = "https://ecode360.com/38455847"
+source = "output/markdown/code/244-subdivision-of-land-site-plan-review.md"
+quote = '''The Planning Board shall, within 30 days of the public hearing, issue an order denying or granting approval of the plan and/or site plan review permit, or granting approval upon those terms and conditions as it may deem advisable'''
+verified = true
+note = "§ 244-7.2H allows one extension of up to 30 days when the applicant and the Board agree."
+
+[[rule]]
+id = "pb-record-90"
+triggers = ["pb-final-approval"]
+label = "Record the approved plan at the Registry of Deeds"
+actor = "Applicant"
+kind = "lapse"
+amount = 90
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 244-7.4A"
+url = "https://ecode360.com/38455866"
+source = "output/markdown/code/244-subdivision-of-land-site-plan-review.md"
+quote = '''Any plan not so filed or recorded within 90 days of the date upon which such plan is approved and signed by the Planning Board as herein provided shall become null and void'''
+verified = true
+note = "Major projects: § 244-9.3. The Board may extend the period in particular circumstances."
+
+[[rule]]
+id = "pb-commence-12mo"
+triggers = ["pb-final-approval"]
+label = "Project must be commenced"
+actor = "Applicant"
+kind = "lapse"
+amount = 12
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "Waterville City Code § 244-7.4B"
+url = "https://ecode360.com/38455866"
+source = "output/markdown/code/244-subdivision-of-land-site-plan-review.md"
+quote = '''After final approval, all projects must be commenced within 12 months and completed within 24 months unless a special schedule has been approved by the Planning Board or an extension has been granted by the Planning Board.'''
+verified = true
+
+[[rule]]
+id = "pb-complete-24mo"
+triggers = ["pb-final-approval"]
+label = "Project must be completed"
+actor = "Applicant"
+kind = "lapse"
+amount = 24
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "Waterville City Code § 244-7.4B"
+url = "https://ecode360.com/38455866"
+source = "output/markdown/code/244-subdivision-of-land-site-plan-review.md"
+quote = '''After final approval, all projects must be commenced within 12 months and completed within 24 months unless a special schedule has been approved by the Planning Board or an extension has been granted by the Planning Board.'''
+verified = true
+
+[[rule]]
+id = "pb-site-plan-appeal"
+triggers = ["pb-decision"]
+label = "Appeal of a site plan decision to Superior Court (from the date of the vote)"
+actor = "Any aggrieved party"
+kind = "deadline"
+amount = 30
+unit = "days"
+direction = "after"
+convention = "rule6a"
+citation = "30-A M.R.S. § 4482-A(1); Waterville City Code § 275-6.4G"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec4482-A.html"
+source = "https://legislature.maine.gov/statutes/30-A/title30-Asec4482-A.html"
+quote = '''A party may file an appeal with the Superior Court of a municipal land use decision subject to this section that is a final decision within 30 days of the date of the vote on the final decision, except that the time period for filing an appeal under this subsection may be extended by the court upon motion for good cause shown.'''
+verified = true
+applies = "check"
+caution = "Enter the date of the Planning Board vote on the final decision. Whether the decision is final is determined under 30-A M.R.S. § 4482-B. A significant municipal land use decision under § 4482 follows a different route; the City Solicitor confirms which applies. The court may extend the period for good cause."
+
+[[rule.also]]
+citation = "Waterville City Code § 275-6.4G"
+url = "https://ecode360.com/38457736"
+source = "output/markdown/code/275-zoning.md"
+quote = '''Appeals of decisions of the Planning Board made in conducting site plan reviews shall be heard in Superior Court.'''
+
+# ------------------------------------------------------------ rules: historic preservation
+
+[[rule]]
+id = "coa-decide-15"
+triggers = ["coa-meeting"]
+label = "Commission decision on the certificate of appropriateness"
+actor = "City (Historic Preservation Commission)"
+kind = "deadline"
+amount = 15
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 161-9A(2)"
+url = "https://ecode360.com/45005651"
+source = "output/markdown/code/161-historic-preservation.md"
+quote = '''The Commission shall consider the application at a regular meeting and, within 15 days of the date of the meeting, approve, approve with conditions or deny the application pursuant to the terms of this chapter.'''
+verified = true
+note = "The Commission and the applicant may agree on the record to extend the period."
+
+[[rule]]
+id = "coa-written-7"
+triggers = ["coa-decision"]
+label = "Staff send the written decision and findings"
+actor = "City staff"
+kind = "deadline"
+amount = 7
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 161-10C, D"
+url = "https://ecode360.com/45005665"
+source = "output/markdown/code/161-historic-preservation.md"
+quote = '''Within seven days of its decision, City staff shall furnish the applicant a copy of the application, a written decision including written findings of fact supporting the decision and any written recommendations.'''
+verified = true
+
+# ------------------------------------------------------------ rules: floodplain
+
+[[rule]]
+id = "fp-ec-72h"
+triggers = ["fp-part1-ec-received"]
+label = "Review the elevation certificate and issue Part II"
+actor = "City (CEO)"
+kind = "deadline"
+amount = 72
+unit = "hours"
+direction = "after"
+convention = "clock_hours"
+citation = "Waterville City Code § 145-5F(1)"
+url = "https://ecode360.com/38454448"
+source = "output/markdown/code/145-floodplain-management.md"
+quote = '''Following review of the elevation certificate data, which shall take place within 72 hours of receipt of the application, the Code Enforcement Officer shall issue Part II of the flood hazard development permit.'''
+verified = true
+caution = "The text counts from \"receipt of the application\", though the review is of the Part I elevation certificate. Enter the receipt time you rely on."
+
+[[rule]]
+id = "fp-coc-10wd"
+triggers = ["fp-completion-notice"]
+label = "Review and issue the certificate of compliance"
+actor = "City (CEO)"
+kind = "deadline"
+amount = 10
+unit = "working_days"
+direction = "after"
+convention = "city_working_days"
+citation = "Waterville City Code § 145-7C"
+url = "https://ecode360.com/38454534"
+source = "output/markdown/code/145-floodplain-management.md"
+quote = '''Within 10 working days, the Code Enforcement Officer shall:'''
+verified = true
+note = "Counted from the applicant's written notice that the development is complete (§ 145-7B)."
+
+[[rule]]
+id = "fp-zba-appeal-30"
+triggers = ["fp-decision-received"]
+label = "Appeal to the ZBA (floodplain)"
+actor = "Any aggrieved party"
+kind = "deadline"
+amount = 30
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 145-9D(1)"
+url = "https://ecode360.com/38454546"
+source = "output/markdown/code/145-floodplain-management.md"
+quote = '''An administrative or variance appeal may be taken to the Zoning Board of Appeals by an aggrieved party within 30 days after receipt of a written decision of the Code Enforcement Officer or Planning Board.'''
+verified = true
+
+[[rule]]
+id = "fp-zba-hearing-35"
+triggers = ["fp-appeal-received"]
+label = "ZBA hearing on the floodplain appeal"
+actor = "City (ZBA)"
+kind = "deadline"
+amount = 35
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 145-9D(3)"
+url = "https://ecode360.com/38454546"
+source = "output/markdown/code/145-floodplain-management.md"
+quote = '''The Zoning Board of Appeals shall hold a public hearing on the appeal within 35 days of its receipt of an appeal request.'''
+verified = true
+
+[[rule]]
+id = "fp-zba-decide-35"
+triggers = ["fp-hearing-closed"]
+label = "ZBA written decision on the floodplain appeal"
+actor = "City (ZBA)"
+kind = "deadline"
+amount = 35
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 145-9D(5)"
+url = "https://ecode360.com/38454546"
+source = "output/markdown/code/145-floodplain-management.md"
+quote = '''The Zoning Board of Appeals shall decide all appeals within 35 days after the close of the hearing, and shall issue a written decision on all appeals.'''
+verified = true
+
+[[rule]]
+id = "fp-court-45"
+triggers = ["fp-zba-decision"]
+label = "Appeal to Superior Court (floodplain)"
+actor = "Any aggrieved party who took part"
+kind = "deadline"
+amount = 45
+unit = "days"
+direction = "after"
+convention = "rule6a"
+citation = "Waterville City Code § 145-9D(7)"
+url = "https://ecode360.com/38454546"
+source = "output/markdown/code/145-floodplain-management.md"
+quote = '''Any aggrieved party who participated as a party during the proceedings before the Zoning Board of Appeals may take an appeal to Superior Court in accordance with state laws within 45 days from the date of any decision of the Zoning Board of Appeals.'''
+verified = true
+
+[[rule]]
+id = "fp-lomr-6mo"
+triggers = ["fp-project-complete"]
+label = "Submit the Letter of Map Revision data to FEMA"
+actor = "Applicant"
+kind = "deadline"
+amount = 6
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "Waterville City Code § 145-6G(3)"
+url = "https://ecode360.com/38454462"
+source = "output/markdown/code/145-floodplain-management.md"
+quote = '''as soon as practicable, but no later than six months after the completion of the project, the applicant shall submit the technical data to FEMA in the form of a Letter of Map Revision request.'''
+verified = true
+note = "Only when the hydrologic and hydraulic analysis shows a change to the base flood elevation, zone or boundary."
+
+# ------------------------------------------------------------ rules: shoreland
+
+[[rule]]
+id = "sl-expansion-record-90"
+triggers = ["sl-expansion-approved"]
+label = "Record the approved expansion plan at the Registry of Deeds"
+actor = "Applicant"
+kind = "deadline"
+amount = 90
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 275-4.27K(3)(a)[4]"
+url = "https://ecode360.com/38456897"
+source = "output/markdown/code/275-zoning.md"
+quote = '''An approved plan for expansion of a nonconforming structure must be recorded by the applicant with the Registry of Deeds within 90 days of approval.'''
+verified = true
+
+[[rule]]
+id = "sl-reconstruct-1yr"
+triggers = ["sl-damage"]
+label = "Permit to reconstruct in place"
+actor = "Owner"
+kind = "lapse"
+amount = 12
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "Waterville City Code § 275-4.27K(3)(d)[2]"
+url = "https://ecode360.com/38456897"
+source = "output/markdown/code/275-zoning.md"
+quote = '''may be reconstructed in place if a permit is obtained from the Code Enforcement Officer within one year of such damage, destruction or removal.'''
+verified = true
+note = "For structures under the required water setback and damaged, destroyed or removed by 50% or less of market value."
+
+[[rule]]
+id = "sl-model-completeness-35"
+triggers = ["sl-application-received"]
+label = "Tell the applicant whether the shoreland application is complete"
+actor = "City (Planning Board or CEO)"
+kind = "deadline"
+amount = 35
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "06-096 CMR ch. 1000 § 16(D)"
+url = "https://www.maine.gov/sos/sites/maine.gov.sos/files/content/assets/096c1000.docx"
+source = "https://www.maine.gov/sos/sites/maine.gov.sos/files/content/assets/096c1000.docx"
+quote = '''Within 35 days of the date of receiving a written application, the Planning Board or Code Enforcement Officer, as indicated in Section 14, shall notify the applicant in writing either that the application is a complete application, or, if the application is incomplete, that specified additional material is needed to make the application complete.'''
+verified = true
+applies = "check"
+caution = "This is the DEP model ordinance. Waterville's shoreland rules (§ 275-4.27) contain no 35-day clock, so whether it binds a Waterville permit is unsettled."
+
+[[rule]]
+id = "sl-model-decision-35"
+triggers = ["sl-application-complete"]
+label = "Decide the shoreland permit in writing"
+actor = "City (Planning Board or CEO)"
+kind = "deadline"
+amount = 35
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "06-096 CMR ch. 1000 § 16(D)"
+url = "https://www.maine.gov/sos/sites/maine.gov.sos/files/content/assets/096c1000.docx"
+source = "https://www.maine.gov/sos/sites/maine.gov.sos/files/content/assets/096c1000.docx"
+quote = '''The Planning Board or the Code Enforcement Officer, as appropriate, shall approve, approve with conditions, or deny all permit applications in writing within 35 days of receiving a completed application.'''
+verified = true
+applies = "check"
+caution = "DEP model ordinance; Waterville's § 275-4.27 has no matching clock. With a Planning Board waiting list the model counts from the first available agenda date or the hearing instead."
+
+[[rule]]
+id = "sl-model-expire-1yr"
+triggers = ["sl-permit-issued"]
+label = "Shoreland permit expires without a substantial start"
+actor = "Applicant"
+kind = "lapse"
+amount = 12
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "06-096 CMR ch. 1000 § 16(F)"
+url = "https://www.maine.gov/sos/sites/maine.gov.sos/files/content/assets/096c1000.docx"
+source = "https://www.maine.gov/sos/sites/maine.gov.sos/files/content/assets/096c1000.docx"
+quote = '''Permits shall expire one year from the date of issuance if a substantial start is not made in construction or in the use of the property during that period.'''
+verified = true
+applies = "check"
+caution = "DEP model ordinance; not found in Waterville's § 275-4.27."
+
+# ------------------------------------------------------------ rules: property maintenance and safety
+
+[[rule]]
+id = "casualty-secure-24h"
+triggers = ["casualty"]
+label = "Make the building secure"
+actor = "Owner"
+kind = "deadline"
+amount = 24
+unit = "hours"
+direction = "after"
+convention = "clock_hours"
+citation = "Waterville City Code § 205-6"
+url = "https://ecode360.com/38529529"
+source = "output/markdown/code/205-property-maintenance.md"
+quote = '''Any building destroyed by fire or other causes shall be made secure within 24 hours, and a permit for demolition or reconstruction shall be obtained within 90 days from the date of the fire or other casualty.'''
+verified = true
+
+[[rule]]
+id = "casualty-permit-90"
+triggers = ["casualty"]
+label = "Obtain a demolition or reconstruction permit"
+actor = "Owner"
+kind = "deadline"
+amount = 90
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 205-6"
+url = "https://ecode360.com/38529529"
+source = "output/markdown/code/205-property-maintenance.md"
+quote = '''Any building destroyed by fire or other causes shall be made secure within 24 hours, and a permit for demolition or reconstruction shall be obtained within 90 days from the date of the fire or other casualty.'''
+verified = true
+note = "The CEO may extend the period when the casualty needs further investigation."
+
+[[rule]]
+id = "casualty-work-120"
+triggers = ["casualty"]
+label = "Begin work to remove or restore the building"
+actor = "Owner"
+kind = "deadline"
+amount = 120
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 205-6"
+url = "https://ecode360.com/38529529"
+source = "output/markdown/code/205-property-maintenance.md"
+quote = '''Work to either remove or restore a fire-damaged building must begin no later than 120 days from the date of the fire or other casualty.'''
+verified = true
+
+[[rule]]
+id = "vacate-24h"
+triggers = ["vacate-order"]
+label = "Extending the vacate order needs written concurrence of Fire Chief and CEO"
+actor = "City (Fire Chief and CEO)"
+kind = "deadline"
+amount = 24
+unit = "hours"
+direction = "after"
+convention = "clock_hours"
+citation = "Waterville City Code § 210-10B"
+url = "https://ecode360.com/44573342"
+source = "output/markdown/code/210-public-safety.md"
+quote = '''If the emergency described above has not been remedied within 24 hours, the order to vacate may be extended but only with the written concurrence of both the Fire Chief and Code Enforcement Officer, or their designee if one or both of them is unavailable.'''
+verified = true
+
+# ------------------------------------------------------------ rules: permits
+
+[[rule]]
+id = "atf-fee-30"
+triggers = ["violation-notice"]
+label = "After-the-fact fee rises to $1,000 without a permit"
+actor = "Owner"
+kind = "deadline"
+amount = 30
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 127-3B; § 127-10B (electrical)"
+url = "https://ecode360.com/38454336"
+source = "output/markdown/code/127-building-and-energy-code.md"
+quote = '''Failure to acquire a permit within 30 calendar days of the issuance of a violation notice from the Code Enforcement Officer shall cause such fee to be increased to $1,000.'''
+verified = true
+
+[[rule]]
+id = "bp-refusal-30"
+triggers = ["bp-application-filed"]
+label = "No written decision by this date counts as a refusal"
+actor = "City (licensing authority)"
+kind = "deadline"
+amount = 30
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "30-A M.R.S. § 4103(3)"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec4103.html"
+source = "https://legislature.maine.gov/statutes/30-A/title30-Asec4103.html"
+quote = '''The failure of the licensing authority to issue a written notice of its decision, directed to the applicant, within 30 days from the date when the application is filed, constitutes a refusal of the permit.'''
+verified = true
+applies = "check"
+caution = "Section 4103 applies to ordinances described in 30-A M.R.S. § 4101, which reads: \"This subchapter applies to any municipal ordinance requiring a permit in connection with: 1. ... The construction, demolition, improvement or alteration of any building\". Chapter 127 requires a building permit (§ 127-2), so § 4103 likely reaches it; whether it governs a Waterville building permit under MUBEC is still for the City Solicitor to confirm. The appeal route for a refusal is § 4103(5)."
+
+[[rule]]
+id = "bp-void-6mo"
+triggers = ["bp-issued"]
+label = "Permit void if construction has not started"
+actor = "Applicant"
+kind = "lapse"
+amount = 6
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "City of Waterville Building Permit Application (form)"
+url = "https://www.waterville-me.gov/DocumentCenter/View/1336/Building-Permit-Application-PDF"
+source = "https://www.waterville-me.gov/DocumentCenter/View/1336/Building-Permit-Application-PDF"
+quote = '''THIS PERMIT WILL BECOME NULL AND VOID IF CONSTRUCTION IS NOT STARTED WITHIN SIX MONTHS OF PERMIT ISSUE DATE.'''
+verified = true
+caution = "Printed on the City's application form; Chapter 127 itself sets no period. MUBEC's own permit expiration terms may also apply."
+
+[[rule]]
+id = "plumbing-permit-24mo"
+triggers = ["plumbing-permit-issued"]
+label = "Plumbing permit valid only for work commenced by"
+actor = "Applicant"
+kind = "lapse"
+amount = 24
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "30-A M.R.S. § 4215(1)"
+url = "https://legislature.maine.gov/statutes/30-A/title30-Asec4215.html"
+source = "https://legislature.maine.gov/statutes/30-A/title30-Asec4215.html"
+quote = '''A permit is required for the following activities and is valid for work commenced within 24 months after the permit is issued:'''
+verified = true
+
+# ------------------------------------------------------------ rules: subsurface wastewater
+
+[[rule]]
+id = "hhe-reject-14"
+triggers = ["hhe-received"]
+label = "Reject an incomplete HHE-200 application in writing"
+actor = "City (LPI)"
+kind = "deadline"
+amount = 14
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "10-144 CMR ch. 241 § 4(B)(1)"
+url = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+source = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+quote = '''such application for a disposal system permit must be rejected by the LPI in writing within 14 days of receipt of the incomplete application, stating the reasons therefor.'''
+verified = true
+note = "Rule last amended September 23, 2023."
+
+[[rule]]
+id = "hhe-issue-20"
+triggers = ["hhe-review-complete"]
+label = "Issue the disposal system permit"
+actor = "City (LPI)"
+kind = "deadline"
+amount = 20
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "10-144 CMR ch. 241 § 4(B)(1)"
+url = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+source = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+quote = '''the LPI must issue a disposal system permit as soon as practicable, but no later than 20 days from completion of review.'''
+verified = true
+
+[[rule]]
+id = "hhe-valid-24mo"
+triggers = ["subsurface-permit-issued"]
+label = "Disposal system permit valid only for work commenced by"
+actor = "Applicant"
+kind = "lapse"
+amount = 24
+unit = "months"
+direction = "after"
+convention = "calendar_months"
+citation = "10-144 CMR ch. 241 § 4(B)(6); 30-A M.R.S. § 4215"
+url = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+source = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+quote = '''A permit is valid for work commenced within 24 months after the permit is issued.'''
+verified = true
+
+[[rule]]
+id = "hhe-inspection-notice-24h"
+triggers = ["subsurface-ready"]
+label = "Notify the LPI before the system is ready for inspection"
+actor = "Installer"
+kind = "deadline"
+amount = 24
+unit = "hours"
+direction = "before"
+convention = "clock_hours"
+citation = "10-144 CMR ch. 241 § 12(I)(6)"
+url = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+source = "https://www.maine.gov/dhhs/sites/maine.gov.dhhs/files/rule-2023-10/10-144%20CMR%20Ch%20241%20Subsurface%20Wastewater%20Disposal%20Rule.pdf"
+quote = '''Notification required: The LPI must be notified at least 24 hours before the system is ready to be inspected.'''
+verified = true
+
+# ------------------------------------------------------------ rules: rental registration
+
+[[rule]]
+id = "rental-transfer-60"
+triggers = ["rental-transfer"]
+label = "Register the rental building"
+actor = "Owner or property manager"
+kind = "deadline"
+amount = 60
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 215-6A"
+url = "https://ecode360.com/44573403"
+source = "output/markdown/code/215-rental-housing-registration.md"
+quote = '''Within 60 calendar days of purchasing or transferring the ownership of such a building or converting a building into a residential rental building, including through the addition of more units, the legal owner, or the property manager, is expected to register the building.'''
+verified = true
+note = "Chapter 215 is a voluntary registration (\"is expected to\")."
+
+[[rule]]
+id = "rental-new-30"
+triggers = ["rental-co-issued"]
+label = "Register the new rental building"
+actor = "Owner or property manager"
+kind = "deadline"
+amount = 30
+unit = "days"
+direction = "after"
+convention = "city_calendar"
+citation = "Waterville City Code § 215-6B"
+url = "https://ecode360.com/44573403"
+source = "output/markdown/code/215-rental-housing-registration.md"
+quote = '''Newly constructed residential rental buildings are expected to be registered within 30 calendar days of the date the City issues a certificate of occupancy.'''
+verified = true
+
+[[rule]]
+id = "rental-expire-oct31"
+triggers = ["rental-cycle", "rental-transfer", "rental-co-issued"]
+label = "Registrations expire; renew before November 1"
+actor = "Owner or property manager"
+kind = "lapse"
+amount = 0
+unit = "annual"
+month = 10
+day = 31
+direction = "after"
+convention = "annual"
+citation = "Waterville City Code § 215-6C, D"
+url = "https://ecode360.com/44573403"
+source = "output/markdown/code/215-rental-housing-registration.md"
+quote = '''All residential rental building registration shall expire on October 31.'''
+verified = true
+
+[[rule.also]]
+citation = "Waterville City Code § 215-6C"
+url = "https://ecode360.com/44573403"
+source = "output/markdown/code/215-rental-housing-registration.md"
+quote = '''Before November 1 of each year, the legal owner, or the property manager, is expected to submit the information through the City's rental registration portal for each residential rental building.'''
+
+# ------------------------------------------------------------ rules: court
+
+[[rule]]
+id = "80e-notice-24h"
+triggers = ["80e-presentation"]
+label = "Written notice to the owner or occupant of the warrant application"
+actor = "City (applicant for the warrant)"
+kind = "deadline"
+amount = 24
+unit = "hours"
+direction = "before"
+convention = "clock_hours"
+citation = "M.R. Civ. P. 80E(b)(5)"
+url = "https://courts.maine.gov/rules/text/mr_civ_p_only_2026-06-01.pdf"
+source = "https://courts.maine.gov/rules/text/mr_civ_p_only_2026-06-01.pdf"
+quote = '''That the applicant has at least 24 hours in advance of the presentation of the application given written notice to the owner or occupant of the premises to be inspected of the time and place at which the applicant intends to present the application to the court.'''
+verified = true
+note = "Rule 80E(b)(6) lets the court dispense with the notice when the application shows an immediate threat to health or safety."
+
+[[rule]]
+id = "80e-execute-10"
+triggers = ["80e-warrant-issued"]
+label = "Execute the inspection warrant (business hours)"
+actor = "City (person named in the warrant)"
+kind = "deadline"
+amount = 10
+unit = "days"
+direction = "after"
+convention = "rule6a"
+citation = "M.R. Civ. P. 80E(e)"
+url = "https://courts.maine.gov/rules/text/mr_civ_p_only_2026-06-01.pdf"
+source = "https://courts.maine.gov/rules/text/mr_civ_p_only_2026-06-01.pdf"
+quote = '''The person to whom a warrant is issued shall execute the same by conducting the inspection authorized during normal business hours within 10 days after issuance of the warrant.'''
+verified = true
+caution = "Rule 6(a) extends a last day that falls on a weekend or holiday, but the inspection itself must happen during normal business hours."
+
+[[rule]]
+id = "80e-return-10"
+triggers = ["80e-executed"]
+label = "File the return with the court"
+actor = "City (person who executed the warrant)"
+kind = "deadline"
+amount = 10
+unit = "days"
+direction = "after"
+convention = "rule6a"
+citation = "M.R. Civ. P. 80E(f)"
+url = "https://courts.maine.gov/rules/text/mr_civ_p_only_2026-06-01.pdf"
+source = "https://courts.maine.gov/rules/text/mr_civ_p_only_2026-06-01.pdf"
+quote = '''Not later than 10 days after execution of the warrant the person executing it shall file a return with the court from which the warrant issued setting forth the date and time of the inspection and any violations of law found upon the inspected premises.'''
+verified = true
+
+[[rule]]
+id = "80k-appeal-21"
+triggers = ["80k-judgment"]
+label = "Notice of appeal from the District Court judgment"
+actor = "Either party"
+kind = "deadline"
+amount = 21
+unit = "days"
+direction = "after"
+convention = "app1a"
+citation = "M.R. App. P. 2B(c)(1); M.R. Civ. P. 80K(j)"
+url = "https://www.courts.maine.gov/rules/text/mr_app_p_only_2024-11-01.pdf"
+source = "https://www.courts.maine.gov/rules/text/mr_app_p_only_2024-11-01.pdf"
+quote = '''The time within which an appeal may be taken in a civil case shall be 21 days after entry into the docket of the judgment or order appealed from, unless a shorter time is provided by law.'''
+verified = true
+note = "Rule 80K itself sets no day counts: the defendant answers orally at the time and place on the citation, and appeals go \"as in other civil actions\" (Rule 80K(j))."
+
+[[rule.also]]
+citation = "M.R. Civ. P. 80K(j)"
+url = "https://courts.maine.gov/rules/text/mr_civ_p_only_2026-06-01.pdf"
+quote = '''A party entitled to appeal may do so as in other civil actions.'''
+
+[[rule]]
+id = "80b-default-30"
+triggers = ["gov-action-notice"]
+label = "Rule 80B complaint when no statute sets the period"
+actor = "Any aggrieved party"
+kind = "deadline"
+amount = 30
+unit = "days"
+direction = "after"
+convention = "rule6a"
+citation = "M.R. Civ. P. 80B(b)"
+url = "https://courts.maine.gov/rules/text/mr_civ_p_only_2026-06-01.pdf"
+source = "https://courts.maine.gov/rules/text/mr_civ_p_only_2026-06-01.pdf"
+quote = '''The time within which review may be sought shall be as provided by statute, except that if no time limit is specified by statute, the complaint shall be filed within 30 days after notice of any action or refusal to act of which review is sought unless the court enlarges the time in accordance with Rule 6(b)'''
+verified = true
+note = "ZBA decisions have their own 45-day statute (30-A § 2691(3)(G)). A written decision sent by mail counts as delivered on actual receipt or three days after mailing, whichever is earlier (Rule 80B(b))."

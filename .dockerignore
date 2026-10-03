@@ -1,5 +1,14 @@
 .git
 .venv
+.data
 data
 output
+.claude
+.playwright-mcp
+docs
 **/__pycache__
+**/node_modules
+web/build
+web/.svelte-kit
+web/test-results
+web/playwright-report

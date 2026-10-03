@@ -1,0 +1,127 @@
+# Shared text blocks for enforcement templates (notices of violation,
+# stop-work order, Rule 80K packet and memo). A template that sets
+# `shared = ["_violation_types.toml"]` gets the fields below in its form and
+# these placeholders from the picked `violation_type`: {chapter},
+# {duty_line}, {penalty_text}, {tier_summary}, {appeal_text}, {cc_required},
+# {mortgagee_block}, {attest_sections}, {notify_check},
+# {prior_conviction_text}. {appeal_text} uses
+# {appeal_by_long} and the building variants use {atf_by_long}, so the
+# template must compute appeal_by and atf_by.
+#
+# Sources checked on 2026-10-03:
+#   Code of the City of Waterville, output/markdown/code/ (legislation through 08-05-2026):
+#     § 275-6.1A(1), (3)(a)-(d); § 275-6.2E(1), H(2); § 205-7, § 205-8;
+#     § 127-3B, § 127-5A, § 127-7; § 5-2.10B.
+#   30-A M.R.S. § 4452(3)(A), (B), (B-1), (C), (D), (F): legislature.maine.gov.
+#   30-A M.R.S. § 2691(4): legislature.maine.gov.
+# Anything not found in those texts carries a visible [VERIFY] tag.
+
+[[fields]]
+name = "violation_type"
+label = "Ordinance and violation type"
+kind = "select"
+required = true
+section = "Violation"
+help = "Picks the enforcement section, the penalty tier under 30-A M.R.S. § 4452(3) and the appeal language."
+options = [
+  { value = "zoning_no_permit", label = "Zoning (Ch. 275): work or land use activity without a required permit" },
+  { value = "zoning_specific", label = "Zoning (Ch. 275): other specific violation" },
+  { value = "zoning_rp", label = "Zoning (Ch. 275): violation in a shoreland Resource Protection District" },
+  { value = "property_maintenance", label = "Property maintenance (Ch. 205)" },
+  { value = "building_no_permit", label = "Building code (Ch. 127, MUBEC): work without a required permit" },
+  { value = "building_specific", label = "Building code (Ch. 127, MUBEC): other specific violation" },
+]
+
+[[fields]]
+name = "mortgagee_name"
+label = "Mortgagee"
+kind = "text"
+section = "Violation"
+required_when = { violation_type = ["property_maintenance"] }
+help = "Chapter 205 notices go to the owner and the mortgagee (§ 205-7). Take the mortgagee from the registry of deeds."
+
+[[fields]]
+name = "mortgagee_address"
+label = "Mortgagee mailing address"
+kind = "textarea"
+rows = 2
+section = "Violation"
+required_when = { violation_type = ["property_maintenance"] }
+
+# ------------------------------------------------------------------ zoning
+
+[variants.violation_type.zoning_no_permit]
+chapter = "Chapter 275 (Zoning)"
+duty_line = "Section 275-6.1A(1) of the City Code directs the Code Enforcement Officer to notify the person responsible for a violation in writing, state the nature of the violation and order the action necessary to correct it, including discontinuance of any illegal work."
+penalty_text = "Under § 275-6.1A(3)(d) of the City Code and 30-A M.R.S. § 4452(3)(A), the minimum penalty for starting construction or undertaking a land use activity without a required permit is $100 and the maximum penalty is $2,500. Under § 275-6.1A(3)(b), after notification of a violation, each day that the violation exists constitutes a separate offense."
+tier_summary = "30-A M.R.S. § 4452(3)(A): $100 minimum, $2,500 maximum"
+notify_check = "City Solicitor and City Council notified of the violation, as § 275-6.1A(3)(a) requires; the City, acting through the City Council, may institute proceedings"
+appeal_text = "You may appeal this notice and order to the Waterville Zoning Board of Appeals. Under § 275-6.2E(1) of the City Code, an appeal must be made within 30 days of the decision of the Code Enforcement Officer, which for this notice is by {appeal_by_long}, and the Board hears the appeal de novo. File the appeal with the Code Enforcement Office; the fee is $25 plus the cost of advertising (§ 275-6.2H(2)). Under 30-A M.R.S. § 2691(4), a notice of violation or an enforcement order by a code enforcement officer under a land use ordinance is reviewable on appeal by the board of appeals, and a decision that is not timely appealed is subject to the same preclusive effect as otherwise provided by law."
+cc_required = "City Solicitor and City Council, as § 275-6.1A(3)(a) requires"
+mortgagee_block = ""
+attest_sections = "Chapter 275, Zoning, the sections cited above and § 275-6.1"
+prior_conviction_text = "Because a previous conviction of the same party within the past two years for a violation of the same law or ordinance has been shown, the fine may reach a maximum of $25,000 (§ 275-6.1A(3)(b) of the City Code; see also 30-A M.R.S. § 4452(3)(F)). [VERIFY: 30-A M.R.S. § 4452(3)(F) raises only the maximums of paragraphs B and B-1, and this violation falls under paragraph A. The $25,000 figure rests on § 275-6.1A(3)(b), which applies unless a different penalty is provided in Chapter 275, and § 275-6.1A(3)(d) sets $2,500 for work without a permit.]"
+
+[variants.violation_type.zoning_specific]
+chapter = "Chapter 275 (Zoning)"
+duty_line = "Section 275-6.1A(1) of the City Code directs the Code Enforcement Officer to notify the person responsible for a violation in writing, state the nature of the violation and order the action necessary to correct it."
+penalty_text = "A person who violates Chapter 275 or fails to comply with any of its requirements, including conditions of a variance, special exception or contract zoning, commits a civil violation and is subject to fines. After notification of a violation, each day that the violation exists constitutes a separate offense (§ 275-6.1A(3)(b)). Under 30-A M.R.S. § 4452(3)(B), the minimum penalty for a specific violation is $100 and the maximum penalty is $5,000, and monetary penalties may be assessed on a per-day basis (30-A M.R.S. § 4452(3))."
+tier_summary = "30-A M.R.S. § 4452(3)(B): $100 minimum, $5,000 maximum"
+notify_check = "City Solicitor and City Council notified of the violation, as § 275-6.1A(3)(a) requires; the City, acting through the City Council, may institute proceedings"
+appeal_text = "You may appeal this notice and order to the Waterville Zoning Board of Appeals. Under § 275-6.2E(1) of the City Code, an appeal must be made within 30 days of the decision of the Code Enforcement Officer, which for this notice is by {appeal_by_long}, and the Board hears the appeal de novo. File the appeal with the Code Enforcement Office; the fee is $25 plus the cost of advertising (§ 275-6.2H(2)). Under 30-A M.R.S. § 2691(4), a notice of violation or an enforcement order by a code enforcement officer under a land use ordinance is reviewable on appeal by the board of appeals, and a decision that is not timely appealed is subject to the same preclusive effect as otherwise provided by law."
+cc_required = "City Solicitor and City Council, as § 275-6.1A(3)(a) requires"
+mortgagee_block = ""
+attest_sections = "Chapter 275, Zoning, the sections cited above and § 275-6.1"
+prior_conviction_text = "Because a previous conviction of the same party within the past two years for a violation of the same law or ordinance has been shown, the fine may reach a maximum of $25,000 (§ 275-6.1A(3)(b) of the City Code; see also 30-A M.R.S. § 4452(3)(F))."
+
+[variants.violation_type.zoning_rp]
+chapter = "Chapter 275 (Zoning)"
+duty_line = "Section 275-6.1A(1) of the City Code directs the Code Enforcement Officer to notify the person responsible for a violation in writing, state the nature of the violation and order the action necessary to correct it."
+penalty_text = "Under 30-A M.R.S. § 4452(3)(B-1), the maximum penalty is $10,000 for a violation of a shoreland zoning ordinance that occurs within an area zoned for resource protection. Section 275-6.1A(3)(d) of the City Code states a maximum of $5,000 for starting construction or undertaking a land use activity without a required permit in a Resource Protection District within the shoreland zone. [VERIFY: which maximum applies to these facts; the city figure differs from § 4452(3)(B-1).] After notification of a violation, each day that the violation exists constitutes a separate offense (§ 275-6.1A(3)(b)), and monetary penalties may be assessed on a per-day basis (30-A M.R.S. § 4452(3))."
+tier_summary = "30-A M.R.S. § 4452(3)(B-1): up to $10,000 [VERIFY against § 275-6.1A(3)(d), $5,000]"
+notify_check = "City Solicitor and City Council notified of the violation, as § 275-6.1A(3)(a) requires; the City, acting through the City Council, may institute proceedings"
+appeal_text = "You may appeal this notice and order to the Waterville Zoning Board of Appeals. Under § 275-6.2E(1) of the City Code, an appeal must be made within 30 days of the decision of the Code Enforcement Officer, which for this notice is by {appeal_by_long}, and the Board hears the appeal de novo. File the appeal with the Code Enforcement Office; the fee is $25 plus the cost of advertising (§ 275-6.2H(2)). Under 30-A M.R.S. § 2691(4), a notice of violation or an enforcement order by a code enforcement officer under a land use ordinance is reviewable on appeal by the board of appeals, and a decision that is not timely appealed is subject to the same preclusive effect as otherwise provided by law."
+cc_required = "City Solicitor and City Council, as § 275-6.1A(3)(a) requires"
+mortgagee_block = ""
+attest_sections = "Chapter 275, Zoning, § 275-4.27 (shoreland), the sections cited above and § 275-6.1"
+prior_conviction_text = "Because a previous conviction of the same party within the past two years for a violation of the same law or ordinance has been shown, the fine may reach a maximum of $25,000 (§ 275-6.1A(3)(b) of the City Code; see also 30-A M.R.S. § 4452(3)(F))."
+
+# ------------------------------------------------------------------ Ch. 205
+
+[variants.violation_type.property_maintenance]
+chapter = "Chapter 205 (Property Maintenance)"
+duty_line = "Section 205-7 of the City Code directs the Code Enforcement Officer to notify the property owner and mortgagee of a violation by written notice served by mail or by hand delivery, explaining the nature of the violation and setting a deadline for correcting it. A copy of this notice goes to the mortgagee."
+penalty_text = "A person who violates Chapter 205 commits a civil violation punishable by a civil penalty of $100, which may not be suspended. Each day the violation continues beyond the correction period set in this notice is a separate violation (§ 205-8). The City may also pursue all remedies and relief provided in 30-A M.R.S. § 4452. If the corrective action is not taken within the time allowed, the Code Enforcement Officer may have it taken and recover the cost in a civil action, and if the City is the prevailing party it shall be awarded its reasonable attorney fees (§ 205-8)."
+tier_summary = "§ 205-8: $100 per day beyond the correction period, not suspendable; plus 30-A M.R.S. § 4452 remedies"
+notify_check = "City Solicitor consulted on whether the City Solicitor or the enforcement official will prosecute (80K Manual 2017, p. 19)"
+appeal_text = "Chapter 205 does not name a board that hears appeals of this notice or a deadline for an appeal. Under 30-A M.R.S. § 2691(4), a notice of violation by a code enforcement officer under a land use ordinance is reviewable on appeal by the board of appeals, but a board may hear only the subject matter that a charter or ordinance specifies. [VERIFY: whether Chapter 205 is a land use ordinance for § 2691(4), which board hears the appeal, and the deadline. The 30-day period below is taken from § 275-6.2E(1), which governs zoning decisions.] If an appeal is available, file it with the Code Enforcement Office within 30 days of the date of this notice, by {appeal_by_long}."
+cc_required = "Mortgagee: {mortgagee_name}, {mortgagee_address} (§ 205-7)"
+mortgagee_block = "Mortgagee (copy sent as § 205-7 requires):\n{mortgagee_name}\n{mortgagee_address}"
+attest_sections = "Chapter 205, Property Maintenance, the sections cited above and §§ 205-7 and 205-8"
+prior_conviction_text = "[VERIFY: a prior conviction was marked, but § 205-8 sets a flat civil penalty of $100, and 30-A M.R.S. § 4452(3)(F) raises only the maximums of paragraphs B and B-1. Delete this line unless the City Solicitor confirms a higher penalty applies.]"
+
+# ------------------------------------------------------------------ Ch. 127
+
+[variants.violation_type.building_no_permit]
+chapter = "Chapter 127 (Building and Energy Code)"
+duty_line = "Section 127-5A of the City Code directs the Code Enforcement Officer to issue the notices or orders necessary to enforce compliance with law, remove illegal or unsafe conditions and secure the necessary safeguards during construction. Section 127-2A requires a permit before the start of any construction, alteration, removal or demolition of a building or structure."
+penalty_text = "Penalties for violations of the Maine Uniform Building and Energy Code are the civil penalties provided in 30-A M.R.S. § 4452(3) (§ 127-7). The minimum penalty for starting construction without a required permit is $100 and the maximum penalty is $2,500 (30-A M.R.S. § 4452(3)(A)), and monetary penalties may be assessed on a per-day basis (§ 4452(3)). A permit applied for after work has started may be charged double the fee, subject to a maximum of $500. If a permit is not obtained within 30 calendar days of this violation notice, by {atf_by_long}, that fee increases to $1,000 (§ 127-3B)."
+tier_summary = "30-A M.R.S. § 4452(3)(A): $100 minimum, $2,500 maximum (via § 127-7)"
+notify_check = "City Solicitor consulted on whether the City Solicitor or the enforcement official will prosecute (80K Manual 2017, p. 19)"
+appeal_text = "Chapter 127 does not name a board that hears appeals of this notice or a deadline for an appeal. Under 30-A M.R.S. § 2691(4), a board of appeals may hear only the subject matter that a charter or ordinance specifies. [VERIFY: the appeal route and deadline for building code orders under Chapter 127 and the Maine Uniform Building and Energy Code. The likely route is 30-A M.R.S. § 4103(5): \"An appeal may be taken from any order issued by the building official, or from the licensing authority's refusal to grant a permit, to the municipal officers or to a board of appeals established under section 2691.\" 30-A M.R.S. § 4101 applies that subchapter to any municipal ordinance requiring a permit in connection with the construction, demolition, improvement or alteration of any building, and § 127-2 requires a building permit. Section 4103(5) sets no deadline. The 30-day period below is taken from § 275-6.2E(1), which governs zoning decisions.] If an appeal is available, file it with the Code Enforcement Office within 30 days of the date of this notice, by {appeal_by_long}."
+cc_required = ""
+mortgagee_block = ""
+attest_sections = "Chapter 127, Building and Energy Code, §§ 127-1, 127-2 and 127-7"
+prior_conviction_text = "[VERIFY: a prior conviction was marked, but 30-A M.R.S. § 4452(3)(F) raises only the maximums of paragraphs B and B-1, and work without a permit falls under paragraph A ($2,500). Delete this line unless the City Solicitor confirms a higher penalty applies.]"
+
+[variants.violation_type.building_specific]
+chapter = "Chapter 127 (Building and Energy Code)"
+duty_line = "Section 127-5A of the City Code directs the Code Enforcement Officer to issue the notices or orders necessary to enforce compliance with law, remove illegal or unsafe conditions and secure the necessary safeguards during construction."
+penalty_text = "Penalties for violations of the Maine Uniform Building and Energy Code are the civil penalties provided in 30-A M.R.S. § 4452(3) (§ 127-7). The minimum penalty for a specific violation is $100 and the maximum penalty is $5,000 (30-A M.R.S. § 4452(3)(B)), and monetary penalties may be assessed on a per-day basis (§ 4452(3))."
+tier_summary = "30-A M.R.S. § 4452(3)(B): $100 minimum, $5,000 maximum (via § 127-7)"
+notify_check = "City Solicitor consulted on whether the City Solicitor or the enforcement official will prosecute (80K Manual 2017, p. 19)"
+appeal_text = "Chapter 127 does not name a board that hears appeals of this notice or a deadline for an appeal. Under 30-A M.R.S. § 2691(4), a board of appeals may hear only the subject matter that a charter or ordinance specifies. [VERIFY: the appeal route and deadline for building code orders under Chapter 127 and the Maine Uniform Building and Energy Code. The likely route is 30-A M.R.S. § 4103(5): \"An appeal may be taken from any order issued by the building official, or from the licensing authority's refusal to grant a permit, to the municipal officers or to a board of appeals established under section 2691.\" 30-A M.R.S. § 4101 applies that subchapter to any municipal ordinance requiring a permit in connection with the construction, demolition, improvement or alteration of any building, and § 127-2 requires a building permit. Section 4103(5) sets no deadline. The 30-day period below is taken from § 275-6.2E(1), which governs zoning decisions.] If an appeal is available, file it with the Code Enforcement Office within 30 days of the date of this notice, by {appeal_by_long}."
+cc_required = ""
+mortgagee_block = ""
+attest_sections = "Chapter 127, Building and Energy Code, §§ 127-1 and 127-7 and the MUBEC provisions cited above"
+prior_conviction_text = "Because a previous conviction of the same party within the past 2 years for a violation of the same law or ordinance has been shown, the maximum penalty may exceed $5,000 but may not exceed $25,000 (30-A M.R.S. § 4452(3)(F), which raises the paragraph B maximum)."
