@@ -61,7 +61,7 @@
 	<div class="page-head">
 		<p class="page-lede">
 			The last {KEEP} sections you opened on this device, kept for reading without a connection. Questions still need
-			a connection. Saved text can be out of date, so check the City Code before you rely on it.
+			a connection.
 		</p>
 	</div>
 

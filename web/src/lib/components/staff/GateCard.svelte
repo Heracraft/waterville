@@ -15,9 +15,9 @@
 			{#if gate.verified}
 				<span class="st st-ok">Verified against primary text</span>
 			{:else if gate.scope === 'city'}
-				<span class="st st-no">Unverified, check before relying</span>
+				<span class="st st-no">Unverified</span>
 			{:else}
-				<span class="st st-no">Unverified for Waterville, check before relying</span>
+				<span class="st st-no">Unverified for Waterville</span>
 			{/if}
 		</p>
 		<h4 id="{uid}-t"><span class="sr-only">Step {gate.order}: </span>{gate.title}</h4>

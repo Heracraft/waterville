@@ -58,7 +58,7 @@ describe('checklistText', () => {
 		expect(t).toContain('New building, Commercial');
 		expect(t).toContain('1) Site plan review permit (Planning Board). § 275-6.4C');
 		expect(t).toContain('- New building footprint of 4,500 sq ft');
-		expect(t).toContain('2) Building permit (Code Enforcement Officer). § 127-2A [unverified, check before relying]');
+		expect(t).toContain('2) Building permit (Code Enforcement Officer). § 127-2A [unverified]');
 		expect(t.trim().endsWith('Research aid, not a determination of the Code Enforcement Officer.')).toBe(true);
 		expect(t).not.toMatch(/\u2014/);
 	});

@@ -1,5 +1,6 @@
 <script lang="ts">
-	// The research-aid stamp under staff answers. The UI renders it, never the
+	// The research-aid stamp under staff answers, on paper only: staff know who
+	// decides, a printout that leaves the office may not. The UI renders it, never the
 	// model. The wording comes from the server (GET /api/staff/me -> stamp).
 	import { staff } from '$lib/staff.svelte';
 
@@ -37,5 +38,10 @@
 	}
 	.stamp-text {
 		flex: 1 1 16em;
+	}
+	@media screen {
+		.stamp {
+			display: none;
+		}
 	}
 </style>

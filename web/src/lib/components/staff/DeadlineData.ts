@@ -111,8 +111,8 @@ export function statusOf(r: Pick<Rule, 'verified' | 'applies'>): Status {
 
 export const STATUS_TEXT: Record<Status, string> = {
 	verified: 'Verified against primary text',
-	check: 'Text verified; applies in Waterville? Check',
-	unverified: 'Unverified, check before relying'
+	check: 'Text verified; reach in Waterville unconfirmed',
+	unverified: 'Unverified'
 };
 
 export const KIND_TEXT: Record<Rule['kind'], string> = {

@@ -9,7 +9,7 @@
 #          and the text applies to Waterville on its face.
 #   false  either the text could not be confirmed, or it is a state or
 #          utility gate whose reach in Waterville has not been confirmed
-#          ("unverified for Waterville"). The UI says "check before relying".
+#          ("unverified for Waterville"). The UI labels it "Unverified".
 #
 # `when` lists the situations that raise the gate. Each has `all`, a list of
 # conditions that must all hold, and a `reason` shown to the user. A
@@ -47,7 +47,7 @@ summary = "Life safety review, system permits and the Fire Chief's site inspecti
 [[phase]]
 n = 4
 label = "State and utility gates"
-summary = "Approvals from state agencies and utilities. Unverified for Waterville: raised in review, check before relying."
+summary = "Approvals from state agencies and utilities. Unverified for Waterville: raised in review."
 
 [[phase]]
 n = 5

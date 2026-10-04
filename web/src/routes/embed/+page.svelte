@@ -39,8 +39,7 @@
 			</div>
 			<PublicTools external />
 			<p class="embed-note">
-				Answers quote the Waterville City Code and Maine law. They are not a permit decision. Confirm with Code
-				Enforcement (207-680-4208) before you build.
+				Answers quote the Waterville City Code and Maine law.
 			</p>
 		{/snippet}
 		{#snippet extra(msg)}

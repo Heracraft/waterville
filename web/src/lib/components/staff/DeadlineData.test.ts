@@ -117,7 +117,7 @@ describe('caseItemFor', () => {
 		if (item.kind !== 'deadline') throw new Error('kind');
 		expect(item.note).toContain('45 days after (Court rule 6(a)).');
 		expect(item.note).toContain('Monday, November 16, 2026');
-		expect(item.note).toContain('Unverified, check before relying.');
+		expect(item.note).toContain('Unverified.');
 		expect(item.note).toContain('Check it.');
 	});
 	it('clips long fields to the server limits', () => {

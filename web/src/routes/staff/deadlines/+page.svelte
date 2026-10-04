@@ -257,10 +257,6 @@
 			{:else if !busy}
 				<div class="empty sheet">
 					<p>Choose an event and its date, then Calculate.</p>
-					<p class="muted">
-						Each clock shows its citation and the controlling text. Clocks marked "Unverified, check before relying"
-						could not be confirmed from primary text.
-					</p>
 				</div>
 			{/if}
 		</section>

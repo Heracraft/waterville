@@ -171,10 +171,6 @@
 			{:else if !busy}
 				<div class="empty sheet">
 					<p>Fill in the project facts and choose Check gates.</p>
-					<p class="muted">
-						State and utility gates are listed as "unverified for Waterville": they were raised in review and need a
-						check before you rely on them.
-					</p>
 				</div>
 			{/if}
 		</section>

@@ -173,7 +173,7 @@ export function checklistText(result: GateResult, labels: { project?: string; us
 	for (const { phase, gates } of groupByPhase(result)) {
 		lines.push(`${phase.n}. ${phase.label}`);
 		for (const g of gates) {
-			const flag = g.verified ? '' : ' [unverified, check before relying]';
+			const flag = g.verified ? '' : ' [unverified]';
 			lines.push(`  ${g.order}) ${g.title} (${g.authority}). ${g.citation}${flag}`);
 			for (const r of g.reasons) lines.push(`     - ${r}`);
 		}

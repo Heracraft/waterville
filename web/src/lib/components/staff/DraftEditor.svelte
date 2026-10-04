@@ -4,8 +4,8 @@
 	// print and delete. Used for a new draft (no `draft`; Save creates it) and
 	// for a saved one. Key it on the draft id: it copies its inputs once.
 	//
-	// Nothing here sends a letter. The banner rides on screen, on paper and in
-	// the .docx footer.
+	// Nothing here sends a letter. The status banner rides on paper and in the
+	// .docx footer.
 	import { beforeNavigate } from '$app/navigation';
 	import { untrack } from 'svelte';
 	import CasePicker from './CasePicker.svelte';
@@ -297,7 +297,7 @@
 	<div class="layout" data-mode={mode}>
 		<div class="pane pane-edit no-print">
 			<section class="review sheet" aria-label="Review">
-				<h3>Before the CEO signs</h3>
+				<h3>Review</h3>
 				<ul class="review-list">
 					<li class:bad={missing.length > 0}>
 						{#if missing.length === 0}
@@ -338,7 +338,7 @@
 				{#if suggestion}
 					<section class="suggestion sheet accent" aria-label="AI draft">
 						<h3>AI draft for {label(suggestion.field)}</h3>
-						<p class="muted small">A first draft from the case record. Check every fact, date and name before you use it.</p>
+						<p class="muted small">From the case record.</p>
 						<p class="sug-text">{suggestion.text}</p>
 						<div class="btn-row">
 							<button type="button" class="btn small" onclick={() => useSuggestion('replace')}>Use this text</button>

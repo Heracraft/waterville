@@ -235,8 +235,7 @@
 		</section>
 
 		<p class="confirm">
-			Every figure on this page is an estimate. Confirm the fee with Code Enforcement ({schedule.office_phone}) before you
-			apply.
+			Code Enforcement sets the fee when you apply: {schedule.office_phone}.
 		</p>
 		<p class="btn-row no-print">
 			<button type="button" class="btn secondary" onclick={reset}>Clear</button>

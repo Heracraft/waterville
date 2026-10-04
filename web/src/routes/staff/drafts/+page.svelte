@@ -3,7 +3,6 @@
 	// change first, plus the template list to start a new one.
 	import { page } from '$app/state';
 	import CasePicker from '$lib/components/staff/CasePicker.svelte';
-	import DraftBanner from '$lib/components/staff/DraftBanner.svelte';
 	import DraftTemplatePicker from '$lib/components/staff/DraftTemplatePicker.svelte';
 	import { drafts, fmtWhen, type DraftSummary, type TemplateSummary } from '$lib/components/staff/DraftData';
 
@@ -45,8 +44,6 @@
 		<h2 class="page-title">Drafts</h2>
 		<p class="page-lede">Letters and packets drafted from Waterville templates. Nothing is sent from here.</p>
 	</div>
-
-	<DraftBanner />
 
 	<section class="start" aria-labelledby="start-h">
 		<h3 id="start-h" class="sec-h">Start a draft{caseId ? ` for case ${caseId}` : ''}</h3>

@@ -371,7 +371,7 @@ def test_docx_export_opens_with_letterhead_and_draft_footer(staff_client):
     assert "CITY OF WATERVILLE" in header and "Code Enforcement Office" in header and "7 College Avenue" in header
     assert "207-680-4208" in header
     footer = "\n".join(p.text for p in sec.footer.paragraphs)
-    assert footer.startswith("DRAFT FOR REVIEW.") and "Check every citation" in footer
+    assert footer.startswith("DRAFT.") and "Not valid until signed" in footer
     assert doc.core_properties.subject == "DRAFT for review"
     headings = [p.text for p in doc.paragraphs if p.style.name.startswith("Heading")]
     assert "Your right to appeal" in headings

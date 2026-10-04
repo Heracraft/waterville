@@ -87,7 +87,6 @@
 		<div class="page-head">
 			<span class="eyebrow">New draft{caseParam ? ` for case ${caseParam}` : ''}</span>
 			<h2 class="page-title">Pick a template</h2>
-			<p class="page-lede">Each template follows the Waterville code and Maine law in the corpus. Statements not checked against primary text carry a [VERIFY] tag.</p>
 		</div>
 		<DraftTemplatePicker templates={all} caseId={caseParam} />
 	{:else if template}

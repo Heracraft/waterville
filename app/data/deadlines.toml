@@ -11,7 +11,7 @@
 #     maine.gov) or a City form. Those quotes were matched against the text
 #     fetched on `checked`.
 # `verified = false` means the clock could not be confirmed from primary text.
-# The calculator still shows it, labeled "Unverified, check before relying".
+# The calculator still shows it, labeled "Unverified".
 #
 # `applies = "check"` marks a clock whose text is verified but whose reach in
 # Waterville is not settled (a state model ordinance, or a statute whose

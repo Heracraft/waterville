@@ -1,5 +1,5 @@
 <script lang="ts">
-	// The review banner on every draft, on screen and on paper.
+	// The status line on every printed draft. Paper only: staff know a draft is a draft.
 	import { BANNER } from './DraftData';
 
 	let { text = BANNER }: { text?: string } = $props();
@@ -31,6 +31,11 @@
 		font: 700 0.72rem/1.7 var(--sans);
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
+	}
+	@media screen {
+		.draft-banner {
+			display: none;
+		}
 	}
 	@media print {
 		.draft-banner {
