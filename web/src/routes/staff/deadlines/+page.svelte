@@ -138,7 +138,7 @@
 	<div class="page-head">
 		<h2 class="page-title">Deadlines</h2>
 		<p class="page-lede">
-			Pick the event and its date to see every legal clock it starts, with the controlling text and its citation.
+			Pick the event and its date to see every legal clock it starts.
 		</p>
 	</div>
 

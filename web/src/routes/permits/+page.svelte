@@ -86,7 +86,7 @@
 	<div class="page-head">
 		<p class="page-lede">
 			Pick your project to see the permits and forms it needs, whether the Fire Department reviews it, and what to bring to
-			the Code Enforcement office. This guide does not decide whether you need a permit. The office does.
+			the Code Enforcement office.
 		</p>
 	</div>
 

@@ -42,12 +42,8 @@
 
 <main class="wrap staff-main drafts-page">
 	<div class="page-head">
-		<span class="eyebrow">Letters, notices and court packets</span>
 		<h2 class="page-title">Drafts</h2>
-		<p class="page-lede">
-			Notices of violation, stop-work orders, abutter and hearing notices, decision letters and Rule 80K packets, drafted from
-			Waterville templates. Nothing is sent from here. The Code Enforcement Officer reviews, signs and sends.
-		</p>
+		<p class="page-lede">Letters and packets drafted from Waterville templates. Nothing is sent from here.</p>
 	</div>
 
 	<DraftBanner />

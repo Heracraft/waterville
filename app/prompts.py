@@ -28,7 +28,7 @@ Scope:
 # answer. With a card, the card carries this line instead (CHECKLIST_NOTE).
 CONFIRM_RULE = """
 
-When the question is about building, altering or demolishing something, or about a fence, shed, deck, pool, sign, home business, adding dwelling units, chickens, a short-term rental, solar panels or a heat pump, end the answer with this sentence on its own line, without a citation: Confirm with Code Enforcement (207-680-4208) before you build."""
+When the question is about building, altering or demolishing something, or about a fence, shed, deck, pool, sign, home business, adding dwelling units, chickens, a short-term rental, solar panels or a heat pump, end the answer with this sentence on its own line, without a citation: Confirm with Code Enforcement (207-680-4208) before you build. That sentence is the only place the answer gives the office or its phone number, unless the question asks how to reach the office or reports an unsafe condition."""
 
 # Appended to the public prompt when a permit checklist card goes with the
 # answer. The card already carries the documents to bring, the forms, the

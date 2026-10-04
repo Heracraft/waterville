@@ -88,7 +88,7 @@
 		</label>
 		{#if error}<p class="notice error-text" role="alert">{error}</p>{/if}
 		<button type="submit" class="btn" disabled={busy}>{busy ? 'Signing in' : 'Sign in'}</button>
-		<p class="fine">Sessions last 12 hours on this device. Answers on the staff desk are research aids, not determinations of the Code Enforcement Officer.</p>
+		<p class="fine">Sessions last 12 hours on this device.</p>
 	</form>
 </main>
 

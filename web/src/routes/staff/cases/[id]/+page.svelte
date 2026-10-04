@@ -266,7 +266,7 @@
 			</aside>
 		</div>
 
-		<p class="print-foot">Printed from the Waterville staff desk. Saved answers are research aids, not determinations of the Code Enforcement Officer.</p>
+		<p class="print-foot">Printed from the Waterville staff desk.</p>
 
 		<CaseConfirm bind:this={confirmCase} title="Delete case {data.id}?" confirmLabel="Delete case" onconfirm={deleteCase}>
 			<p>This deletes <strong>{caseHeading(data)}</strong> and its {items.length} timeline {items.length === 1 ? 'item' : 'items'} for every staff user.</p>

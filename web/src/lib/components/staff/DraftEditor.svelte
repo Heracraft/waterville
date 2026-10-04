@@ -338,7 +338,7 @@
 				{#if suggestion}
 					<section class="suggestion sheet accent" aria-label="AI draft">
 						<h3>AI draft for {label(suggestion.field)}</h3>
-						<p class="muted small">A first draft from the case record. It may be wrong. Check every fact, date and name before you use it.</p>
+						<p class="muted small">A first draft from the case record. Check every fact, date and name before you use it.</p>
 						<p class="sug-text">{suggestion.text}</p>
 						<div class="btn-row">
 							<button type="button" class="btn small" onclick={() => useSuggestion('replace')}>Use this text</button>
@@ -362,7 +362,7 @@
 					onchange={fieldsChanged}
 					onai={draftFacts}
 					{aiBusy}
-					aiNote={caseId ? 'Drafts this field from the case notes and the form. Check every fact before the CEO signs.' : 'No case is linked, so the AI sees only the form. Link a case for better facts.'}
+					aiNote={caseId ? 'Drafts this field from the case notes and the form.' : 'No case is linked, so the AI sees only the form. Link a case for better facts.'}
 				/>
 
 				{#if template.tools.includes('penalty')}

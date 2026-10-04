@@ -84,7 +84,7 @@
 					{/if}
 					{#if f.help}<span class="help">{f.help}</span>{/if}
 					{#if f.ai && onai}
-						<span class="help ai-help" id="{id}-ai">{aiNote || 'Drafts this field from the case notes. Check every fact before you sign.'}</span>
+						<span class="help ai-help" id="{id}-ai">{aiNote || 'Drafts this field from the case notes.'}</span>
 					{/if}
 				</div>
 			{/each}

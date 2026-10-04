@@ -92,8 +92,7 @@
 <main class="wrap fees">
 	<div class="page-head">
 		<p class="page-lede">
-			Estimates from the fee formulas the city publishes on its forms. Every figure here is an estimate. The office
-			confirms the fee when you apply.
+			Estimates from the fee formulas the city publishes on its forms.
 		</p>
 	</div>
 
